@@ -90,9 +90,6 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
-#ifdef WIN32
-#include <time.h>
-#endif
 
 /* PABLO support files */
 #ifdef HAVE_PABLO
@@ -961,7 +958,7 @@ typedef int               hdf_pint_t;   /* an integer the same size as a pointer
 #endif /* INTEL86 */
 #endif /* !(defined(macintosh) || defined(MAC)) */
 
-#if defined(NEXT) || defined(NeXT)
+#if defined(NEXT) || defined(NeXT) || defined(__APPLE__)
 
 #ifndef NEXT
 #define NEXT
