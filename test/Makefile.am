@@ -11,7 +11,7 @@ AM_CPPFLAGS=-I$(top_srcdir)/src -I$(top_srcdir)/test
 TESTS = gentest
 check_PROGRAMS = gentest
 
-lib_LTLIBRARIES = libmcgill.la
+noinst_LTLIBRARIES = libmcgill.la
 CSOURCES = mcgill.c
 CHEADERS = mcgill.h
 libmcgill_la_SOURCES = $(CSOURCES)

@@ -8,7 +8,7 @@ AM_CPPFLAGS=-I$(top_srcdir)/src  -I$(top_srcdir)/test
 ##                              Testing                                    ##
 #############################################################################
 
-bin_PROGRAMS = burst_szip example
+noinst_PROGRAMS = burst_szip example
 
 burst_szip_SOURCES = burst_szip.c
 burst_szip_LDADD =  ../test/libmcgill.la ../src/libsz.la
