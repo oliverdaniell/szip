@@ -1,10 +1,12 @@
+
 /*==============================================================================
-The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
-Science & Technology Corporation @ UNM.  All rights released and licensed
-to ICs Corp. for distribution  by the University of Illinois' National 
-Center for Supercomputing Applications as a part of the HDF data storage 
-and retrieval file format and software library products package. All 
-rights reserved.  Do not modify or use for other purposes.
+The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
+& Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
+H. Miles and Jack A. Venbrux.  Licensed to ICs Corp. for distribution by the
+University of Illinois' National Center for Supercomputing Applications as a
+part of the HDF data storage and retrieval file format and software library
+products package.  All rights reserved.  Do not modify or use for other
+purposes.
 
 SZIP implements an extended Rice adaptive lossless compression algorithm
 for sample data.  The primary algorithm was developed by R. F. Rice at

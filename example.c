@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "szlib.h"
 
+#define MAX_IMAGE_SIZE (1024*1024L)
+
 #if 0
 const char hello[] = "AAAAAAAAAAAAAAAA";
 #endif
@@ -20,8 +22,8 @@ char *image_in;
 char *image_in2;
 char *image_out;
 
-long test_decoding(char *in, long size, char *out, long out_size, long buffer_size);
-long test_encoding(char *in, long size, char *out, long buffer_size);
+long test_decoding(int bits_per_pixel, char *in, long size, char *out, long out_size, long buffer_size);
+long test_encoding(int bits_per_pixel, char *in, long size, char *out, long buffer_size);
 
 long
 read_image(file_name)
@@ -54,24 +56,30 @@ char *file_name;
 }
 
 long
-test_encoding(in, size, out, buffer_size)
+test_encoding(bits_per_pixel, in, size, out, buffer_size)
+int bits_per_pixel;
 char *in;
 long size;
 char *out;
 long buffer_size;
 {
 	sz_stream c_stream;
+	int bytes_per_pixel;
 	int err;
 	int len;
 
 	c_stream.hidden = 0;
 
-	c_stream.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_ALLOW_K13_OPTION_MASK;
-	c_stream.bits_per_pixel = 8;
+	c_stream.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_MSB_OPTION_MASK;
+	c_stream.bits_per_pixel = bits_per_pixel;
 	c_stream.pixels_per_block = 8;
 	c_stream.pixels_per_scanline = 16;
 
-	c_stream.image_pixels = size;
+	bytes_per_pixel = (bits_per_pixel + 7)/8;
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
+
+	c_stream.image_pixels = size/bytes_per_pixel;
 
 	len = size;
 
@@ -100,7 +108,7 @@ long buffer_size;
 			fprintf(stderr, "SZ_Compress error: %d\n", err);
 			exit(1);
 			}
-	}
+		}
 
 	for (;;)
 		{
@@ -117,7 +125,7 @@ long buffer_size;
 			fprintf(stderr, "SZ_Compress error: %d\n", err);
 			exit(1);
 			}
-	    }
+		}
 
 	err = SZ_CompressEnd(&c_stream);
 	if (err != SZ_OK)
@@ -143,13 +151,15 @@ long buffer_size;
 }
 
 long
-test_decoding(in, size, out, out_size, buffer_size)
+test_decoding(bits_per_pixel, in, size, out, out_size, buffer_size)
+int bits_per_pixel;
 char *in;
 long size;
 char *out;
 long out_size;
 long buffer_size;
 {
+	int bytes_per_pixel;
 	int err;
 	sz_stream d_stream;
 
@@ -166,12 +176,16 @@ long buffer_size;
 	d_stream.total_in = 0;
 	d_stream.total_out = 0;
 
-	d_stream.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_ALLOW_K13_OPTION_MASK;
-	d_stream.bits_per_pixel = 8;
+	d_stream.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_MSB_OPTION_MASK;
+	d_stream.bits_per_pixel = bits_per_pixel;
 	d_stream.pixels_per_block = 8;
 	d_stream.pixels_per_scanline = 16;
 
-	d_stream.image_pixels = out_size;
+	bytes_per_pixel = (bits_per_pixel + 7)/8;
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
+
+	d_stream.image_pixels = out_size/bytes_per_pixel;
 
 	err = SZ_DecompressInit(&d_stream);
 	if (err != SZ_OK)
@@ -221,13 +235,26 @@ long buffer_size;
 	return d_stream.total_out;
 }
 
+/**********************************************/
+/*** Usage: example [bits_per_pixel]        ***/
+/*** default bits_per_pixel = 8             ***/ 
+/**********************************************/
+
+/****************************************** **************/
+/*** To generate random image file, run the following: ***/
+/*** burst_szip -msb # 8 1024 16 image.#.in            ***/
+/*** Where # is the bits_per_pixel value               ***/
+/*********************************************************/
+
 int
 main(argc, argv)
 int argc;
 char *argv[];
 {
 	char *compr;
+	char file_name[256];
 	char *uncompr;
+	int bits_per_pixel;
 	long comprLen = 10000*sizeof(int);
 	long uncomprLen = comprLen;
 	size_t size;
@@ -237,22 +264,35 @@ char *argv[];
 	int i;
 	SZ_com_t params;
 
+	if (argc == 1)
+		bits_per_pixel = 8;
+	else if (argc == 2)
+		bits_per_pixel = atoi(argv[1]);
+
+	sprintf(file_name, "image.%d.in", bits_per_pixel);
+
 	compr    = (char *) calloc(comprLen, 1);
 	uncompr  = (char *) calloc(uncomprLen, 1);
 	if (compr == SZ_NULL || uncompr == SZ_NULL)
 		{
 		fprintf(stderr, "out of memory\n");
 		exit(1);
-		}
+	    }
 
-	image_in  = (char *) malloc(1024*1024);
-	image_out = (char *) malloc(1024*1024);
-	image_in2 = (char *) malloc(1024*1024);
+	image_in  = (char *) malloc(MAX_IMAGE_SIZE);
+	image_out = (char *) malloc(MAX_IMAGE_SIZE*2);
+	image_in2 = (char *) malloc(MAX_IMAGE_SIZE);
 
 	strcpy(image_out, "Junk!!!");
 	strcpy(image_in2, "Junk!!!");
 
-	image_size = read_image("image.in");
+	image_size = read_image(file_name);
+	if (image_size > MAX_IMAGE_SIZE)
+		{
+		fprintf(stderr, "MAX_IMAGE_SIZE of %ld exceeded.\n", MAX_IMAGE_SIZE);
+		exit(1);
+		}
+
 	printf("Image size %ld \n", image_size);
 
 	/*** test with power of two buffer sizes ***/
@@ -263,8 +303,8 @@ char *argv[];
 
 		printf("Testing buffer size = %d\n", i);
 
-		size = test_encoding(image_in, image_size, image_out, i);
-		size = test_decoding(image_out, size, image_in2, image_size, i);
+	    size = test_encoding(bits_per_pixel, image_in, image_size, image_out, i);
+		size = test_decoding(bits_per_pixel, image_out, size, image_in2, image_size, i);
 #if 0
 		image_in2[1111] ^= 0x44;
 #endif
@@ -275,12 +315,12 @@ char *argv[];
 		if (rv)
 			exit(1);
 
-		params.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_ALLOW_K13_OPTION_MASK;
-		params.bits_per_pixel = 8;
+		params.options_mask = SZ_RAW_OPTION_MASK | SZ_NN_OPTION_MASK | SZ_MSB_OPTION_MASK;
+		params.bits_per_pixel = bits_per_pixel;
 		params.pixels_per_block = 8;
 		params.pixels_per_scanline = 16;
 		
-		size = 1024*1024;
+		size = 2*MAX_IMAGE_SIZE;
 #if 0
 		size = 8000;
 #endif
@@ -294,7 +334,7 @@ char *argv[];
 			exit(1);
 			}
 
-		size2 = 1024*1024;
+		size2 = MAX_IMAGE_SIZE;
 #if 0
 		size2 = 14000;
 #endif

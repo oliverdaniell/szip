@@ -1,10 +1,12 @@
+
 /*==============================================================================
-The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
-Science & Technology Corporation @ UNM.  All rights released and licensed
-to ICs Corp. for distribution  by the University of Illinois' National 
-Center for Supercomputing Applications as a part of the HDF data storage 
-and retrieval file format and software library products package. All 
-rights reserved.  Do not modify or use for other purposes.
+The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
+& Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
+H. Miles and Jack A. Venbrux.  Licensed to ICs Corp. for distribution by the
+University of Illinois' National Center for Supercomputing Applications as a
+part of the HDF data storage and retrieval file format and software library
+products package.  All rights reserved.  Do not modify or use for other
+purposes.
 
 SZIP implements an extended Rice adaptive lossless compression algorithm
 for sample data.  The primary algorithm was developed by R. F. Rice at
@@ -30,20 +32,6 @@ For commercial use license to SZIP compression software routines and underlying
 patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
-==============================================================================*/
-/*==============================================================================
-To compile szip on the following operating systems do:
-
-UNIX:      cc -o szip rice.c
-MSDOS:     cc -o szip -DMSDOS rice.c
-WINDOWS95: cc -o szip -DWINDOWS95 rice.c
-WINDOSNT:  cc -o szip -DWINDOWS95 rice.c
-
-If you compiler is not named "cc", then replace "cc" above with the name of
-your compiler.
-
-The szip program will run much faster when compiler optimization options are
-used.
 ==============================================================================*/
 #include <stdlib.h>
 #include <stdio.h>
@@ -5332,7 +5320,7 @@ char **argv;
 	exit(0);
 
 	if (chip)
-		;
+		;	/*** removes chip not used warning ***/
 }
 
 static void
@@ -5518,7 +5506,7 @@ char **msg;
 #endif
 
 #endif /*** HDF ***/
-
+/*
 #if !HDF
 main(argc, argv)
 int argc;
@@ -5678,3 +5666,4 @@ char *argv[];
 	return 0;
 }
 #endif
+*/

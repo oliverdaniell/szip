@@ -1,20 +1,38 @@
-To build SZIP Library
+#### This is a README file for SZIP source distribution
+#### See rice.h for copyright information
 
-./configure --prefix=...
-make
-make test
-make install
+
+1. To build SZIP Library
+========================
+              ./configure --prefix=...
+              make
+              make test
+              make install
 
 To build shared and static SZIP Libraries use -s flag with configure.
 Default compiler is gcc. Use 
 
-setenv CC "....." 
-setenv CFLAGS "...."
+              setenv CC "....." 
+              setenv CFLAGS "...."
 
 to set desired compiler and flags. 
 
-Known problems:
+2. To run example
+==================
 
-"make test" invokes SZIP test that seems to go into infinite loop. EIP, 3/12/03
+First generate generate random image file
+ 
+              burst_szip -msb # 8 1024 16 image.#.in         
+
+where # is the bits_per_pixel value           
+
+Then run example
+
+              example [bits_per_pixel]        
+
+default bits_per_pixel = 8 
+
+
+
 
  

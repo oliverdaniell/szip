@@ -1,5 +1,5 @@
 # Makefile for szlib
-# Copied from GNU ZLIB Makefile.in
+# Created from GNU ZLIB Makefile.in
 # We need to put refer to ZLIB  and SZIP copyright statements here.
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # To compile and test, type:
@@ -39,16 +39,18 @@ exec_prefix = ${prefix}
 libdir = ${exec_prefix}/lib
 includedir = ${prefix}/include
 
-OBJS = rice.o sz_api.o
+OBJS = rice.o sz_api.o 
 
 
-TEST_OBJS = example.o  burst_szip.o mcgill.o
+EXAMPLE_OBJS = example.o  burst_szip.o mcgill.o
+TEST_OBJS = gentest.o mcgill.o 
 
-all: example burst_szip 
+#all: example burst_szip 
+all: gentest example burst_szip
 
 test: all
 	@LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ; export LD_LIBRARY_PATH; \
-	./testit
+	./gentest
 
 libsz.a: $(OBJS) $(OBJA)
 	$(AR) $@ $(OBJS) $(OBJA)
@@ -70,11 +72,14 @@ example: example.o $(LIBS)
 burst_szip: burst_szip.o $(LIBS) 
 	$(CC) $(CFLAGS) -o $@ burst_szip.o mcgill.o -lm
 
+gentest: gentest.o $(LIBS) 
+	$(CC) $(CFLAGS) -o $@ gentest.o mcgill.o $(LDFLAGS) -lm
+
 install: $(LIBS)
 	-@if [ ! -d $(includedir)  ]; then mkdir $(includedir); fi
 	-@if [ ! -d $(libdir) ]; then mkdir $(libdir); fi
-	cp szlib.h szip_adpt.h $(includedir)
-	chmod 644 $(includedir)/szlib.h $(includedir)/szip_adpt.h
+	cp szlib.h szip_adpt.h rice.h ricehdf.h $(includedir)
+	chmod 644 $(includedir)/szlib.h $(includedir)/szip_adpt.h $(includedir)/rice*.h
 	cp $(LIBS) $(libdir)
 	cd $(libdir); chmod 755 $(LIBS)
 	-@(cd $(libdir); $(RANLIB) libsz.a || true) >/dev/null 2>&1
@@ -92,7 +97,7 @@ uninstall:
 	v=$(VER); \
 	if test -f szlib.h; then \
 	  v=`sed -n '/VERSION "/s/.*"\(.*\)".*/\1/p' < szlib.h`; \
-          rm -f szlib.h ; \
+          rm -f szlib.h szip_adpt.h rice.h ricehdf.h; \
 	fi; \
 	cd $(libdir); rm -f libsz.a; \
 	if test -f $(SHAREDLIB).$$v; then \
@@ -100,10 +105,10 @@ uninstall:
 	fi
 
 clean:
-	rm -f *.o *~ example burst_szip mcgill image.in libsz.a libsz.so*
+	rm -f *.o *~ example burst_szip mcgill gentest image* libsz.a libsz.so*
 
 distclean:	
-	rm -f Makefile *.o *~ example burst_szip mcgill image.in libsz.a libsz.so* 
+	rm -f Makefile *.o *~ example burst_szip mcgill gentest image* libsz.a libsz.so* 
 
 
 depend:
@@ -112,7 +117,9 @@ depend:
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
 example.o: szlib.h 
+gentest.o: szlib.h 
 mcgill.o: mcgill.h
 rice.o: rice.h
 sz_api.o: szlib.h
 burst_szip: mcgill.o
+gentest: mcgill.o 
