@@ -203,7 +203,7 @@ char *msg;
 static void
 binary_mode()
 {
-#if defined(MSDOS) || defined(WINDOWS95)
+#if defined(MSDOS) || defined(WINDOWS95) || defined(WIN32)
 	if (_setmode(_fileno(stdin), _O_BINARY) == -1)
 		{
 		error("Could not change standard input mode to binary.");

@@ -42,7 +42,7 @@ char *file_name;
 	int n;
 	long size;
 
-	if ((fp = fopen(file_name, "r")) == 0)
+	if ((fp = fopen(file_name, "rb")) == 0)
 		{
 		fprintf(stderr, "Could not open input file: %s\n", file_name);
 		exit(1);
