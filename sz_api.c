@@ -368,6 +368,7 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 	long out_size;
 	long pixels;
 	long output_bytes;
+    unsigned allocate_buffer=0; /* Flag to indicate if we allocate a buffer */
 
 	sz = param;
 	if (sz == 0)
@@ -389,6 +390,7 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 	else
 		{
 		image_out = (char *) malloc(out_size);
+        allocate_buffer=1;
 		if (image_out == 0)
 			return SZ_MEM_ERROR;
 		}
@@ -402,6 +404,10 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 
 	if (image_out != dest)
 		memcpy(dest, image_out, *destLen);
+
+    /* Release the temporary buffer, if we allocated one */
+    if(allocate_buffer)
+        free(image_out);
 
 	return rv;
 }
