@@ -1,4 +1,3 @@
-
 /*==============================================================================
 The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
 & Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
@@ -32,6 +31,20 @@ For commercial use license to SZIP compression software routines and underlying
 patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
+==============================================================================*/
+/*==============================================================================
+To compile szip on the following operating systems do:
+
+UNIX:      cc -o szip rice.c
+MSDOS:     cc -o szip -DMSDOS rice.c
+WINDOWS95: cc -o szip -DWINDOWS95 rice.c
+WINDOSNT:  cc -o szip -DWINDOWS95 rice.c
+
+If you compiler is not named "cc", then replace "cc" above with the name of
+your compiler.
+
+The szip program will run much faster when compiler optimization options are
+used.
 ==============================================================================*/
 #include <stdlib.h>
 #include <stdio.h>
@@ -3599,77 +3612,16 @@ int pixels;
 	end = sigma + pixels;
 	s = sigma;
 	xptr = bptr;
-	if (bytes_per_pixel == 1)
+	if (pixels & 1)
 		{
-		x = *s++;
-		*xptr++ = x;
-
-		sig1 = *s++;
-		if (sig1 >= (x << 1))
-			x = sig1;
-		else if (sig1 > (xmax - x) << 1)
-			x = xmax - sig1;
-		else if (sig1 & 1)
-			x = x - ((sig1 + 1) >> 1);
-		else 
-			x = x + (sig1 >> 1);
-
-		*xptr++ = x;
-
-		while (s < end)
-			{
-			sig1 = *s++;
-			sig2 = *s++;
-			if (sig1 >= (x << 1))
-				x = sig1;
-			else if (sig1 > (xmax - x) << 1)
-				x = xmax - sig1;
-			else if (sig1 & 1)
-				x = x - ((sig1 + 1) >> 1);
-			else 
-				x = x + (sig1 >> 1);
-
-			*xptr++ = x;
-
-			if (sig2 >= (x << 1))
-				x = sig2;
-			else if (sig2 > (xmax - x) << 1)
-				x = xmax - sig2;
-			else if (sig2 & 1)
-				x = x - ((sig2 + 1) >> 1);
-			else 
-				x = x + (sig2 >> 1);
-
-			*xptr++ = x;
-			}
-
-		bptr += pixels;
-		}
-	else if (bytes_per_pixel == 2)
-		{
-		if (msb_first)
+		if (bytes_per_pixel == 1)
 			{
 			x = *s++;
-			*xptr++ = (unsigned) x >> 8;
-			*xptr++ = x;
-
-			sig1 = *s++;
-			if (sig1 >= (x << 1))
-				x = sig1;
-			else if (sig1 > (xmax - x) << 1)
-				x = xmax - sig1;
-			else if (sig1 & 1)
-				x = x - ((sig1 + 1) >> 1);
-			else 
-				x = x + (sig1 >> 1);
-
-			*xptr++ = (unsigned) x >> 8;
 			*xptr++ = x;
 
 			while (s < end)
 				{
 				sig1 = *s++;
-				sig2 = *s++;
 				if (sig1 >= (x << 1))
 					x = sig1;
 				else if (sig1 > (xmax - x) << 1)
@@ -3678,84 +3630,128 @@ int pixels;
 					x = x - ((sig1 + 1) >> 1);
 				else 
 					x = x + (sig1 >> 1);
-
-				*xptr++ = (unsigned) x >> 8;
-				*xptr++ = x;
-
-				if (sig2 >= (x << 1))
-					x = sig2;
-				else if (sig2 > (xmax - x) << 1)
-					x = xmax - sig2;
-				else if (sig2 & 1)
-					x = x - ((sig2 + 1) >> 1);
-				else 
-					x = x + (sig2 >> 1);
-
-				*xptr++ = (unsigned) x >> 8;
+	
 				*xptr++ = x;
 				}
 
-			bptr += pixels << 1;
+			bptr += pixels;
+			}
+		else if (bytes_per_pixel == 2)
+			{
+			if (msb_first)
+				{
+				x = *s++;
+				*xptr++ = (unsigned) x >> 8;
+				*xptr++ = x;
+
+				while (s < end)
+					{
+					sig1 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+	
+					*xptr++ = (unsigned) x >> 8;
+					*xptr++ = x;
+					}
+
+				bptr += pixels << 1;
+				}
+			else
+				{
+				x = *s++;
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >> 8;
+
+				while (s < end)
+					{
+					sig1 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+	
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >> 8;
+					}
+
+				bptr += pixels << 1;
+				}
 			}
 		else
 			{
-			x = *s++;
-			*xptr++ = x;
-			*xptr++ = (unsigned) x >> 8;
-
-			sig1 = *s++;
-			if (sig1 >= (x << 1))
-				x = sig1;
-			else if (sig1 > (xmax - x) << 1)
-				x = xmax - sig1;
-			else if (sig1 & 1)
-				x = x - ((sig1 + 1) >> 1);
-			else 
-				x = x + (sig1 >> 1);
-
-			*xptr++ = x;
-			*xptr++ = (unsigned) x >> 8;
-
-			while (s < end)
+			if (msb_first)
 				{
-				sig1 = *s++;
-				sig2 = *s++;
-				if (sig1 >= (x << 1))
-					x = sig1;
-				else if (sig1 > (xmax - x) << 1)
-					x = xmax - sig1;
-				else if (sig1 & 1)
-					x = x - ((sig1 + 1) >> 1);
-				else 
-					x = x + (sig1 >> 1);
-
+				x = *s++;
+				*xptr++ = (unsigned) x >> 24;
+				*xptr++ = (unsigned) x >> 16;
+				*xptr++ = (unsigned) x >>  8;
 				*xptr++ = x;
-				*xptr++ = (unsigned) x >> 8;
 
-				if (sig2 >= (x << 1))
-					x = sig2;
-				else if (sig2 > (xmax - x) << 1)
-					x = xmax - sig2;
-				else if (sig2 & 1)
-					x = x - ((sig2 + 1) >> 1);
-				else 
-					x = x + (sig2 >> 1);
+				while (s < end)
+					{
+					sig1 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
 
-				*xptr++ = x;
-				*xptr++ = (unsigned) x >> 8;
+					*xptr++ = (unsigned) x >> 24;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = x;
+					}
+
+				bptr += pixels << 2;
 				}
+			else
+				{
+				x = *s++;
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >>  8;
+				*xptr++ = (unsigned) x >> 16;
+				*xptr++ = (unsigned) x >> 24;
 
-			bptr += pixels << 1;
+				while (s < end)
+					{
+					sig1 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >> 24;
+					}
+
+				bptr += pixels << 2;
+				}
 			}
 		}
 	else
 		{
-		if (msb_first)
+		if (bytes_per_pixel == 1)
 			{
 			x = *s++;
-			*xptr++ = (unsigned) x >> 24;
-			*xptr++ = (unsigned) x >> 16;
-			*xptr++ = (unsigned) x >>  8;
 			*xptr++ = x;
 
 			sig1 = *s++;
@@ -3768,11 +3764,8 @@ int pixels;
 			else 
 				x = x + (sig1 >> 1);
 
-			*xptr++ = (unsigned) x >> 24;
-			*xptr++ = (unsigned) x >> 16;
-			*xptr++ = (unsigned) x >>  8;
 			*xptr++ = x;
-
+	
 			while (s < end)
 				{
 				sig1 = *s++;
@@ -3786,9 +3779,6 @@ int pixels;
 				else 
 					x = x + (sig1 >> 1);
 
-				*xptr++ = (unsigned) x >> 24;
-				*xptr++ = (unsigned) x >> 16;
-				*xptr++ = (unsigned) x >>  8;
 				*xptr++ = x;
 
 				if (sig2 >= (x << 1))
@@ -3800,41 +3790,125 @@ int pixels;
 				else 
 					x = x + (sig2 >> 1);
 
-				*xptr++ = (unsigned) x >> 24;
-				*xptr++ = (unsigned) x >> 16;
-				*xptr++ = (unsigned) x >>  8;
 				*xptr++ = x;
 				}
 
-			bptr += pixels << 2;
+			bptr += pixels;
+			}
+		else if (bytes_per_pixel == 2)
+			{
+			if (msb_first)
+				{
+				x = *s++;
+				*xptr++ = (unsigned) x >> 8;
+				*xptr++ = x;
+
+				sig1 = *s++;
+				if (sig1 >= (x << 1))
+					x = sig1;
+				else if (sig1 > (xmax - x) << 1)
+					x = xmax - sig1;
+				else if (sig1 & 1)
+					x = x - ((sig1 + 1) >> 1);
+				else 
+					x = x + (sig1 >> 1);
+
+				*xptr++ = (unsigned) x >> 8;
+				*xptr++ = x;
+
+				while (s < end)
+					{
+					sig1 = *s++;
+					sig2 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+
+					*xptr++ = (unsigned) x >> 8;
+					*xptr++ = x;
+
+					if (sig2 >= (x << 1))
+						x = sig2;
+					else if (sig2 > (xmax - x) << 1)
+						x = xmax - sig2;
+					else if (sig2 & 1)
+						x = x - ((sig2 + 1) >> 1);
+					else 
+						x = x + (sig2 >> 1);
+
+					*xptr++ = (unsigned) x >> 8;
+					*xptr++ = x;
+					}
+
+				bptr += pixels << 1;
+				}
+			else
+				{
+				x = *s++;
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >> 8;
+
+				sig1 = *s++;
+				if (sig1 >= (x << 1))
+					x = sig1;
+				else if (sig1 > (xmax - x) << 1)
+					x = xmax - sig1;
+				else if (sig1 & 1)
+					x = x - ((sig1 + 1) >> 1);
+				else 
+					x = x + (sig1 >> 1);
+
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >> 8;
+
+				while (s < end)
+					{
+					sig1 = *s++;
+					sig2 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >> 8;
+
+					if (sig2 >= (x << 1))
+						x = sig2;
+					else if (sig2 > (xmax - x) << 1)
+						x = xmax - sig2;
+					else if (sig2 & 1)
+						x = x - ((sig2 + 1) >> 1);
+					else 
+						x = x + (sig2 >> 1);
+
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >> 8;
+					}
+
+				bptr += pixels << 1;
+				}
 			}
 		else
 			{
-			x = *s++;
-			*xptr++ = x;
-			*xptr++ = (unsigned) x >>  8;
-			*xptr++ = (unsigned) x >> 16;
-			*xptr++ = (unsigned) x >> 24;
-
-			sig1 = *s++;
-			if (sig1 >= (x << 1))
-				x = sig1;
-			else if (sig1 > (xmax - x) << 1)
-				x = xmax - sig1;
-			else if (sig1 & 1)
-				x = x - ((sig1 + 1) >> 1);
-			else 
-				x = x + (sig1 >> 1);
-
-			*xptr++ = x;
-			*xptr++ = (unsigned) x >>  8;
-			*xptr++ = (unsigned) x >> 16;
-			*xptr++ = (unsigned) x >> 24;
-
-			while (s < end)
+			if (msb_first)
 				{
+				x = *s++;
+				*xptr++ = (unsigned) x >> 24;
+				*xptr++ = (unsigned) x >> 16;
+				*xptr++ = (unsigned) x >>  8;
+				*xptr++ = x;
+
 				sig1 = *s++;
-				sig2 = *s++;
 				if (sig1 >= (x << 1))
 					x = sig1;
 				else if (sig1 > (xmax - x) << 1)
@@ -3844,27 +3918,104 @@ int pixels;
 				else 
 					x = x + (sig1 >> 1);
 
-				*xptr++ = x;
-				*xptr++ = (unsigned) x >>  8;
-				*xptr++ = (unsigned) x >> 16;
 				*xptr++ = (unsigned) x >> 24;
-
-				if (sig2 >= (x << 1))
-					x = sig2;
-				else if (sig2 > (xmax - x) << 1)
-					x = xmax - sig2;
-				else if (sig2 & 1)
-					x = x - ((sig2 + 1) >> 1);
-				else 
-					x = x + (sig2 >> 1);
-
-				*xptr++ = x;
-				*xptr++ = (unsigned) x >>  8;
 				*xptr++ = (unsigned) x >> 16;
-				*xptr++ = (unsigned) x >> 24;
+				*xptr++ = (unsigned) x >>  8;
+				*xptr++ = x;
+
+				while (s < end)
+					{
+					sig1 = *s++;
+					sig2 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+
+					*xptr++ = (unsigned) x >> 24;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = x;
+
+					if (sig2 >= (x << 1))
+						x = sig2;
+					else if (sig2 > (xmax - x) << 1)
+						x = xmax - sig2;
+					else if (sig2 & 1)
+						x = x - ((sig2 + 1) >> 1);
+					else 
+						x = x + (sig2 >> 1);
+
+					*xptr++ = (unsigned) x >> 24;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = x;
+					}
+
+				bptr += pixels << 2;
 				}
-
-			bptr += pixels << 2;
+			else
+				{
+				x = *s++;
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >>  8;
+				*xptr++ = (unsigned) x >> 16;
+				*xptr++ = (unsigned) x >> 24;
+	
+				sig1 = *s++;
+				if (sig1 >= (x << 1))
+					x = sig1;
+				else if (sig1 > (xmax - x) << 1)
+					x = xmax - sig1;
+				else if (sig1 & 1)
+					x = x - ((sig1 + 1) >> 1);
+				else 
+					x = x + (sig1 >> 1);
+	
+				*xptr++ = x;
+				*xptr++ = (unsigned) x >>  8;
+				*xptr++ = (unsigned) x >> 16;
+				*xptr++ = (unsigned) x >> 24;
+	
+				while (s < end)
+					{
+					sig1 = *s++;
+					sig2 = *s++;
+					if (sig1 >= (x << 1))
+						x = sig1;
+					else if (sig1 > (xmax - x) << 1)
+						x = xmax - sig1;
+					else if (sig1 & 1)
+						x = x - ((sig1 + 1) >> 1);
+					else 
+						x = x + (sig1 >> 1);
+	
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >> 24;
+	
+					if (sig2 >= (x << 1))
+						x = sig2;
+					else if (sig2 > (xmax - x) << 1)
+						x = xmax - sig2;
+					else if (sig2 & 1)
+						x = x - ((sig2 + 1) >> 1);
+					else 
+						x = x + (sig2 >> 1);
+	
+					*xptr++ = x;
+					*xptr++ = (unsigned) x >>  8;
+					*xptr++ = (unsigned) x >> 16;
+					*xptr++ = (unsigned) x >> 24;
+					}
+	
+				bptr += pixels << 2;
+				}
 			}
 		}
 }
@@ -5506,7 +5657,7 @@ char **msg;
 #endif
 
 #endif /*** HDF ***/
-/*
+
 #if !HDF
 main(argc, argv)
 int argc;
@@ -5666,4 +5817,3 @@ char *argv[];
 	return 0;
 }
 #endif
-*/
