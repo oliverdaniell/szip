@@ -97,19 +97,25 @@ Post Falls, ID 83854.  (208) 262-2008.
 #define SZ_STREAM_END	1
 #define SZ_OUTBUFF_FULL 2
 
-#define SZ_STREAM_ERROR (-1)
-#define SZ_MEM_ERROR    (-2)
-#define SZ_INIT_ERROR   (-3)
-#define SZ_PARAM_ERROR  (-4)
+/*** API error values defined in ricehdf.h ***/
+/* SZ_STREAM_ERROR */
+/* SZ_MEM_ERROR    */
+/* SZ_INIT_ERROR   */
+/* SZ_PARAM_ERROR  */
 
-#define SZ_RAW_OPTION_MASK 128
-#define SZ_NN_OPTION_MASK   32
-#define SZ_MSB_OPTION_MASK  16
-#define SZ_LSB_OPTION_MASK   8
+/*** API options_mask values defined in ricehdf.h ***/
+/* SZ_ALLOW_K13_OPTION_MASK */
+/* SZ_CHIP_OPTION_MASK      */
+/* SZ_EC_OPTION_MASK        */
+/* SZ_LSB_OPTION_MASK       */
+/* SZ_MSB_OPTION_MASK       */
+/* SZ_NN_OPTION_MASK        */
+/* SZ_RAW_OPTION_MASK       */
 
-#define SZ_MAX_BLOCKS_PER_SCANLINE		128
-#define SZ_MAX_PIXELS_PER_BLOCK	 	 32
-#define SZ_MAX_PIXELS_PER_SCANLINE     (SZ_MAX_BLOCKS_PER_SCANLINE)*(SZ_MAX_PIXELS_PER_BLOCK)
+/*** API MAX limits defined in ricehdf.h ***/
+/* SZ_MAX_BLOCKS_PER_SCANLINE */
+/* SZ_MAX_PIXELS_PER_BLOCK    */
+/* SZ_MAX_PIXELS_PER_SCANLINE */
 
 typedef struct sz_hidden_data_s
 	{

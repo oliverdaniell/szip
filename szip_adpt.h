@@ -1,7 +1,7 @@
 /*
  * This files has neccesary definitions to provide SZIP DLL 
  * support on Windows platfroms, both MSVC and CodeWarrior 
-	* compilers
+ * compilers
  */
 
 #ifndef SZAPI_ADPT_H

@@ -1,4 +1,3 @@
-
 /*==============================================================================
 The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
 & Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
@@ -46,6 +45,15 @@ Post Falls, ID 83854.  (208) 262-2008.
 #define SZ_MSB_OPTION_MASK              16
 #define SZ_NN_OPTION_MASK               32
 #define SZ_RAW_OPTION_MASK             128
+
+#define SZ_STREAM_ERROR (-1)
+#define SZ_MEM_ERROR    (-2)
+#define SZ_INIT_ERROR   (-3)
+#define SZ_PARAM_ERROR  (-4)
+
+#define SZ_MAX_BLOCKS_PER_SCANLINE            128
+#define SZ_MAX_PIXELS_PER_BLOCK                32
+#define SZ_MAX_PIXELS_PER_SCANLINE     (SZ_MAX_BLOCKS_PER_SCANLINE)*(SZ_MAX_PIXELS_PER_BLOCK)
 
 long szip_compress_memory(
 	int options_mask,

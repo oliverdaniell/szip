@@ -1,4 +1,3 @@
-
 /*==============================================================================
 The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
 & Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
@@ -33,6 +32,7 @@ patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
 ==============================================================================*/
+
 #if !defined(__MWERKS__) 
 typedef int boolean;
 #endif
@@ -142,3 +142,6 @@ static struct
 
 #define SZIP_PROGRAM_NAME		"szip"
 #define SUNZIP_PROGRAM_NAME		"sunzip"
+
+#define MEMORY_ERROR	(-2)
+#define PARAM_ERROR		(-4)

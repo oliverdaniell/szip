@@ -148,7 +148,7 @@ SZ_Compress(sz_stream *strm, int flush)
 			sz = strm;
 			output_bytes = szip_compress_memory(sz->options_mask, sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, hidden->image_in, sz->image_pixels, hidden->image_out);
 			if (output_bytes < 0)
-				return SZ_STREAM_ERROR;
+				return output_bytes;
 #if 0
 			printf("compress_memory: output_bytes=%ld\n", output_bytes);
 #endif
@@ -296,7 +296,7 @@ SZ_Decompress(sz_stream *strm, int flush)
 			size_in = hidden->next_in - hidden->image_in;
 			output_bytes = szip_uncompress_memory(sz->options_mask, sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, hidden->image_in, size_in, hidden->image_out, strm->image_pixels);
 			if (output_bytes < 0)
-				return SZ_STREAM_ERROR;
+				return output_bytes;
 
 			hidden->avail_out = output_bytes;
 			sz->state = SZ_OUTPUT_IMAGE;
@@ -405,7 +405,7 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 		if (image_out != dest)
 			free(image_out);
 
-		return SZ_STREAM_ERROR;
+		return output_bytes;
 		}
 
 	rv = SZ_OK;
@@ -449,7 +449,7 @@ SZ_BufftoBuffDecompress(void *dest, size_t *destLen, const void *source, size_t 
 
 	output_bytes = szip_uncompress_memory(sz->options_mask, sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, source, sourceLen, dest, pixels);
 	if (output_bytes < 0)
-		return SZ_STREAM_ERROR;
+		return output_bytes;
 
 	rv = SZ_OK;
 	if (szip_output_buffer_full)
