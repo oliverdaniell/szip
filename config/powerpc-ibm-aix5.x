@@ -1,111 +1,119 @@
-#							-*- shell-script -*-
+#                                                   -*- shell-script -*-
 #
-# This file is part of the HDF5 build script.  It is processed shortly
+# This file is part of the HDF4 build script. It is processed shortly
 # after configure starts and defines, among other things, flags for
-# the various compile modes.
+# the various compilation modes.
 
-# Use AIX supplied C compiler by default, xlc for serial, mpcc_r for parallel.
-# Use -D_LARGE_FILES by default to support large file size.
-if test "X-" =  "X-$CC"; then
-  if test "X-$enable_parallel" = "X-yes"; then
-    CC='mpcc_r -qlanglvl=ansi -D_LARGE_FILES'
-    CC_BASENAME=mpcc_r
-  else
-    CC='xlc -qlanglvl=ansi -D_LARGE_FILES'
-    CC_BASENAME=xlc
-  fi
+# Choosing C, Fortran, and C++ Compilers
+# --------------------------------------
+#
+# The user should be able to specify the compiler by setting the CC, F77,
+# and CXX environment variables to the name of the compiler and any
+# switches it requires for proper operation. If CC is unset then this
+# script may set it. If CC is unset by time this script completes then
+# configure will try `gcc' and `cc' in that order (perhaps some others
+# too).
+#
+# Note: Code later in this file may depend on the value of $CC_BASENAME
+#       in order to distinguish between different compilers when
+#       deciding which compiler command-line switches to use.  This
+#       variable is set based on the incoming value of $CC and is only
+#       used within this file.
+
+if test "X-$CC" = "X-"; then
+  CC=xlc
+  CC_BASENAME=xlc
 fi
 
-# Define RUNPARALLEL if parallel mode is enabled or a parallel compiler used.
-if test "X-$enable_parallel" = "X-yes" -o X-$CC_BASENAME = X-mpcc_r; then
-    RUNPARALLEL=${RUNPARALLEL="MP_PROCS=\$\${NPROCS:=3} MP_TASKS_PER_NODE=\$\${NPROCS:=3} poe"}
-fi
 
-
-#----------------------------------------------------------------------------
-# Compiler flags. The CPPFLAGS values should not include package debug
-# flags like `-DH5G_DEBUG' since these are added with the
-# `--enable-debug' switch of configure.
+# C, Fortran, and C++ Compiler and Preprocessor Flags
+# ---------------------------------------------------
+#
+# - Flags that end with `_CFLAGS' are always passed to the C compiler.
+# - Flags that end with `_FFLAGS' are always passed to the Fortran
+#   compiler.
+# - Flags that end with `_CXXFLAGS' are always passed to the C++ compiler.
+# - Flags that end with `_CPPFLAGS' are passed to the C and C++ compilers
+#   when compiling but not when linking.
+#
+#   DEBUG_CFLAGS
+#   DEBUG_FFLAGS
+#   DEBUG_CXXFLAGS
+#   DEBUG_CPPFLAGS  - Flags to pass to the compiler to create a
+#                     library suitable for use with debugging
+#			          tools. Usually this list will exclude
+#                     optimization switches (like `-O') and include
+#                     switches that turn on symbolic debugging support
+#                     (like `-g').
+#
+#   PROD_CFLAGS
+#   PROD_FFLAGS
+#   PROD_CXXFLAGS
+#   PROD_CPPFLAGS   - Flags to pass to the compiler to create a
+#                     production version of the library. These
+#                     usualy exclude symbolic debugging switches (like
+#                     `-g') and include optimization switches (like
+#                     `-O').
+#
+#   PROFILE_CFLAGS
+#   PROFILE_FFLAGS
+#   PROFILE_CXXFLAGS
+#   PROFILE_CPPFLAGS- Flags to pass to the compiler to create a
+#                     library suitable for performance testing (like
+#                     `-pg').  This may or may not include debugging or
+#                     production flags.
+#			
+#   FFLAGS
+#   CFLAGS          - Flags can be added to these variable which
+#                     might already be partially initialized. These
+#                     flags will always be passed to the compiler and
+#                     should include switches to turn on full warnings.
+#
+#                     WARNING: flags do not have to be added to the CFLAGS
+#                     or FFLAGS variable if the compiler is the GNU gcc
+#                     and g77 compiler.
+#
+#                     FFLAGS and CFLAGS should contain *something* or else
+#                     configure will probably add `-g'. For most systems
+#                     this isn't a problem but some systems will disable
+#                     optimizations in favor of the `-g'. The configure
+#                     script will remove the `-g' flag in production mode
+#                     only.
+#
+# These flags should be set according to the compiler being used.
+# There are two ways to check the compiler. You can try using `-v' or
+# `--version' to see if the compiler will print a version string.  You
+# can use the value of $FOO_BASENAME which is the base name of the
+# first word in $FOO, where FOO is either CC, F77, or CXX (note that the
+# value of CC may have changed above).
 
 case $CC_BASENAME in
-    xlc|mpcc_r)
-	# Turn off shared lib option.  It causes some test suite to fail.
-	enable_shared="${enable_shared:-no}"
-	# CFLAGS must be set else configure set it to -g
-	CFLAGS="$CFLAGS"
-	DEBUG_CFLAGS="-g"
-	DEBUG_CPPFLAGS=
-	# -O causes test/dtypes to fail badly. Turn it off for now.
-	PROD_CFLAGS=""
-	PROD_CPPFLAGS=
-	PROFILE_CFLAGS="-pg"
-	PROFILE_CPPFLAGS=
-	;;
+  gcc)
+    CFLAGS="$CFLAGS"
+    DEBUG_CFLAGS="-g -fverbose-asm"
+    DEBUG_CPPFLAGS=
+    PROD_CFLAGS="-O3 -fomit-frame-pointer"
+    PROD_CPPFLAGS=
+    PROFILE_CFLAGS="-pg"
+    PROFILE_CPPFLAGS=
+    ;;
 
-    gcc)
-	. $srcdir/config/gnu-flags
-	;;
-
-    *)
-	CFLAGS="$CFLAGS -ansi"
-	DEBUG_CFLAGS="-g"
-	DEBUG_CPPFLAGS=
-	PROD_CFLAGS="-O"
-	PROD_CPPFLAGS=
-	PROFILE_CFLAGS="-pg"
-	PROFILE_CPPFLAGS=
-	;;
+  *)
+    CFLAGS="$CFLAGS -D_ALL_SOURCE -qlanglvl=ansi"
+    DEBUG_CFLAGS="-g"
+    DEBUG_CPPFLAGS=
+    PROD_CFLAGS="-O"
+    PROD_CPPFLAGS=
+    PROFILE_CFLAGS="-pg"
+    PROFILE_CPPFLAGS=
+    ;;
 esac
 
-#----------------------------------------------------------------------------
+# Overriding Configure Tests
+# --------------------------
+#
 # Values for overriding configuration tests when cross compiling.
-# This includes compiling on some machines where the serial front end
-# compiles for a parallel back end.
 
 # Set this to `yes' or `no' depending on whether the target is big
 # endian or little endian.
-hdf5_cv_printf_ll=${hdf5_cv_printf_ll='ll'}
-ac_cv_c_bigendian=${ac_cv_c_bigendian='yes'}
-ac_cv_header_stdc=${ac_cv_header_stdc='yes'}
-ac_cv_header_sys_ioctl_h=${ac_cv_header_sys_ioctl_h=yes}
-
-# cache the sizeof of "standard C types" so that configure can run faster.
-ac_cv_sizeof_char=${ac_cv_sizeof_char=1}
-ac_cv_sizeof_short=${ac_cv_sizeof_short=2}
-ac_cv_sizeof_int=${ac_cv_sizeof_int=4}
-ac_cv_sizeof_long_long=${ac_cv_sizeof_long_long=8}
-ac_cv_sizeof___int64=${ac_cv_sizeof___int64=8}
-ac_cv_sizeof_float=${ac_cv_sizeof_float=4}
-ac_cv_sizeof_double=${ac_cv_sizeof_double=8}
-ac_cv_sizeof_long_double=${ac_cv_sizeof_long_double=8}
-ac_cv_sizeof_int8_t=${ac_cv_sizeof_int8_t=1}
-ac_cv_sizeof_uint8_t=${ac_cv_sizeof_uint8_t=1}
-ac_cv_sizeof_int_least8_t=${ac_cv_sizeof_int_least8_t=1}
-ac_cv_sizeof_uint_least8_t=${ac_cv_sizeof_uint_least8_t=1}
-ac_cv_sizeof_int_fast8_t=${ac_cv_sizeof_int_fast8_t=1}
-ac_cv_sizeof_uint_fast8_t=${ac_cv_sizeof_uint_fast8_t=4}
-ac_cv_sizeof_int16_t=${ac_cv_sizeof_int16_t=2}
-ac_cv_sizeof_uint16_t=${ac_cv_sizeof_uint16_t=2}
-ac_cv_sizeof_int_least16_t=${ac_cv_sizeof_int_least16_t=2}
-ac_cv_sizeof_uint_least16_t=${ac_cv_sizeof_uint_least16_t=2}
-ac_cv_sizeof_int_fast16_t=${ac_cv_sizeof_int_fast16_t=4}
-ac_cv_sizeof_uint_fast16_t=${ac_cv_sizeof_uint_fast16_t=4}
-ac_cv_sizeof_int32_t=${ac_cv_sizeof_int32_t=4}
-ac_cv_sizeof_uint32_t=${ac_cv_sizeof_uint32_t=4}
-ac_cv_sizeof_int_least32_t=${ac_cv_sizeof_int_least32_t=4}
-ac_cv_sizeof_uint_least32_t=${ac_cv_sizeof_uint_least32_t=4}
-ac_cv_sizeof_int_fast32_t=${ac_cv_sizeof_int_fast32_t=4}
-ac_cv_sizeof_uint_fast32_t=${ac_cv_sizeof_uint_fast32_t=4}
-ac_cv_sizeof_int64_t=${ac_cv_sizeof_int64_t=8}
-ac_cv_sizeof_uint64_t=${ac_cv_sizeof_uint64_t=8}
-ac_cv_sizeof_int_least64_t=${ac_cv_sizeof_int_least64_t=8}
-ac_cv_sizeof_uint_least64_t=${ac_cv_sizeof_uint_least64_t=8}
-ac_cv_sizeof_int_fast64_t=${ac_cv_sizeof_int_fast64_t=8}
-ac_cv_sizeof_uint_fast64_t=${ac_cv_sizeof_uint_fast64_t=8}
-
-# Don't cache long since it varies between 32 and 64 bits
-#ac_cv_sizeof_long=${ac_cv_sizeof_long=4}
-
-# Don't cache size_t and off_t because they depend on if -D_LARGE_FILES is used
-#ac_cv_sizeof_size_t=${ac_cv_sizeof_size_t=4}
-#ac_cv_sizeof_off_t=${ac_cv_sizeof_off_t=8}
+#ac_cv_c_bigendian=${ac_cv_c_bigendian='yes'}

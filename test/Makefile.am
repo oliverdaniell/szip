@@ -13,9 +13,7 @@ check_PROGRAMS = gentest
 
 noinst_LTLIBRARIES = libmcgill.la
 CSOURCES = mcgill.c
-CHEADERS = mcgill.h
 libmcgill_la_SOURCES = $(CSOURCES)
-include_HEADERS = $(CHEADERS)
 
 gentest_SOURCES = gentest.c 
 gentest_LDADD = ./libmcgill.la ../src/libsz.la

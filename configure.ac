@@ -2,12 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([SZIP], [1.2], [hdfhelp@ncsa.uiuc.edu])
+AC_INIT([SZIP], [2.0], [hdfhelp@ncsa.uiuc.edu])
 AC_CONFIG_SRCDIR([src/rice.h])
 AC_CONFIG_AUX_DIR([bin])
 AC_CONFIG_HEADER([src/SZconfig.h])
 
-AM_INIT_AUTOMAKE([SZIP], [1.2])
+AM_INIT_AUTOMAKE([SZIP], [2.0])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
