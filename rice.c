@@ -192,7 +192,10 @@ static void
 warning(msg)
 char *msg;
 {
+/* Disable warning output if compiled as part of the HDF library */
+#if !HDF
 	fprintf(stderr, "WARNING: %s: %s\n", input_file_name, msg);
+#endif /* !HDF */
 	warning_count++;
 }
 
@@ -1778,13 +1781,11 @@ rice_encode()
 		else if (bits_per_pixel > 8)
 			pixels_read >>= 1;
 
-#if !HDF
 		if (pixels_read % pixels_per_scanline)
 			{
 			sprintf(msg, "More data will be decoded than was encoded.");
 			warning(msg);
 			}
-#endif
 		}
 
 	if (total_bytes_read == 0)
@@ -2527,6 +2528,7 @@ set_defaults()
 	pixels_per_scanline = DEFAULT_PIXELS_PER_SCANLINE;
 }
 
+#if !HDF
 static void
 help(name)
 char *name;
@@ -2707,6 +2709,7 @@ char **argv;
 			}
 		}
 }
+#endif /* !HDF */
 
 static void
 check_args()
