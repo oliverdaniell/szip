@@ -144,6 +144,20 @@ AC_FUNC_MEMCMP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memset])
 
+# ======================================================================
+# Checks if encoding is enabled
+# ======================================================================
+AC_MSG_CHECKING([if encoding enabled])
+AC_ARG_ENABLE([encoding],
+             [AC_HELP_STRING([--enable-encoding],
+                             [Enable SZIP encoding [default=yes]])],
+             [ENCODING=$enableval])
+if test "X$ENCODING" = "Xyes"; then 
+     echo "yes"
+     AC_DEFINE([HAVE_ENCODING], [1], [Define if encoding is enabled])
+   else
+     echo "no"
+fi
 AC_CONFIG_FILES([Makefile
                  examples/Makefile
                  src/Makefile

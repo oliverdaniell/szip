@@ -858,6 +858,7 @@ Optional Features:
   --disable-dependency-tracking Speeds up one-time builds
   --enable-dependency-tracking  Do not reject slow dependency extractors
   --enable-production     Determines how to run the compiler.
+  --enable-encoding       Enable SZIP encoding [default=yes]
 
 Some influential environment variables:
   CC          C compiler command
@@ -4485,6 +4486,26 @@ fi
 done
 
 
+# ======================================================================
+# Checks if encoding is enabled
+# ======================================================================
+echo "$as_me:$LINENO: checking if encoding enabled" >&5
+echo $ECHO_N "checking if encoding enabled... $ECHO_C" >&6
+# Check whether --enable-encoding or --disable-encoding was given.
+if test "${enable_encoding+set}" = set; then
+  enableval="$enable_encoding"
+  ENCODING=$enableval
+fi;
+if test "X$ENCODING" = "Xyes"; then
+     echo "yes"
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_ENCODING 1
+_ACEOF
+
+   else
+     echo "no"
+fi
                                         ac_config_files="$ac_config_files Makefile examples/Makefile src/Makefile test/Makefile"
 
 cat >confcache <<\_ACEOF
