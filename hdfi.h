@@ -90,6 +90,9 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#ifdef WIN32
+#include <time.h>
+#endif
 
 /* PABLO support files */
 #ifdef HAVE_PABLO
