@@ -16,7 +16,7 @@
 1. Obtaining SZIP
 
    The latest supported public release of SZIP is available from
-   ftp://hdf.ncsa.uiuc.edu/szip/src. Binary distribution (with encoder
+   ftp://hdf.ncsa.uiuc.edu/szip/2.0. Binary distribution (with encoder
    enabled) can be found under ftp://hdf.ncsa.uiuc.edu/szip/2.0/bin 
    For general information about SZIP see 
    http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/.
