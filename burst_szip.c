@@ -14,9 +14,7 @@
 #define EC_MODE	1
 #define NN_MODE	2
 
-#ifndef WIN32
 typedef int boolean;
-#endif
 
 boolean msb_first = TRUE;
 boolean partial_last_scanline;
