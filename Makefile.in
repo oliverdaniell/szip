@@ -1,0 +1,118 @@
+# Makefile for szlib
+# Copied from GNU ZLIB Makefile.in
+# We need to put refer to ZLIB  and SZIP copyright statements here.
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# To compile and test, type:
+#   ./configure; make test
+# The call of configure is optional if you don't have special requirements
+# If you wish to build szlib as a shared library, use: ./configure -s
+
+# To install /usr/local/lib/libsz.* and /usr/local/include/szlib.h, type:
+#    make install
+# To install in $HOME instead of /usr/local, use:
+#    make install prefix=$HOME
+
+CC=gcc
+
+CFLAGS=-O
+#CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
+#CFLAGS=-g -DDEBUG
+#CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
+#           -Wstrict-prototypes -Wmissing-prototypes
+
+LDFLAGS=-L. -lsz
+LDSHARED=$(CC)
+CPP=$(CC) -E
+
+
+VER=1.0
+LIBS=libsz.a
+SHAREDLIB=libsz.so
+
+AR=ar rc
+RANLIB=ranlib
+TAR=tar
+SHELL=/bin/sh
+
+prefix = /usr/local
+exec_prefix = ${prefix}
+libdir = ${exec_prefix}/lib
+includedir = ${prefix}/include
+
+OBJS = rice.o sz_api.o
+
+
+TEST_OBJS = example.o  burst_szip.o mcgill.o
+
+all: example burst_szip 
+
+test: all
+	@LD_LIBRARY_PATH=.:$(LD_LIBRARY_PATH) ; export LD_LIBRARY_PATH; \
+	./testit
+
+libsz.a: $(OBJS) $(OBJA)
+	$(AR) $@ $(OBJS) $(OBJA)
+	-@ ($(RANLIB) $@ || true) >/dev/null 2>&1
+
+
+$(SHAREDLIB).$(VER): $(OBJS)
+	$(LDSHARED) -o $@ $(OBJS)
+	rm -f $(SHAREDLIB) $(SHAREDLIB).1
+	ln -s $@ $(SHAREDLIB)
+	ln -s $@ $(SHAREDLIB).1
+
+mcgill.o:
+	$(CC) -c mcgill.c
+
+example: example.o $(LIBS)
+	$(CC) $(CFLAGS) -o $@ example.o $(LDFLAGS)
+
+burst_szip: burst_szip.o $(LIBS) 
+	$(CC) $(CFLAGS) -o $@ burst_szip.o mcgill.o -lm
+
+install: $(LIBS)
+	-@if [ ! -d $(includedir)  ]; then mkdir $(includedir); fi
+	-@if [ ! -d $(libdir) ]; then mkdir $(libdir); fi
+	cp szlib.h szconf.h $(includedir)
+	chmod 644 $(includedir)/szlib.h $(includedir)/szconf.h
+	cp $(LIBS) $(libdir)
+	cd $(libdir); chmod 755 $(LIBS)
+	-@(cd $(libdir); $(RANLIB) libsz.a || true) >/dev/null 2>&1
+	cd $(libdir); if test -f $(SHAREDLIB).$(VER); then \
+	  rm -f $(SHAREDLIB) $(SHAREDLIB).1; \
+	  ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB); \
+	  ln -s $(SHAREDLIB).$(VER) $(SHAREDLIB).1; \
+	  (ldconfig || true)  >/dev/null 2>&1; \
+	fi
+# The ranlib in install is needed on NeXTSTEP which checks file times
+# ldconfig is for Linux
+
+uninstall:
+	cd $(includedir); \
+	v=$(VER); \
+	if test -f szlib.h; then \
+	  v=`sed -n '/VERSION "/s/.*"\(.*\)".*/\1/p' < szlib.h`; \
+          rm -f szlib.h szconf.h; \
+	fi; \
+	cd $(libdir); rm -f libsz.a; \
+	if test -f $(SHAREDLIB).$$v; then \
+	  rm -f $(SHAREDLIB).$$v $(SHAREDLIB) $(SHAREDLIB).1; \
+	fi
+
+clean:
+	rm -f *.o *~ example burst_szip mcgill image.in libsz.a libsz.so*
+
+distclean:	
+	rm -f Makefile *.o *~ example burst_szip mcgill image.in libsz.a libsz.so* 
+
+
+depend:
+	makedepend -- $(CFLAGS) -- *.[ch]
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+example.o: szlib.h szconf.h
+mcgill.o: mcgill.h
+rice.o: rice.h
+sz_api.o: szlib.h
+burst_szip: mcgill.o

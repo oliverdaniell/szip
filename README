@@ -1,0 +1,20 @@
+To build SZIP Library
+
+./configure --prefix=...
+make
+make test
+make install
+
+To build shared and static SZIP Libraries use -s flag with configure.
+Default compiler is gcc. Use 
+
+setenv CC "....." 
+setenv CFLAGS "...."
+
+to set desired compiler and flags. 
+
+Known problems:
+
+"make test" invokes SZIP test that seems to go into infinite loop. EIP, 3/12/03
+
+ 
