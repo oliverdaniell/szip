@@ -10,8 +10,8 @@
 
 #ifdef REMOVE_SZIP_ENCODER
 int szip_allow_encoding = 0; 
-static char * szip_encoder_status = "SZIP ENCODER DISABLED";
+extern char * szip_encoder_status = "SZIP ENCODER DISABLED";
 #else
 int szip_allow_encoding = 1; 
-static char * szip_encoder_status = "SZIP ENCODER ENABLED";
+extern char * szip_encoder_status = "SZIP ENCODER ENABLED";
 #endif
