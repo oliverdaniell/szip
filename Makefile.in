@@ -73,8 +73,8 @@ burst_szip: burst_szip.o $(LIBS)
 install: $(LIBS)
 	-@if [ ! -d $(includedir)  ]; then mkdir $(includedir); fi
 	-@if [ ! -d $(libdir) ]; then mkdir $(libdir); fi
-	cp szlib.h szconf.h szip_adpt.h $(includedir)
-	chmod 644 $(includedir)/szlib.h $(includedir)/szconf.h $(includedir)/szip_adpt.h
+	cp szlib.h szip_adpt.h $(includedir)
+	chmod 644 $(includedir)/szlib.h $(includedir)/szip_adpt.h
 	cp $(LIBS) $(libdir)
 	cd $(libdir); chmod 755 $(LIBS)
 	-@(cd $(libdir); $(RANLIB) libsz.a || true) >/dev/null 2>&1
@@ -92,7 +92,7 @@ uninstall:
 	v=$(VER); \
 	if test -f szlib.h; then \
 	  v=`sed -n '/VERSION "/s/.*"\(.*\)".*/\1/p' < szlib.h`; \
-          rm -f szlib.h szconf.h; \
+          rm -f szlib.h ; \
 	fi; \
 	cd $(libdir); rm -f libsz.a; \
 	if test -f $(SHAREDLIB).$$v; then \
@@ -111,7 +111,7 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-example.o: szlib.h szconf.h
+example.o: szlib.h 
 mcgill.o: mcgill.h
 rice.o: rice.h
 sz_api.o: szlib.h

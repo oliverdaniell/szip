@@ -1,22 +1,35 @@
 /*==============================================================================
-szip: Science data lossless compression program.
-(C) Copyright 1993,1994,1996,2000 University of New Mexico.
-    All Rights Reserved.
+The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
+Science & Technology Corporation @ UNM.  All rights released and licensed
+to ICs Corp. for distribution  by the University of Illinois' National 
+Center for Supercomputing Applications as a part of the HDF data storage 
+and retrieval file format and software library products package. All 
+rights reserved.  Do not modify or use for other purposes.
 
-This source code contains confidential and proprietary information,
-algorithms, and implementation.  This source code is being distributed
-under a signed non-disclosure agreement and is subject to all the terms
-and conditions of said agreement.
+SZIP implements an extended Rice adaptive lossless compression algorithm
+for sample data.  The primary algorithm was developed by R. F. Rice at
+Jet Propulsion Laboratory.  
 
-This software uses an extended Rice algorithm and was developed at the 
-University of New Mexico.  The Rice algorithm is an adaptive lossless
-compression algorithm for sample data.  The software includes extensions for
-efficiently coding low entropy data.
+SZIP embodies certain inventions patented by the National Aeronautics &
+Space Administration.  United States Patent Nos. 5,448,642, 5,687,255,
+and 5,822,457 have been licensed to ICs Corp. for distribution with the
+HDF data storage and retrieval file format and software library products.
+All rights reserved.
 
-R.F. Rice, at Jet Propulsion Laboratory, was primary algorithm developer. 
+Revocable, royalty-free, nonexclusive sublicense to use SZIP decompression
+software routines and underlying patents is hereby granted by ICs Corp. to 
+all users of and in conjunction with HDF data storage and retrieval file 
+format and software library products.
 
-Encoder chip:  USES (Universal Source Encoder for Space).
-Decoder chip:  USDS (Universal Source Decoder for Space).
+Revocable, royalty-free, nonexclusive sublicense to use SZIP compression
+software routines and underlying patents for non-commercial, scientific use
+only is hereby granted by ICs Corp. to users of and in conjunction with HDF 
+data storage and retrieval file format and software library products.
+
+For commercial use license to SZIP compression software routines and underlying 
+patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
+Post Falls, ID 83854.  (208) 262-2008.
+
 ==============================================================================*/
 /*==============================================================================
 To compile szip on the following operating systems do:
@@ -48,20 +61,30 @@ used.
 #define HDF 1	/*** 1 if part of HDF package ***/
 
 #if HDF
+#include "ricehdf.h"
+
 #define compress_memory szip_compress_memory 
 #define uncompress_memory szip_uncompress_memory
 #define output_buffer_full szip_output_buffer_full
+#define check_params szip_check_params
 #endif
 
-static char sccs_id[] = "@(#) szip: Combined Version: %I%, Revised: %G% %U%";
+#if !HDF
+static char sccs_id[] = "@(#) szip: Combined Version: 1.5, Revised: 06/11/02 15:01:11";
+#endif
+
 char copyright[] = "@(#) (C) Copyright 1993,1994,1996 University of New Mexico.  All Rights Reserved.";
 
+#if !HDF
 static char credits1[] = "This software uses an extended Rice algorithm and was developed at the"; 
 static char credits2[] = "University of New Mexico.";
 static char credits3[] = "Software emulates two common modes of the extended Rice Algorithm chip set.";
+#endif
 
 static boolean allow_k13 = TRUE;
+#if !HDF
 static boolean encoding;
+#endif
 static boolean keep_compressed_file = FALSE;
 static boolean keep_image_file = FALSE;
 static boolean msb_first = TRUE;
@@ -83,16 +106,14 @@ boolean output_buffer_full;
 /*** variables for reading data ***/
 static long input_byte_count;
 static long input_pixel_count;
-static long *input_long_data;
+static char *input_long_data;
 static short *input_word_data;
 static unsigned char *input_byte_data;
 
-static int bits_per_block;
 static int	bits_per_pixel;
 static int blocks_per_scanline;
 static int bytes_per_pixel;
 static int compression_mode;
-static int end_scanline_block_pixels;
 static int padded_pixels_per_scanline;
 static int	pixels_per_block;
 static int pixels_per_scanline;
@@ -117,7 +138,6 @@ static char output_file_name[MAX_FILENAME_SIZE];
 static long input_file_size;
 
 static char *bptr;
-static char *bend;
 static char *bmid;
 static char *global_bptr;
 static char output_buffer[OUTPUT_BUFFER_SIZE];
@@ -128,8 +148,10 @@ static unsigned char ext2_array2[MAX_EXT2_SUM+1];
 
 static int leading_zeros[256];
 
+#if !HDF
 static char *file_array[MAX_COMMAND_LINE_FILES];
 static int file_count;
+#endif
 
 static char msg[256];
 static int error_count;
@@ -138,11 +160,20 @@ static int warning_count;
 static unsigned long global_packed_value;
 static unsigned long global_packed_bits = 32;
 
+#if 0  /*** set to 1 to check packed bits ***/
+#define check_value(x, n) \
+	{ \
+	if (x > n) \
+		internal_error(__FILE__, __LINE__); \
+	}
+#else
+#define check_value(x, n)
+#endif
+
 #define pack1(value, pbits) \
 	{ \
 	packed_bits -= pbits; \
-	if (packed_bits > 32) \
-		internal_error(__FILE__, __LINE__); \
+	check_value(packed_bits, 32); \
 	packed_value |= value << packed_bits; \
 	if (packed_bits <= 16) \
 		{ \
@@ -977,7 +1008,7 @@ encode_scanline()
 			n = input_pixel_count >= pixels_per_scanline ? pixels_per_scanline : input_pixel_count;
 			input_pixel_count -= n;
 			memcpy(byte_buffer, input_long_data, 4*n);
-			input_long_data += n;
+			input_long_data += 4*n;
 			}
 
 		if (n == 0)
@@ -1758,7 +1789,6 @@ rice_encode()
 	if (!raw_mode)
 		write_header();
 
-	bits_per_block = pixels_per_block*bits_per_pixel;
 	total_bytes_read = 0;
 	while (1)
 		{
@@ -2934,7 +2964,6 @@ decode_initialize()
 
 	blocks_per_scanline = (pixels_per_scanline + pixels_per_block - 1)/pixels_per_block;
 	padded_pixels_per_scanline = blocks_per_scanline * pixels_per_block;
-	end_scanline_block_pixels = pixels_per_block - (padded_pixels_per_scanline - pixels_per_scanline);
 
 	if (bits_per_pixel > 16)
 		{
@@ -2955,7 +2984,6 @@ decode_initialize()
 	xmax = (1 << bits_per_pixel) - 1;
 
 	bptr = output_buffer;
-	bend = output_buffer + sizeof(output_buffer);
 	bmid = output_buffer + sizeof(output_buffer)/2;
 
 	p = leading_zeros;
@@ -3013,13 +3041,17 @@ char *file_name;
 {
 	long bytes_read;
 
-	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	keep_compressed_file = (new_options_mask & KEEP_COMPRESSED_OPTION_MASK) != 0;
 	keep_image_file = (new_options_mask & KEEP_IMAGE_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
+
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
 
 	bits_per_pixel = new_bits_per_pixel;
 	pixels_per_block = new_pixels_per_block;
@@ -3055,18 +3087,23 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-char *in;
+const void *in;
 long pixels;
 char *out;
 {
 	long bytes_read;
 	long bytes_written;
 
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
+
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
 
 	bits_per_pixel = new_bits_per_pixel;
 	pixels_per_block = new_pixels_per_block;
@@ -3100,18 +3137,23 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-short *in;
+const void *in;
 long pixels;
 char *out;
 {
 	long bytes_read;
 	long bytes_written;
 
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
+
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
 
 	bits_per_pixel = new_bits_per_pixel;
 	pixels_per_block = new_pixels_per_block;
@@ -3120,7 +3162,7 @@ char *out;
 	input_mode  = MEMORY_DATA;
 	output_mode = MEMORY_DATA;
 
-	input_word_data = in;
+	input_word_data = (short *) in;
 	input_pixel_count = pixels;
 	strcpy(input_file_name, "*memory*");
 
@@ -3144,18 +3186,23 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-long *in;
+const void *in;
 long pixels;
 char *out;
 {
 	long bytes_read;
 	long bytes_written;
 
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
+
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
 
 	bits_per_pixel = new_bits_per_pixel;
 	pixels_per_block = new_pixels_per_block;
@@ -3164,7 +3211,7 @@ char *out;
 	input_mode  = MEMORY_DATA;
 	output_mode = MEMORY_DATA;
 
-	input_long_data = in;
+	input_long_data = (char *) in;
 	input_pixel_count = pixels;
 	strcpy(input_file_name, "*memory*");
 
@@ -3225,7 +3272,7 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-float *in;
+const void *in;
 long pixels;
 char *out;
 {
@@ -3240,18 +3287,23 @@ char *out;
 		exit(1);
 		}
 
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
 
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
+
 	bits_per_pixel = 8;
 	pixels_per_block = new_pixels_per_block;
 	pixels_per_scanline = new_pixels_per_scanline;
 
 	interleave_array = (unsigned char *) malloc(4 * pixels);
-	interleave(in, pixels*4, new_bits_per_pixel, interleave_array);
+	interleave((char *) in, pixels*4, new_bits_per_pixel, (char *) interleave_array);
 
 	input_mode  = MEMORY_DATA;
 	output_mode = MEMORY_DATA;
@@ -3281,7 +3333,7 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-float *in;
+const void *in;
 long pixels;
 char *out;
 {
@@ -3296,18 +3348,23 @@ char *out;
 		exit(1);
 		}
 
+	new_options_mask |= ALLOW_K13_OPTION_MASK;
+
 	allow_k13 = (new_options_mask & ALLOW_K13_OPTION_MASK) != 0;
 	compression_mode = (new_options_mask & NN_OPTION_MASK) ? NN_MODE : EC_MODE;
 	compress_exactly_as_chip = (new_options_mask & CHIP_OPTION_MASK) != 0;
 	msb_first = (new_options_mask & MSB_OPTION_MASK) != 0;
 	raw_mode  = (new_options_mask & RAW_OPTION_MASK) != 0;
 
+	if (compress_exactly_as_chip)
+		allow_k13 = FALSE;
+
 	bits_per_pixel = 8;
 	pixels_per_block = new_pixels_per_block;
 	pixels_per_scanline = new_pixels_per_scanline;
 
 	interleave_array = (unsigned char *) malloc(8 * pixels);
-	interleave(in, pixels*8, new_bits_per_pixel, interleave_array);
+	interleave((char *) in, pixels*8, new_bits_per_pixel, (char *) interleave_array);
 
 	input_mode  = MEMORY_DATA;
 	output_mode = MEMORY_DATA;
@@ -3343,7 +3400,7 @@ int options_mask;
 int bits_per_pixel;
 int pixels_per_block;
 int pixels_per_scanline;
-void *in;
+const void *in;
 long pixels;
 char *out;
 {
@@ -5089,7 +5146,7 @@ int new_options_mask;
 int new_bits_per_pixel;
 int new_pixels_per_block;
 int new_pixels_per_scanline;
-char *in;
+const char *in;
 long in_bytes;
 void *out;
 long out_pixels;
@@ -5273,6 +5330,9 @@ char **argv;
 #endif
 
 	exit(0);
+
+	if (chip)
+		;
 }
 
 static void
@@ -5377,6 +5437,87 @@ post_decode()
 	if (!keep_compressed_file && fp_in != stdin)
 		remove(input_file_name);
 }
+
+int
+check_params(bits_per_pixel, pixels_per_block, pixels_per_scanline, image_pixels, msg)
+int bits_per_pixel;
+int pixels_per_block;
+int pixels_per_scanline;
+long image_pixels;
+char **msg;
+{
+	if (bits_per_pixel >= 1 && bits_per_pixel <= 24)
+		;
+	else if (bits_per_pixel == 32 || bits_per_pixel == 64)
+		;
+	else
+		{
+		*msg = "bits per pixel must be in range 1..24,32,64";
+		return 0;
+		}
+
+	if (pixels_per_block > MAX_PIXELS_PER_BLOCK)	
+		{
+		*msg = "maximum pixels per block exceeded";
+		return 0;
+		}
+
+	if (pixels_per_block > pixels_per_scanline)
+		{
+		*msg = "pixels per block > pixels per scanline";
+		return 0;
+		}
+
+	if (pixels_per_scanline > MAX_PIXELS_PER_SCANLINE)
+		{
+		*msg = "maximum pixels per scanline exceeded";
+		return 0;
+		}
+
+	if (image_pixels < pixels_per_scanline)
+		{
+		*msg = "image pixels less than pixels per scanline";
+		return 0;
+		}
+
+	return 1;
+}
+
+#if HDF
+
+/*********************************************************************/
+/*** Make sure that the defines in ricehdf.h match those in rice.h ***/
+/*********************************************************************/
+
+#if ALLOW_K13_OPTION_MASK != SZ_ALLOW_K13_OPTION_MASK
+#error "define ALLOW_K13_OPTION_MASK != SZ_ALLOW_K13_OPTION_MASK"
+#endif
+
+#if CHIP_OPTION_MASK != SZ_CHIP_OPTION_MASK
+#error "define CHIP_OPTION_MASK != SZ_CHIP_OPTION_MASK"
+#endif
+
+#if EC_OPTION_MASK != SZ_EC_OPTION_MASK
+#error "define EC_OPTION_MASK != SZ_EC_OPTION_MASK"
+#endif
+
+#if LSB_OPTION_MASK != SZ_LSB_OPTION_MASK
+#error "define LSB_OPTION_MASK != SZ_LSB_OPTION_MASK"
+#endif
+
+#if MSB_OPTION_MASK != SZ_MSB_OPTION_MASK
+#error "define MSB_OPTION_MASK != SZ_MSB_OPTION_MASK"
+#endif
+
+#if NN_OPTION_MASK != SZ_NN_OPTION_MASK 
+#error "define NN_OPTION_MASK  != SZ_NN_OPTION_MASK "
+#endif
+
+#if RAW_OPTION_MASK != SZ_RAW_OPTION_MASK 
+#error "define NN_RAW_OPTION_MASK != SZ_RAW_OPTION_MASK "
+#endif
+
+#endif /*** HDF ***/
 
 #if !HDF
 main(argc, argv)

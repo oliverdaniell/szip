@@ -1,11 +1,44 @@
+/*==============================================================================
+The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
+Science & Technology Corporation @ UNM.  All rights released and licensed
+to ICs Corp. for distribution  by the University of Illinois' National 
+Center for Supercomputing Applications as a part of the HDF data storage 
+and retrieval file format and software library products package. All 
+rights reserved.  Do not modify or use for other purposes.
+
+SZIP implements an extended Rice adaptive lossless compression algorithm
+for sample data.  The primary algorithm was developed by R. F. Rice at
+Jet Propulsion Laboratory.  
+
+SZIP embodies certain inventions patented by the National Aeronautics &
+Space Administration.  United States Patent Nos. 5,448,642, 5,687,255,
+and 5,822,457 have been licensed to ICs Corp. for distribution with the
+HDF data storage and retrieval file format and software library products.
+All rights reserved.
+
+Revocable, royalty-free, nonexclusive sublicense to use SZIP decompression
+software routines and underlying patents is hereby granted by ICs Corp. to 
+all users of and in conjunction with HDF data storage and retrieval file 
+format and software library products.
+
+Revocable, royalty-free, nonexclusive sublicense to use SZIP compression
+software routines and underlying patents for non-commercial, scientific use
+only is hereby granted by ICs Corp. to users of and in conjunction with HDF 
+data storage and retrieval file format and software library products.
+
+For commercial use license to SZIP compression software routines and underlying 
+patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
+Post Falls, ID 83854.  (208) 262-2008.
+
+==============================================================================*/
+/* sz_api.c -- szlib interface to szip functions
+ * This code is loosely based on the zlib inflate and deflate
+ * code.  See szlib.h for attribution.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "szlib.h"
-
-#define SZ_MAX_PIXELS_PER_BLOCK 32
-#define SZ_MAX_PIXELS_PER_SCANLINE 2048
-#define SZ_RAW_OPTION_MASK 128
 
 long szip_compress_memory(
 	int options_mask,
@@ -26,65 +59,12 @@ long szip_uncompress_memory(
 	void *out,
 	long out_pixels);
 
-#if 0
-#define FAR
-#define Bytef char *
-#define uInt unsigned int
-#define uLong unsigned long
-#define SZ_NULL 0
-typedef void FAR *voidpf;
-#define OF(args)  args
-
-typedef voidpf (*alloc_func) OF((voidpf opaque, uInt items, uInt size));
-typedef void   (*free_func)  OF((voidpf opaque, voidpf address));
-voidpf zcalloc OF((voidpf opaque, unsigned items, unsigned size));
-void   zcfree  OF((voidpf opaque, voidpf ptr));
-#endif
-
-int
-SZ_check_params(bits_per_pixel, pixels_per_block, pixels_per_scanline, image_pixels, msg)
-int bits_per_pixel;
-int pixels_per_block;
-int pixels_per_scanline;
-long image_pixels;
-char **msg;
-{
-	if (bits_per_pixel >= 1 && bits_per_pixel <= 24)
-		;
-	else if (bits_per_pixel == 32 || bits_per_pixel == 64)
-		;
-	else
-		{
-		*msg = "bits per pixel must be in range 1..24,32,64";
-		return 0;
-		}
-
-	if (pixels_per_block > SZ_MAX_PIXELS_PER_BLOCK)	
-		{
-		*msg = "maximum pixels per block exceeded";
-		return 0;
-		}
-
-	if (pixels_per_block > pixels_per_scanline)
-		{
-		*msg = "pixels per block > pixels per scanline";
-		return 0;
-		}
-
-	if (pixels_per_scanline > SZ_MAX_PIXELS_PER_SCANLINE)
-		{
-		*msg = "maximum pixels per scanline exceeded";
-		return 0;
-		}
-
-	if (image_pixels < pixels_per_scanline)
-		{
-		*msg = "image pixels less than pixels per scanline";
-		return 0;
-		}
-
-	return 1;
-}
+int szip_check_params(
+	int bits_per_pixel,
+	int pixels_per_block,
+	int pixels_per_scanline,
+	long image_pixels,
+	char **msg);
 
 int
 SZ_CompressInit(sz_stream *strm)
@@ -94,21 +74,8 @@ SZ_CompressInit(sz_stream *strm)
 	if (strm == SZ_NULL)
 		return SZ_STREAM_ERROR; 
 
-	strm->hidden = (voidpf) 0;
+	strm->hidden = 0;
 	strm->msg = SZ_NULL;
-
-#if 0
-	if (strm->szalloc == SZ_NULL)
-		{
-		strm->szalloc = szalloc;
-		strm->hidden = (voidpf) 0;
-		}
-#endif
-
-#if 0
-	if (strm->szfree == SZ_NULL)
-		strm->szfree = szfree;
-#endif
 
 	strm->state = SZ_INPUT_IMAGE;
 
@@ -121,7 +88,7 @@ SZ_CompressInit(sz_stream *strm)
 		memset(strm->hidden, 0, sizeof(sz_hidden_data));
 		}
 
-	rv = SZ_check_params(strm->bits_per_pixel, strm->pixels_per_block, strm->pixels_per_scanline, strm->image_pixels, &strm->msg);
+	rv = szip_check_params(strm->bits_per_pixel, strm->pixels_per_block, strm->pixels_per_scanline, strm->image_pixels, &strm->msg);
 	if (rv == 0)
 		return SZ_INIT_ERROR;
 
@@ -143,13 +110,8 @@ SZ_Compress(sz_stream *strm, int flush)
 		return SZ_STREAM_ERROR;
 
 	bytes_per_pixel = (strm->bits_per_pixel+7) >> 3;
-#if 0
-	if (strm->avail_in < strm->image_pixels * bytes_per_pixel)
-		{
-		strm->msg = "avail_in number of bytes to small for image size";
-		return SZ_STREAM_ERROR;
-		}
-#endif
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
 
 	hidden = (sz_hidden_data *) strm->hidden;
 	if (hidden->image_in == SZ_NULL)
@@ -257,20 +219,7 @@ SZ_DecompressInit(sz_stream *strm)
 		return SZ_STREAM_ERROR; 
 
 	strm->msg = SZ_NULL;
-	strm->hidden = (voidpf) 0;
-#if 0
-	if (strm->szalloc == SZ_NULL)
-		{
-		strm->szalloc = zcalloc;
-		strm->hidden = (voidpf) 0;
-		}
-#endif
-
-#if 0
-	if (strm->szfree == SZ_NULL)
-		strm->szfree = szfree;
-#endif
-
+	strm->hidden = 0;
 	strm->state = SZ_INPUT_IMAGE;
 
 	if (strm->hidden == SZ_NULL)
@@ -282,7 +231,7 @@ SZ_DecompressInit(sz_stream *strm)
 		memset(strm->hidden, 0, sizeof(sz_hidden_data));
 		}
 
-	rv = SZ_check_params(strm->bits_per_pixel, strm->pixels_per_block, strm->pixels_per_scanline, strm->image_pixels, &strm->msg);
+	rv = szip_check_params(strm->bits_per_pixel, strm->pixels_per_block, strm->pixels_per_scanline, strm->image_pixels, &strm->msg);
 	if (rv == 0)
 		return SZ_INIT_ERROR;
 
@@ -304,13 +253,8 @@ SZ_Decompress(sz_stream *strm, int flush)
 		return SZ_STREAM_ERROR;
 
 	bytes_per_pixel = (strm->bits_per_pixel+7) >> 3;
-#if 0
-	if (strm->avail_in < strm->image_pixels * bytes_per_pixel)
-		{
-		strm->msg = "avail_in number of bytes to small for image size";
-		return SZ_STREAM_ERROR;
-		}
-#endif
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
 
 	hidden = (sz_hidden_data *) strm->hidden;
 	if (hidden->image_in == SZ_NULL)
@@ -407,12 +351,9 @@ SZ_DecompressEnd(sz_stream *strm)
 	return SZ_OK;
 }
 
-#define SZ_OUTBUFF_FULL 1
-#define SZ_PARAM_ERROR  2
-
 extern int szip_output_buffer_full;
 
-static SZ_com_t sz_default_param = { SZ_RAW_OPTION_MASK, 8, 16, 256 };
+static SZ_com_t sz_default_param = { SZ_RAW_OPTION_MASK | SZ_ALLOW_K13_OPTION_MASK, 8, 16, 256 };
 
 int
 SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t sourceLen, SZ_com_t *param)
@@ -430,11 +371,14 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 	if (sz == 0)
 		sz = &sz_default_param;
 
-	rv = SZ_check_params(sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, sz->pixels_per_scanline, &msg);
+	rv = szip_check_params(sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, sz->pixels_per_scanline, &msg);
 	if (rv == 0)
 		return SZ_PARAM_ERROR;
 
 	bytes_per_pixel = (sz->bits_per_pixel+7) >> 3;
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
+
 	pixels = (sourceLen+bytes_per_pixel-1)/bytes_per_pixel;
 	out_size = sourceLen * 1.25;
 
@@ -474,11 +418,14 @@ SZ_BufftoBuffDecompress(void *dest, size_t *destLen, const void *source, size_t 
 	if (sz == 0)
 		sz = &sz_default_param;
 
-	rv = SZ_check_params(sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, sz->pixels_per_scanline, &msg);
+	rv = szip_check_params(sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, sz->pixels_per_scanline, &msg);
 	if (rv == 0)
 		return SZ_PARAM_ERROR;
 
 	bytes_per_pixel = (sz->bits_per_pixel+7) >> 3;
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
+
 	pixels = *destLen/bytes_per_pixel;
 
 	output_bytes = szip_uncompress_memory(sz->options_mask, sz->bits_per_pixel, sz->pixels_per_block, sz->pixels_per_scanline, source, sourceLen, dest, pixels);

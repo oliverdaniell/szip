@@ -18,40 +18,49 @@
 
 #define MULT 69069L
 
-static uint32 mcgn, srgn;
+#define MASK32 0xFFFFFFFFUL
+
+static unsigned long mcgn, srgn;
 
 void
 rstart(i1, i2)
-int32 i1, i2;
+long i1, i2;
 {
 	mcgn = (i1 == 0) ? 0 : i1 | 1;
+	mcgn &= MASK32;
+
 	srgn = (i2 == 0) ? 0 : (i2 & 0x7ff) | 1;
+	srgn &= MASK32;
 }
 
-int32
+long
 iuni()
 {
-	register uint32 r0, r1;
+	register unsigned long r0, r1;
 
 	r0 = (srgn >> 15);
 	r1 = srgn ^ r0;
 	r0 = (r1 << 17);
+	r0 &= MASK32;
 	srgn = r0 ^ r1;
 	mcgn = MULT * mcgn;
+	mcgn &= MASK32;
 	r1 = mcgn ^ srgn;
 	return ((r1 >> 1));
 }
 
-int32
+long
 ivni()
 {
-	register uint32 r0, r1;
+	register unsigned long r0, r1;
 
 	r0 = (srgn >> 15);
 	r1 = srgn ^ r0;
 	r0 = (r1 << 17);
+	r0 &= MASK32;
 	srgn = r0 ^ r1;
 	mcgn = MULT * mcgn;
+	mcgn &= MASK32;
 	r1 = mcgn ^ srgn;
 	return (r1);
 }
@@ -59,13 +68,15 @@ ivni()
 double
 uni()
 {
-	register uint32 r0, r1;
+	register unsigned long r0, r1;
 
 	r0 = (srgn >> 15);
 	r1 = srgn ^ r0;
 	r0 = (r1 << 17);
+	r0 &= 0xFFFFFFFFUL;
 	srgn = r0 ^ r1;
 	mcgn = MULT * mcgn;
+	mcgn &= 0xFFFFFFFFUL;
 	r1 = mcgn ^ srgn;
 	return ((double)(r1 >> 1) / 2147483648.);
 }
@@ -73,13 +84,15 @@ uni()
 double
 vni()
 {
-	register uint32 r0, r1;
+	register unsigned long r0, r1;
 
 	r0 = (srgn >> 15);
 	r1 = srgn ^ r0;
 	r0 = (r1 << 17);
+	r0 &= 0xFFFFFFFFUL;
 	srgn = r0 ^ r1;
 	mcgn = MULT * mcgn;
+	mcgn &= 0xFFFFFFFFUL;
 	r1 = mcgn ^ srgn;
 	return ((double)(r1) / 2147483648.);
 }

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
 #include "mcgill.h"
 
 #define eq(a, b) (!strcmp((a), (b)))
@@ -29,6 +32,7 @@ double mult = 1.0;
 double offset;
 double sine_mult;
 
+void
 put_pixel(pixel)
 unsigned pixel;
 {
@@ -82,12 +86,13 @@ unsigned pixel;
 		putc(pixel, fp_out);
 }
 
+void
 map_nn(sigma, end)
 unsigned *sigma;
 unsigned *end;
 {
-    int del;
-    int x;
+	int del;
+	int x;
 	int xp;
 	unsigned *s;
 
@@ -95,27 +100,28 @@ unsigned *end;
 	s = sigma + 1;
 	while (s < end)
 		{
-        x = *s;
-        del = x-xp;
-        if (del >= 0)
-        	{
-            if (del <= xp)
-                *s++ = del << 1;
-            else
-                *s++ = x;
-        	}
-        else
-        	{
-            if (del >= (xp-max))
-                *s++ = ((-del)<<1) - 1;
-            else 
-                *s++ = max-x;
-        	}
+	x = *s;
+	del = x-xp;
+	if (del >= 0)
+		{
+		if (del <= xp)
+			*s++ = del << 1;
+		else
+			*s++ = x;
+			}
+		else
+			{
+			if (del >= (xp-max))
+				*s++ = ((-del)<<1) - 1;
+			else 
+				*s++ = max-x;
+			}
 
-        xp = x;
-    	}
+		xp = x;
+		}
 }
 
+void
 random_scanline(pixels_per_block, width)
 int pixels_per_block;
 int width;
@@ -265,6 +271,7 @@ int width;
 		put_pixel(*s++);
 }
 
+void
 random_float_scanline(pixels_per_block, width)
 int pixels_per_block;
 int width;
@@ -300,13 +307,12 @@ int width;
 	fwrite(scanline, width, sizeof(float), fp_out);
 }
 
+void
 random_double_scanline(pixels_per_block, width)
 int pixels_per_block;
 int width;
 {
-	double offset;
 	double scanline[8*1024];
-	double sine_mult;
 	double start;
 	double step;
 	double x;
@@ -343,6 +349,7 @@ int width;
 	fwrite(scanline, width, sizeof(double), fp_out);
 }
 
+void
 usage(name)
 char *name;
 {
@@ -350,6 +357,7 @@ char *name;
 	exit(1);
 }
 
+int
 main(argc, argv)
 int argc;
 char **argv;
@@ -358,7 +366,6 @@ char **argv;
 	int i;
 	int l;
 	int lines;
-	int pixel;
 	int pixels_per_block;
 	int width;
 
@@ -443,9 +450,9 @@ char **argv;
 			width = uni() * (width-1) + 1;
 
 		if (bits == 32)
-			random_float_scanline(pixels_per_block, width, bits);
+			random_float_scanline(pixels_per_block, width);
 		else if (bits == 64)
-			random_double_scanline(pixels_per_block, width, bits);
+			random_double_scanline(pixels_per_block, width);
 		else
 			random_scanline(pixels_per_block, width);
 		}

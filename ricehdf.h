@@ -1,3 +1,4 @@
+
 /*==============================================================================
 The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
 Science & Technology Corporation @ UNM.  All rights released and licensed
@@ -31,29 +32,42 @@ patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
 ==============================================================================*/
-/*
-	H5api_adpt.h
-	Used for the HDF5 dll project
-*/
-#ifndef SZAPI_ADPT_H
-#define SZAPI_ADPT_H
+/********************************************************/
+/* defines and declarations to interface to the szip    */
+/* functions in file rice.c.                            */
+/* USE EXTREME CARE WHEN MODIFYING THIS FILE            */
+/********************************************************/
 
-#if defined(WIN32)
-#if defined(_SZDLL_)
-#pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
-#define __SZ_DLL__ __declspec(dllexport)
-/*#define __DLLVARH425__ __declspec(dllexport)*/
-#elif defined(_SZUSEDLL_)
-#define __SZ_DLL__ __declspec(dllimport)
-/*#define __DLLVARH425__ __declspec(dllimport)*/
-#else
-#define __SZ_DLL__
-/*#define __DLLVARH425__ extern*/
-#endif /* _SZDLL_ */
+#define SZ_ALLOW_K13_OPTION_MASK         1
+#define SZ_CHIP_OPTION_MASK              2 
+#define SZ_EC_OPTION_MASK                4
+#define SZ_LSB_OPTION_MASK               8
+#define SZ_MSB_OPTION_MASK              16
+#define SZ_NN_OPTION_MASK               32
+#define SZ_RAW_OPTION_MASK             128
 
-#else /*WIN32*/
-#define __SZ_DLL__
-/*#define __DLLVAR__ extern*/
-#endif
+long szip_compress_memory(
+	int options_mask,
+	int bits_per_pixel,
+	int pixels_per_block,
+	int pixels_per_scanline,
+	const void *in,
+	long pixels,
+	char *out);
 
-#endif /* H5API_ADPT_H */
+long szip_uncompress_memory(
+	int new_options_mask,
+	int new_bits_per_pixel,
+	int new_pixels_per_block,
+	int new_pixels_per_scanline, 
+	const char *in,
+	long in_bytes,
+	void *out,
+	long out_pixels);
+
+int szip_check_params(
+	int bits_per_pixel,
+	int pixels_per_block,
+	int pixels_per_scanline,
+	long image_pixels,
+	char **msg);
