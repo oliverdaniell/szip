@@ -2,6 +2,7 @@
 #define _SZLIB_H
 
 #include "szconf.h"
+#include "szip_adpt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -315,15 +316,15 @@ typedef struct SZ_com_t_s
 #define SZ_RAW_OPTION_MASK 128
 #define SZ_NN_OPTION_MASK   32
 
-int SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t sourceLen, SZ_com_t *param);
-int SZ_BufftoBuffDecompress(void *dest, size_t *destLen, const void *source, size_t sourceLen, SZ_com_t *param);
+__SZ_DLL__ int SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t sourceLen, SZ_com_t *param);
+__SZ_DLL__ int SZ_BufftoBuffDecompress(void *dest, size_t *destLen, const void *source, size_t sourceLen, SZ_com_t *param);
 
-int SZ_DecompressInit(sz_stream *strm);
-int SZ_Decompress(sz_stream *strm, int flush);
-int SZ_DecompressEnd(sz_stream *strm);
+__SZ_DLL__ int SZ_DecompressInit(sz_stream *strm);
+__SZ_DLL__ int SZ_Decompress(sz_stream *strm, int flush);
+__SZ_DLL__ int SZ_DecompressEnd(sz_stream *strm);
 
-int SZ_CompressInit(sz_stream *strm);
-int SZ_Compress(sz_stream *strm, int flush);
-int SZ_CompressEnd(sz_stream *strm);
+__SZ_DLL__ int SZ_CompressInit(sz_stream *strm);
+__SZ_DLL__ int SZ_Compress(sz_stream *strm, int flush);
+__SZ_DLL__ int SZ_CompressEnd(sz_stream *strm);
 
 #endif /* _SZLIB_H */

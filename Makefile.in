@@ -73,8 +73,8 @@ burst_szip: burst_szip.o $(LIBS)
 install: $(LIBS)
 	-@if [ ! -d $(includedir)  ]; then mkdir $(includedir); fi
 	-@if [ ! -d $(libdir) ]; then mkdir $(libdir); fi
-	cp szlib.h szconf.h $(includedir)
-	chmod 644 $(includedir)/szlib.h $(includedir)/szconf.h
+	cp szlib.h szconf.h szip_adpt.h $(includedir)
+	chmod 644 $(includedir)/szlib.h $(includedir)/szconf.h $(includedir)/szip_adpt.h
 	cp $(LIBS) $(libdir)
 	cd $(libdir); chmod 755 $(LIBS)
 	-@(cd $(libdir); $(RANLIB) libsz.a || true) >/dev/null 2>&1
