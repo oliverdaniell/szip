@@ -36,8 +36,12 @@ used.
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#if defined(MSDOS) || defined(WINDOWS95)
+#if defined(MSDOS) || defined(WINDOWS95) 
 #include <fcntl.h>
+#endif
+#if defined(WIN32)
+#include <fcntl.h>
+#include <io.h>
 #endif
 #include "rice.h"
 
