@@ -5,7 +5,7 @@ AC_PREREQ(2.57)
 AC_INIT([SZIP], [1.2], [hdfhelp@ncsa.uiuc.edu])
 AC_CONFIG_SRCDIR([src/rice.h])
 AC_CONFIG_AUX_DIR([bin])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([src/SZconfig.h])
 
 AM_INIT_AUTOMAKE([SZIP], [1.2])
 AM_MAINTAINER_MODE

@@ -143,7 +143,7 @@ DISTCLEANFILES = image.8.in
 subdir = examples
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/bin/mkinstalldirs
-CONFIG_HEADER = $(top_builddir)/config.h
+CONFIG_HEADER = $(top_builddir)/src/SZconfig.h
 CONFIG_CLEAN_FILES =
 bin_PROGRAMS = burst_szip$(EXEEXT) example$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -155,7 +155,7 @@ am_example_OBJECTS = example.$(OBJEXT)
 example_OBJECTS = $(am_example_OBJECTS)
 example_LDFLAGS =
 
-DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)
+DEFAULT_INCLUDES =  -I. -I$(srcdir) -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/bin/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/burst_szip.Po ./$(DEPDIR)/example.Po
