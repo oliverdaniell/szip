@@ -14,7 +14,9 @@
 #define EC_MODE	1
 #define NN_MODE	2
 
+#if !defined(__MWERKS__) 
 typedef int boolean;
+#endif
 
 boolean msb_first = TRUE;
 boolean partial_last_scanline;

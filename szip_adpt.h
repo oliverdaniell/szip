@@ -1,12 +1,13 @@
 /*
  * This files has neccesary definitions to provide SZIP DLL 
- * support on Windows platfroms.
+ * support on Windows platfroms, both MSVC and CodeWarrior 
+	* compilers
  */
 
 #ifndef SZAPI_ADPT_H
 #define SZAPI_ADPT_H
 
-#if defined(WIN32)
+#if defined(WIN32) && !defined(__MWERKS__)
 #if defined(_SZDLL_)
 #pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
 #define __SZ_DLL__ __declspec(dllexport)

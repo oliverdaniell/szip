@@ -33,7 +33,9 @@ patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
 ==============================================================================*/
+#if !defined(__MWERKS__) 
 typedef int boolean;
+#endif
 
 #define FALSE	0
 #define TRUE	1
