@@ -1,10 +1,12 @@
+
 /*==============================================================================
-The SZIP Science Data Lossless Compression Program is Copyright (C) 2001
-Lowell H. Miles and Jack A. Venbrux.  All rights released and licensed
-to ICs Corp. for distribution  by the University of Illinois' National 
-Center for Supercomputing Applications as a part of the HDF data storage 
-and retrieval file format and software library products package. All 
-rights reserved.  Do not modify or use for other purposes.
+The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
+& Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
+H. Miles and Jack A. Venbrux.  Licensed to ICs Corp. for distribution by the
+University of Illinois' National Center for Supercomputing Applications as a
+part of the HDF data storage and retrieval file format and software library
+products package.  All rights reserved.  Do not modify or use for other
+purposes.
 
 SZIP implements an extended Rice adaptive lossless compression algorithm
 for sample data.  The primary algorithm was developed by R. F. Rice at
@@ -31,9 +33,6 @@ patents please contact ICs Corp. at ICs Corp., 721 Lochsa Street, Suite 8,
 Post Falls, ID 83854.  (208) 262-2008.
 
 ==============================================================================*/
-/*
- * Test file for SZIP LIbrary; see also example.c file in the same directory
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -220,26 +219,18 @@ int n;
 }
 
 void
-gentest(n, j, blocks)
+genimage(n, j, blocks)
 int n;
 int j;
 int blocks;
 {
-	SZ_com_t params;
-	long image_size;
-	int count;
 	int i;
 	int k;
-	int rv;
 	int sum;
 	int sum_array[32];
-	size_t size;
-	size_t size2;
 	unsigned sigma[1024];
 	unsigned sigma_out[1024];
 	unsigned *send;
-
-	printf("test: mode=%s msb_first=%d n=%02d, j=%02d, blocks=%d -------------------\n", nn_mode ? "nn" : "ec", msb_first, n, j, blocks);
 
 	bp = image_in;
 
@@ -300,6 +291,26 @@ int blocks;
 			send = sigma + j*16;
 			}
 		}
+}
+
+void
+gentest(n, j, blocks)
+int n;
+int j;
+int blocks;
+{
+	SZ_com_t params;
+	long image_size;
+	int count;
+	int i;
+	int k;
+	int rv;
+	size_t size;
+	size_t size2;
+
+	printf("test: mode=%s msb_first=%d n=%02d, j=%02d, blocks=%d -------------------\n", nn_mode ? "nn" : "ec", msb_first, n, j, blocks);
+
+	genimage(n, j, blocks);
 
 	image_size = blocks * j;
 	if (n > 16)
@@ -316,6 +327,95 @@ int blocks;
 	params.bits_per_pixel = n;
 	params.pixels_per_block = j;
 	params.pixels_per_scanline = 256;
+        
+	params.options_mask |= (nn_mode ? SZ_NN_OPTION_MASK : SZ_EC_OPTION_MASK);
+
+	size = ARRAY_SIZE;
+	rv = SZ_BufftoBuffCompress(image_out, &size, image_in, image_size, &params);
+
+	if (rv != SZ_OK)
+		{
+		fprintf(stderr, "SZ_BufftoBuffCompress fails\n");
+		exit(1);
+		}
+
+	size2 = ARRAY_SIZE;
+	rv = SZ_BufftoBuffDecompress(image_in2, &size2, image_out, size, &params);
+
+	if (rv != SZ_OK)
+		{
+		fprintf(stderr, "SZ_BufftoBuffDecompress fails\n");
+		exit(1);
+		}
+
+	rv = memcmp(image_in, image_in2, image_size);
+	printf("memcmp(image_in, image_in2, %ld) = %d\n", image_size, rv);
+	if (rv)
+		{
+		printf("Test failed.\n");
+		printf("j=%d n=%d msb_first=%d\n", j, n, msb_first);
+		printf("image_size = %ld, image_size2 = %ld\n", image_size, (long) size2);
+		count = 0;
+		for (i = 0; i < image_size; i++)
+			if (image_in[i] != image_in2[i])
+				{
+				printf("in[%04d] = %02x, in2[%04d] = %02x\n", i, image_in[i], i, image_in2[i]);
+				if (++count == 10)
+					break;
+				}
+
+		exit(1);
+		}
+}
+
+void
+gentest_odd(n, j, s)
+int n;
+int j;
+int s;
+{
+	SZ_com_t params;
+	char *ip;
+	int bytes_per_pixel;
+	int count;
+	int i;
+	int k;
+	int rv;
+	int sum;
+	int sum_array[32];
+	long image_size;
+	size_t size;
+	size_t size2;
+	unsigned sigma[1024];
+	unsigned sigma_out[1024];
+	unsigned *send;
+
+	printf("test(odd): mode=%s msb_first=%d n=%02d, j=%02d s=%03d -------------------\n", nn_mode ? "nn" : "ec", msb_first, n, j, s);
+
+	ip = image_in2;
+	bytes_per_pixel = (n + 7) >> 3;
+	if (bytes_per_pixel == 3)
+		bytes_per_pixel = 4;
+
+	for (i = 0; i < 32; i++)
+		{
+		genimage(n, 16, 16);
+		memcpy(ip, image_in, s*bytes_per_pixel);
+		ip += s*bytes_per_pixel;
+		}
+
+	image_size = s * i * bytes_per_pixel;
+	memcpy(image_in, image_in2, image_size);
+
+	params.options_mask = SZ_RAW_OPTION_MASK | SZ_ALLOW_K13_OPTION_MASK;
+	if (msb_first)
+		params.options_mask |= SZ_MSB_OPTION_MASK;
+	else
+		params.options_mask |= SZ_LSB_OPTION_MASK;
+
+	params.bits_per_pixel = n;
+	params.pixels_per_block = j;
+	params.pixels_per_scanline = s;
         
 	params.options_mask |= (nn_mode ? SZ_NN_OPTION_MASK : SZ_EC_OPTION_MASK);
 
@@ -452,6 +552,12 @@ char **argv;
 #endif
 	printf("Seed = %ld\n", seed);
 	rstart(-seed, seed);
+
+	/*** Test the umap_nn function for odd scanline length ***/
+	nn_mode = 1;
+	for (msb_first = 0; msb_first < 2; msb_first++)
+		for (n = 8; n <= 24; n += 8)
+			gentest_odd(n, 8, 101); 
 
 	/*** We only need to test the interleaving and deinterleaving ***/
 	/*** for float and double types.                              ***/
