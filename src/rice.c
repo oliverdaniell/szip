@@ -4715,7 +4715,7 @@ rice_decode()
 					if (bits < 5)
 						zero_blocks = bits;
 					else if (bits == 5)
-						zero_blocks = blocks_per_scanline > 64 ? 64 : blocks_per_scanline;
+						zero_blocks = blocks_per_scanline > MAX_ZERO_BLOCKS ? MAX_ZERO_BLOCKS : blocks_per_scanline;
 					else 
 						zero_blocks = bits - 1;
 				
@@ -4726,11 +4726,8 @@ rice_decode()
 						return;
 						}
 
-					while (zero_blocks--)
-						end += pixels_per_block;
-
+					end += (zero_blocks-1) * pixels_per_block;
 					memset(s, 0, (end-s)*sizeof(int));
-					end -= pixels_per_block;
 					}
 				}
 
@@ -5446,9 +5443,10 @@ rice_decode()
 						zero_blocks = bits;
 					else if (bits == 5)
 						{
-						/*** Zero blocks till the end of the scanline or to the nearest scanline block that is a multiple of 64. ***/
+						/*** Zero blocks till the end of the scanline or to the nearest scanline block that is ***/
+						/*** a multiple of MAX_ZERO_BLOCKS. ***/
 						/*** Hardware is limited to 64 zero blocks and 64 blocks per scanline ***/
-						zero_blocks = 64 - ((i-1) & 0x3f);
+						zero_blocks = MAX_ZERO_BLOCKS - ((i-1) & (MAX_ZERO_BLOCKS-1));
 						if (blocks_per_scanline - (i-1) < zero_blocks)
 							zero_blocks = blocks_per_scanline - (i-1);
 						}
@@ -5462,11 +5460,8 @@ rice_decode()
 						return;
 						}
 
-					while (zero_blocks--)
-						end += pixels_per_block;
-
+					end += (zero_blocks-1) * pixels_per_block;
 					memset(s, 0, (end-s)*sizeof(int));
-					end -= pixels_per_block;
 					}
 				}
 
