@@ -68,11 +68,11 @@ used.
 #define uncompress_memory szip_uncompress_memory
 #define output_buffer_full szip_output_buffer_full
 #define check_params szip_check_params
-#endif
+#endif /* HDF */
 
 #if !HDF
 static char sccs_id[] = "@(#) szip: Combined Version: 1.5, Revised: 06/11/02 15:01:11";
-#endif
+#endif /* !HDF */
 
 char copyright[] = "@(#) (C) Copyright 1993,1994,1996 University of New Mexico.  All Rights Reserved.";
 
@@ -80,19 +80,21 @@ char copyright[] = "@(#) (C) Copyright 1993,1994,1996 University of New Mexico. 
 static char credits1[] = "This software uses an extended Rice algorithm and was developed at the"; 
 static char credits2[] = "University of New Mexico.";
 static char credits3[] = "Software emulates two common modes of the extended Rice Algorithm chip set.";
-#endif
+#endif /* !HDF */
 
 static boolean allow_k13 = TRUE;
 #if !HDF
 static boolean encoding;
-#endif
 static boolean keep_compressed_file = FALSE;
 static boolean keep_image_file = FALSE;
+#endif /* !HDF */
 static boolean msb_first = TRUE;
 static boolean raw_mode = FALSE;
+#if !HDF
 static int verbose_mode;
 
 static short msb_test = 0x0001;
+#endif /* !HDF */
 
 static int (*winner_function)();
 static int (*winner_ref_function)();
@@ -132,11 +134,13 @@ static FILE *fp_out;
 
 static long output_pixel_count;
 
+#if !HDF
 static char base_file_name[MAX_FILENAME_SIZE];
 static char input_file_name[MAX_FILENAME_SIZE];
 static char output_file_name[MAX_FILENAME_SIZE];
 
 static long input_file_size;
+#endif /* !HDF */
 
 static char *bptr;
 static char *bmid;
@@ -152,7 +156,7 @@ static int leading_zeros[256];
 #if !HDF
 static char *file_array[MAX_COMMAND_LINE_FILES];
 static int file_count;
-#endif
+#endif /* !HDF */
 
 static char msg[256];
 static int error_count;
@@ -235,10 +239,13 @@ static void
 error(msg)
 char *msg;
 {
+#if !HDF
 	fprintf(stderr, "ERROR: %s: %s\n", input_file_name, msg);
+#endif /* !HDF */
 	error_count++;
 }
 
+#if !HDF
 static void
 binary_mode()
 {
@@ -256,6 +263,7 @@ binary_mode()
 		}
 #endif
 }
+#endif /* !HDF */
 
 static int
 getch()
@@ -356,7 +364,7 @@ read_header()
 		}
 	else
 		{
-		sprintf(msg, "Unknown file size format in input file: %s", input_file_name);
+		sprintf(msg, "Unknown file size format in input file.");
 		error(msg);
 		return;
 		}
@@ -542,6 +550,7 @@ int n;
 		}
 }
 
+#if !HDF
 static void
 internal_error(file_name, line_number)
 char *file_name;
@@ -550,6 +559,7 @@ int line_number;
 	fprintf(stderr, "INTERNAL ERROR: File: %s, Line: %d\n", file_name, line_number);
 	exit(1);
 }
+#endif /* !HDF */
 
 static int
 encode_scanline()
@@ -2548,6 +2558,7 @@ unsigned *end;
 	return id;
 }
 
+#if !HDF
 static void
 set_defaults()
 {
@@ -2559,7 +2570,6 @@ set_defaults()
 	pixels_per_scanline = DEFAULT_PIXELS_PER_SCANLINE;
 }
 
-#if !HDF
 static void
 help(name)
 char *name;
@@ -2760,6 +2770,7 @@ check_args()
 		}
 }
 
+#if !HDF
 static void
 print_stats(bytes_read, bytes_written)
 long bytes_read;
@@ -2871,6 +2882,7 @@ char *file_name;
 		return;
 		}
 }
+#endif /* !HDF */
 
 static void
 encode_initialize()
@@ -3004,6 +3016,7 @@ decode_initialize()
 	output_buffer_full = FALSE;
 }
 
+#if !HDF
 static void
 post_encode()
 {
@@ -3081,6 +3094,7 @@ char *file_name;
 
 	return total_coded_bytes;
 }
+#endif /* !HDF */
 
 static long
 compress_memory_bytes(new_options_mask, new_bits_per_pixel, new_pixels_per_block, new_pixels_per_scanline, in, pixels, out)
@@ -3116,7 +3130,9 @@ char *out;
 	input_byte_data = (unsigned char *) in;
 	input_pixel_count = pixels;
 
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	global_bptr = out;
 	encode_initialize();
@@ -3126,8 +3142,10 @@ char *out;
 
 	bytes_read = rice_encode();
 	bytes_written = global_bptr - out; 
+#if !HDF
 	if (verbose_mode)
 		print_stats(bytes_read, bytes_written);
+#endif /* !HDF */
 
 	return bytes_written;
 }
@@ -3165,7 +3183,10 @@ char *out;
 
 	input_word_data = (short *) in;
 	input_pixel_count = pixels;
+
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	global_bptr = out;
 	encode_initialize();
@@ -3175,8 +3196,10 @@ char *out;
 
 	bytes_read = rice_encode();
 	bytes_written = global_bptr - out; 
+#if !HDF
 	if (verbose_mode)
 		print_stats(bytes_read, bytes_written);
+#endif /* !HDF */
 
 	return bytes_written;
 }
@@ -3214,7 +3237,10 @@ char *out;
 
 	input_long_data = (char *) in;
 	input_pixel_count = pixels;
+
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	global_bptr = out;
 	encode_initialize();
@@ -3224,8 +3250,11 @@ char *out;
 
 	bytes_read = rice_encode();
 	bytes_written = global_bptr - out; 
+
+#if !HDF
 	if (verbose_mode)
 		print_stats(bytes_read, bytes_written);
+#endif /* !HDF */
 
 	return bytes_written;
 }
@@ -3285,7 +3314,7 @@ char *out;
 		{
 		sprintf(msg, "I only know how to compress 32 bit floats.");
 		error(msg);
-		exit(1);
+		return -1;
 		}
 
 	new_options_mask |= ALLOW_K13_OPTION_MASK;
@@ -3308,7 +3337,7 @@ char *out;
 		{
 		sprintf(msg, "Out of Memory.");
 		error(msg);
-		exit(1);
+		return -1;
 		}
 
 	interleave((char *) in, pixels*4, new_bits_per_pixel, (char *) interleave_array);
@@ -3318,18 +3347,26 @@ char *out;
 
 	input_byte_data = interleave_array;
 	input_pixel_count = pixels*4;
+
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	global_bptr = out;
 	encode_initialize();
 	check_args();
 	if (error_count)
+		{
+		free(interleave_array);
 		return -1;
+		}
 
 	bytes_read = rice_encode();
 	bytes_written = global_bptr - out; 
+#if !HDF
 	if (verbose_mode)
 		print_stats(bytes_read, bytes_written);
+#endif /* !HDF */
 
 	free(interleave_array);
 	return bytes_written;
@@ -3353,7 +3390,7 @@ char *out;
 		{
 		sprintf(msg, "I only know how to compress 64 bit doubles.");
 		error(msg);
-		exit(1);
+		return -1;
 		}
 
 	new_options_mask |= ALLOW_K13_OPTION_MASK;
@@ -3376,7 +3413,7 @@ char *out;
 		{
 		sprintf(msg, "Out of Memory.");
 		error(msg);
-		exit(1);
+		return -1;
 		}
 
 	interleave((char *) in, pixels*8, new_bits_per_pixel, (char *) interleave_array);
@@ -3386,18 +3423,26 @@ char *out;
 
 	input_byte_data = interleave_array;
 	input_pixel_count = pixels*8;
+
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	global_bptr = out;
 	encode_initialize();
 	check_args();
 	if (error_count)
+		{
+		free(interleave_array);
 		return -1;
+		}
 
 	bytes_read = rice_encode();
 	bytes_written = global_bptr - out; 
+#if !HDF
 	if (verbose_mode)
 		print_stats(bytes_read, bytes_written);
+#endif /* !HDF */
 
 	free(interleave_array);
 	return bytes_written;
@@ -3441,6 +3486,7 @@ char *out;
 	return out_bytes;
 }
 
+#if !HDF
 static void
 alternate_encoding(argc, argv)
 int argc;
@@ -3582,6 +3628,7 @@ char **argv;
 	printf("size = %d\n", size);
 	exit(0);
 }
+#endif /* !HDF */
 
 static void
 deinterleave(in, bytes, bits, out)
@@ -5322,7 +5369,10 @@ long out_pixels;
 
 	input_byte_data = (unsigned char *) in;
 	input_byte_count = in_bytes;
+
+#if !HDF
 	strcpy(input_file_name, "*memory*");
+#endif /* !HDF */
 
 	if (new_bits_per_pixel == 32 || new_bits_per_pixel == 64)
 		{
@@ -5335,7 +5385,7 @@ long out_pixels;
 			{
 			sprintf(msg, "Out of Memory.");
 			error(msg);
-			exit(1);
+			return -1;
 			}
 
 		bits_per_pixel = 8;
@@ -5368,7 +5418,6 @@ long out_pixels;
 	if (error_count)
 		return -1;
 
-
 	if (new_bits_per_pixel == 32 || new_bits_per_pixel == 64)
 		{
 		bytes_written = bptr - interleave_array; 
@@ -5380,6 +5429,7 @@ long out_pixels;
 	return bytes_written;
 }
 
+#if !HDF
 static void
 alternate_decoding(argc, argv)
 int argc;
@@ -5597,6 +5647,7 @@ post_decode()
 	if (!keep_compressed_file && fp_in != stdin)
 		remove(input_file_name);
 }
+#endif /* !HDF */
 
 int
 check_params(bits_per_pixel, pixels_per_block, pixels_per_scanline, image_pixels, msg)
@@ -5837,4 +5888,4 @@ char *argv[];
 
 	return 0;
 }
-#endif
+#endif /* !HDF */
