@@ -126,7 +126,7 @@ esac
 case "$cc_vendor-$cc_version" in
     gcc*|egcs*|pgcc*)
 	# General
-	CFLAGS="$CFLAGS $ARCH -ansi -pedantic -Wall -W -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wsign-compare -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline"
+	CFLAGS="$CFLAGS  -ansi -pedantic -Wall -W -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wsign-compare -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline"
 
 	# Production
         case "$cc_vendor-$cc_version" in
