@@ -8,7 +8,7 @@
 
 #if defined(WIN32)
 #if defined(_SZDLL_)
-#prama warning(disable: 4273)	/* Disable the dll linkage warnings */
+#pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
 #define __SZ_DLL__ __declspec(dllexport)
 /*#define __DLLVARH425__ __declspec(dllexport)*/
 #elif defined(_SZUSEDLL_)
