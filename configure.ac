@@ -151,7 +151,8 @@ AC_MSG_CHECKING([if encoding enabled])
 AC_ARG_ENABLE([encoding],
              [AC_HELP_STRING([--enable-encoding],
                              [Enable SZIP encoding [default=yes]])],
-             [ENCODING=$enableval])
+             [ENCODING=$enableval],
+             [ENCODING=yes])
 if test "X$ENCODING" = "Xyes"; then 
      echo "yes"
      AC_DEFINE([HAVE_ENCODING], [1], [Define if encoding is enabled])

@@ -4495,6 +4495,8 @@ echo $ECHO_N "checking if encoding enabled... $ECHO_C" >&6
 if test "${enable_encoding+set}" = set; then
   enableval="$enable_encoding"
   ENCODING=$enableval
+else
+  ENCODING=yes
 fi;
 if test "X$ENCODING" = "Xyes"; then
      echo "yes"
