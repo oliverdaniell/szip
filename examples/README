@@ -1,0 +1,20 @@
+
+ To run example
+ ==============
+
+First generate generate random image file
+ 
+              burst_szip -msb # 8 1024 16 image.#.in         
+
+where # is the bits_per_pixel value           
+
+Then run example
+
+              example [bits_per_pixel]        
+
+default bits_per_pixel = 8 
+
+
+
+
+ 
