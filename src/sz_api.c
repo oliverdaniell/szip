@@ -127,7 +127,7 @@ SZ_Compress(sz_stream *strm, int flush)
 
 	if (hidden->image_out == SZ_NULL)
 		{
-		image_size = strm->image_pixels * bytes_per_pixel * 1.25;
+		image_size = strm->image_pixels * bytes_per_pixel * 1.75;
 		hidden->image_out = (char *) malloc(image_size);
 		hidden->next_out = hidden->image_out;
 		hidden->avail_out = 0;
@@ -266,10 +266,10 @@ SZ_Decompress(sz_stream *strm, int flush)
 	hidden = (sz_hidden_data *) strm->hidden;
 	if (hidden->image_in == SZ_NULL)
 		{
-		image_size = strm->image_pixels * bytes_per_pixel * 1.25;
+		image_size = strm->image_pixels * bytes_per_pixel * 1.75;
 		hidden->image_in = (char *) malloc(image_size);
 		hidden->next_in = hidden->image_in;
-		hidden->avail_in = image_size * 1.25;
+		hidden->avail_in = image_size;
 		}
 
 	if (hidden->image_out == SZ_NULL)
@@ -393,7 +393,7 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 		bytes_per_pixel = 4;
 
 	pixels = (sourceLen+bytes_per_pixel-1)/bytes_per_pixel;
-	out_size = sourceLen * 1.25;
+	out_size = sourceLen * 2.00;
 
 	if (*destLen >= out_size)
 		image_out = dest;
