@@ -377,6 +377,9 @@ SZ_BufftoBuffCompress(void *dest, size_t *destLen, const void *source, size_t so
 	long pixels;
 	long output_bytes;
 
+	if (szip_allow_encoding == 0) {
+		return SZ_NO_ENCODER_ERROR;
+	}
 	sz = param;
 	if (sz == 0)
 		sz = &sz_default_param;
@@ -460,4 +463,9 @@ SZ_BufftoBuffDecompress(void *dest, size_t *destLen, const void *source, size_t 
 		*destLen = output_bytes;
 
 	return rv;
+}
+
+int
+SZ_encoder_enabled() {
+	return(szip_allow_encoding);
 }

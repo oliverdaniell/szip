@@ -173,5 +173,6 @@ __SZ_DLL__ int SZ_DecompressEnd(sz_stream *strm);
 __SZ_DLL__ int SZ_CompressInit(sz_stream *strm);
 __SZ_DLL__ int SZ_Compress(sz_stream *strm, int flush);
 __SZ_DLL__ int SZ_CompressEnd(sz_stream *strm);
+__SZ_DLL__ int SZ_encoder_enabled(void);
 
 #endif /* _SZLIB_H */
