@@ -1,4 +1,3 @@
-
 /*==============================================================================
 The SZIP Science Data Lossless Compression Program is Copyright (C) 2001 Science
 & Technology Corporation @ UNM.  All rights released.  Copyright (C) 2003 Lowell
@@ -303,7 +302,6 @@ int blocks;
 	long image_size;
 	int count;
 	int i;
-	int k;
 	int rv;
 	size_t size;
 	size_t size2;
@@ -379,16 +377,10 @@ int s;
 	int bytes_per_pixel;
 	int count;
 	int i;
-	int k;
 	int rv;
-	int sum;
-	int sum_array[32];
 	long image_size;
 	size_t size;
 	size_t size2;
-	unsigned sigma[1024];
-	unsigned sigma_out[1024];
-	unsigned *send;
 
 	printf("test(odd): mode=%s msb_first=%d n=%02d, j=%02d s=%03d -------------------\n", nn_mode ? "nn" : "ec", msb_first, n, j, s);
 
@@ -574,3 +566,4 @@ char **argv;
 
 	return 0;
 }
+
