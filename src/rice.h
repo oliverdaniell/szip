@@ -102,9 +102,12 @@ typedef int boolean;
 
 #define FILE_DATA	1
 #define MEMORY_DATA	2
-
+/* This doesn't work when scaline is set to max value 4K EIP 2004/8/05
 #define INPUT_BUFFER_SIZE 	16*1024
 #define OUTPUT_BUFFER_SIZE  16*1024
+*/
+#define INPUT_BUFFER_SIZE 	2*MAX_PIXELS_PER_SCANLINE*4
+#define OUTPUT_BUFFER_SIZE      2*MAX_PIXELS_PER_SCANLINE*4 
 
 static struct
 	{
