@@ -1,0 +1,317 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: lib - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP304.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\..\\" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /Fp"Debug/lib.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\szip\rice.c"
+"D:\szip\sz_api.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP304.tmp" 
+Creating command line "link.exe -lib /nologo /out:"Debug\szlib.lib"  .\Debug\rice.obj .\Debug\sz_api.obj "
+<h3>Output Window</h3>
+Compiling...
+rice.c
+d:\szip\rice.c(387) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(388) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(400) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(401) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(402) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(403) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(415) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(416) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(417) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(418) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(435) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(442) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(443) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(444) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(445) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1241) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1241) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1242) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1242) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1242) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1242) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1246) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1246) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1259) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1259) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1260) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1260) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1260) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1260) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1264) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1264) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1264) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1264) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1273) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1273) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1273) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1273) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1280) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1280) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1280) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1280) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1286) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1286) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1287) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1287) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1287) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1287) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1291) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1291) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1291) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1291) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1296) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1296) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1297) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1297) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1297) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1297) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1299) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1299) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1299) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1299) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1303) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1303) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1303) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1303) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1325) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1325) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1335) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1335) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1335) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1335) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1350) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1350) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1350) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1350) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1359) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1359) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1363) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1363) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1363) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1363) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1379) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1379) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1383) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1383) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1383) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1383) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1384) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1384) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1384) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1384) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1400) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1400) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1408) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1408) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1420) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1420) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1424) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1424) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1424) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1424) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1425) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1425) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1425) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1425) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1441) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1441) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1449) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1449) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1461) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1461) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1465) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1465) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1465) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1465) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1466) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1466) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1466) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1466) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1479) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1479) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1484) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1484) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1492) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1492) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1504) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1504) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1508) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1508) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1508) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1508) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1509) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1509) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1509) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1509) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1521) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1521) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1527) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1527) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1535) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1535) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1547) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1547) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1551) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1551) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1551) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1551) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1552) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1552) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1552) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1552) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1563) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1563) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1568) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1568) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1572) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1572) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1580) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1580) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1592) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1592) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1596) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1596) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1596) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1596) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1597) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1597) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1597) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1597) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1605) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1605) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1614) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1614) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1614) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1614) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1615) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1615) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1615) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1615) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1622) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1622) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1631) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1631) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1631) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1631) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1632) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1632) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1632) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1632) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1639) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1639) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1654) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1654) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1654) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1654) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1655) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1655) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1655) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1655) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1662) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1662) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1671) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1671) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1671) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1671) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1672) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1672) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1672) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1672) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1679) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1679) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1679) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1679) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1687) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1687) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1691) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1691) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1691) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1691) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1696) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1696) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1696) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1696) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1700) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1700) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1700) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+d:\szip\rice.c(1700) : warning C4244: '=' : conversion from 'unsigned long ' to 'char ', possible loss of data
+sz_api.c
+d:\szip\sz_api.c(7) : warning C4005: 'SZ_MAX_PIXELS_PER_SCANLINE' : macro redefinition
+        d:\szip\szlib.h(323) : see previous definition of 'SZ_MAX_PIXELS_PER_SCANLINE'
+d:\szip\sz_api.c(165) : warning C4244: '=' : conversion from 'double ' to 'long ', possible loss of data
+d:\szip\sz_api.c(174) : warning C4018: '<' : signed/unsigned mismatch
+d:\szip\sz_api.c(198) : warning C4018: '<' : signed/unsigned mismatch
+d:\szip\sz_api.c(318) : warning C4244: '=' : conversion from 'double ' to 'long ', possible loss of data
+d:\szip\sz_api.c(321) : warning C4244: '=' : conversion from 'double ' to 'long ', possible loss of data
+d:\szip\sz_api.c(326) : warning C4244: '=' : conversion from 'double ' to 'long ', possible loss of data
+d:\szip\sz_api.c(335) : warning C4018: '<' : signed/unsigned mismatch
+d:\szip\sz_api.c(357) : warning C4018: '<' : signed/unsigned mismatch
+d:\szip\sz_api.c(439) : warning C4244: '=' : conversion from 'double ' to 'long ', possible loss of data
+d:\szip\sz_api.c(441) : warning C4018: '>=' : signed/unsigned mismatch
+d:\szip\sz_api.c(452) : warning C4018: '>=' : signed/unsigned mismatch
+Creating library...
+<h3>
+--------------------Configuration: burst_szip - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP305.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\..\\" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Debug/burst_szip.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\szip\burst_szip.c"
+"D:\szip\mcgill.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP305.tmp" 
+Creating temporary file "C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP306.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/burst_szip.pdb" /debug /machine:I386 /out:"Debug/burst_szip.exe" /pdbtype:sept 
+.\Debug\burst_szip.obj
+.\Debug\mcgill.obj
+\szip\all\lib\Debug\szlib.lib
+]
+Creating command line "link.exe @C:\DOCUME~1\pvn\LOCALS~1\Temp\RSP306.tmp"
+<h3>Output Window</h3>
+Compiling...
+burst_szip.c
+Automatic linking with the debug static single-threaded HDF library - HD415d.lib
+d:\szip\burst_szip.c(37) : warning C4018: '>' : signed/unsigned mismatch
+d:\szip\burst_szip.c(144) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(154) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(161) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(162) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(177) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(184) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(185) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(200) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(213) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(221) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(222) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(231) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(232) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(247) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(296) : warning C4244: '=' : conversion from 'double ' to 'float ', possible loss of data
+d:\szip\burst_szip.c(443) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+d:\szip\burst_szip.c(361) : warning C4101: 'pixel' : unreferenced local variable
+mcgill.c
+d:\szip\burst_szip.c(335) : warning C4700: local variable 'sine_mult' used without having been initialized
+d:\szip\burst_szip.c(335) : warning C4700: local variable 'offset' used without having been initialized
+Automatic linking with the debug static single-threaded HDF library - HD415d.lib
+Linking...
+LINK : fatal error LNK1104: cannot open file "HD415d.lib"
+Error executing link.exe.
+
+
+
+<h3>Results</h3>
+all - 1 error(s), 259 warning(s)
+</pre>
+</body>
+</html>
