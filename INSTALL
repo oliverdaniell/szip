@@ -1,5 +1,5 @@
-        Instructions for the SZIP Library Installation
-        ===============================================
+        Instructions for the SZIP 2.0 Library Installation
+        ==================================================
 
         CONTENTS
         --------
@@ -16,48 +16,50 @@
 1. Obtaining SZIP
 
    The latest supported public release of SZIP is available from
-   ftp://hdf.ncsa.uiuc.edu/szip/src. Binary distribution can be found
-   under ftp://hdf.ncsa.uiuc.edu/szip/bin and 
-   ftp://hdf.ncsa.uiuc.edu/szip/bin_noencoder. For general information about
-   SZIP see http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/.
+   ftp://hdf.ncsa.uiuc.edu/szip/src. Binary distribution (with encoder
+   enabled) can be found under ftp://hdf.ncsa.uiuc.edu/szip/2.0/bin 
+   For general information about SZIP see 
+   http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/.
 
 2. License agreement
 
    SZIP comes with a license. SZIP distributed with HDF products is free for 
    non-commercial use; commercial licenses are available for commercial users 
    who wish to distribute an Szip-based software product. For details check
-   "License terms" section under http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/ or
-   COPYING file in the top-level directory of the SZIP source code distribution. 
+   "License terms" section under http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/
+   or COPYING file in the top-level directory of the SZIP source code 
+   distribution. 
    
 3. Installation on UNIX and Mac OSX
 
-   Obtain source tar ball from ftp://hdf.ncsa.uiuc.edu/szip/src
+   Obtain source tar ball from ftp://hdf.ncsa.uiuc.edu/szip/2.0/src
 
    3.1 Installation with encoder (license may be required)
 
-   Untar the source into szip directory
-   % tar -xvf szip.tar
+   Untar the source into szip-2.0 directory
+   % tar -xvf szip-2.0.tar
 
-   Change directory to the "szip" directory; configure, build and test for 
-   your platform:  
+   Change directory to the szip-2.0 directory; configure, build and 
+   test for your platform:  
 
-   % cd szip
+   % cd szip-2.0
    % ./configure --prefix=/where_to_install
    % make
    % make check
    % make install
 
-   Encoder is available by default.
+   Encoder is available by default. If "prefix" flag is not specified,
+   library will be installed under the szip-2.0/szip directory. 
 
    3.2 Installation without encoder (license not required)
 
-   Untar the source into the "szip" directory
-   % tar -xvf szip.tar
+   Untar the source into the szip-2.0 directory
+   % tar -xvf szip-2.0.tar
 
    Change directory to the "szip" directory; configure and build for your 
    platform:
 
-   % cd szip
+   % cd szip-2.0
    % ./configure --disable-encoding --prefix=/where_to_install
    % make
    % make check (you should get an error message when you try to test since
@@ -85,11 +87,11 @@
 
 5. Supported OSs
 
-   Solaris 2.7 and 2.8 (32 and 64-bit)
+   Solaris 2.7, 2.8, 2.9 (32 and 64-bit)
    FreeBSD
-   OSF1
+   OSF1 V5.1
    HPUX-11.00
-   Linux 2.4
+   Linux 2.4 32-bit and 64-bit
    Mac OSX
    Windows 2000 and XP
    AIX 5.1 and 5.2 (32 and 64-bit)
