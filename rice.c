@@ -3283,7 +3283,7 @@ char *out;
 
 	if (new_bits_per_pixel != 32)
 		{
-		sprintf(msg, "I only know how to compress 32 bit floats.\n");
+		sprintf(msg, "I only know how to compress 32 bit floats.");
 		error(msg);
 		exit(1);
 		}
@@ -3304,6 +3304,13 @@ char *out;
 	pixels_per_scanline = new_pixels_per_scanline;
 
 	interleave_array = (unsigned char *) malloc(4 * pixels);
+	if (interleave_array == 0)
+		{
+		sprintf(msg, "Out of Memory.");
+		error(msg);
+		exit(1);
+		}
+
 	interleave((char *) in, pixels*4, new_bits_per_pixel, (char *) interleave_array);
 
 	input_mode  = MEMORY_DATA;
@@ -3344,7 +3351,7 @@ char *out;
 
 	if (new_bits_per_pixel != 64)
 		{
-		sprintf(msg, "I only know how to compress 64 bit doubles.\n");
+		sprintf(msg, "I only know how to compress 64 bit doubles.");
 		error(msg);
 		exit(1);
 		}
@@ -3365,6 +3372,13 @@ char *out;
 	pixels_per_scanline = new_pixels_per_scanline;
 
 	interleave_array = (unsigned char *) malloc(8 * pixels);
+	if (interleave_array == 0)
+		{
+		sprintf(msg, "Out of Memory.");
+		error(msg);
+		exit(1);
+		}
+
 	interleave((char *) in, pixels*8, new_bits_per_pixel, (char *) interleave_array);
 
 	input_mode  = MEMORY_DATA;
@@ -3419,7 +3433,7 @@ char *out;
 		out_bytes = compress_memory_doubles(options_mask, bits_per_pixel, pixels_per_block, pixels_per_scanline, in, pixels, out);	
 	else
 		{
-		sprintf(msg, "compress_memory: szip compression does not work on %d bit data.\n", bits_per_pixel);
+		sprintf(msg, "compress_memory: szip compression does not work on %d bit data.", bits_per_pixel);
 		error(msg);
 		return -1;
 		}
@@ -3513,7 +3527,7 @@ char **argv;
 			size = compress_memory_doubles(option_mask, n, j, s, (double *) in, pixels, out);
 		else
 			{
-			sprintf(msg, "Bits per pixel (n) out of range 1..24,32,64.\n");
+			sprintf(msg, "Bits per pixel (n) out of range 1..24,32,64.");
 			error(msg);
 			exit(1);
 			}
@@ -3529,7 +3543,7 @@ char **argv;
 	sprintf(file_name, "%s.sz", argv[1]);
 	if ((fp = fopen(file_name, "wb")) == 0)
 		{
-		sprintf(msg, "Unable to open output file: %s\n", file_name);
+		sprintf(msg, "Unable to open output file: %s", file_name);
 		error(msg);
 		exit(1);
 		}
@@ -5317,6 +5331,13 @@ long out_pixels;
 
 		out_bytes = out_pixels * (new_bits_per_pixel >> 3);
 		interleave_array = (char *) malloc(out_bytes);
+		if (interleave_array == 0)
+			{
+			sprintf(msg, "Out of Memory.");
+			error(msg);
+			exit(1);
+			}
+
 		bits_per_pixel = 8;
 		}
 
