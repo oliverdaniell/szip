@@ -80,6 +80,41 @@ case "$INSTALL" in
     ;;
 esac
 
+dnl ----------------------------------------------------------------------
+dnl Check which archiving tool to use. This needs to be done before
+dnl the AC_PROG_LIBTOOL macro.
+dnl
+if test -z "$AR"; then
+  AC_CHECK_PROGS([AR], [ar xar], [:], [$PATH])
+fi
+AC_SUBST([AR])
+
+dnl Export the AR macro so that it will be placed in the libtool file
+dnl correctly.
+export AR
+
+AC_PROG_MAKE_SET
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+
+dnl Post processing to patch up some deficiencies in libtool
+case $host_os in
+  linux*)
+    # If gcc is not used, need to set $wl to use "-Wl,"
+    if $CC -v 2>&1 | grep '^gcc' > /dev/null ; then
+      : using gcc
+    else
+      echo 'fixing $wl in' $ofile
+ed - $ofile <<EOF 2> /dev/null
+/^wl=""/s//wl="-Wl,"/
+w
+q
+EOF
+    fi
+    ;;
+esac
+
+
 
 # Are we building this in debug or production mode? (Remove the -g flag
 # in production mode.)
@@ -139,7 +174,7 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
+#AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([memset])

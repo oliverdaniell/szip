@@ -11,13 +11,13 @@ AM_CPPFLAGS=-I$(top_srcdir)/src  -I$(top_srcdir)/test
 bin_PROGRAMS = burst_szip example
 
 burst_szip_SOURCES = burst_szip.c
-burst_szip_LDADD =  ../test/libmcgill.a ../src/libsz.a
-burst_szip_DEPENDENCIES = ../test/libmcgill.a ../src/libsz.a
+burst_szip_LDADD =  ../test/libmcgill.la ../src/libsz.la
+burst_szip_DEPENDENCIES = ../test/libmcgill.la ../src/libsz.la
 
 
 example_SOURCES = example.c
-example_LDADD = ../src/libsz.a
-example_DEPENDENCIES = ../src/libsz.a
+example_LDADD = ../src/libsz.la
+example_DEPENDENCIES = ../src/libsz.la
 
 #############################################################################
 ##                          Testing example                                ##

@@ -11,15 +11,15 @@ AM_CPPFLAGS=-I$(top_srcdir)/src -I$(top_srcdir)/test
 TESTS = gentest
 check_PROGRAMS = gentest
 
-lib_LIBRARIES = libmcgill.a
+lib_LTLIBRARIES = libmcgill.la
 CSOURCES = mcgill.c
 CHEADERS = mcgill.h
-libmcgill_a_SOURCES = $(CSOURCES)
+libmcgill_la_SOURCES = $(CSOURCES)
 include_HEADERS = $(CHEADERS)
 
 gentest_SOURCES = gentest.c 
-gentest_LDADD = ./libmcgill.a ../src/libsz.a
-gentest_DEPENDENCIES = ./libmcgill.a ../src/libsz.a
+gentest_LDADD = ./libmcgill.la ../src/libsz.la
+gentest_DEPENDENCIES = ./libmcgill.la ../src/libsz.la
 
 #############################################################################
 ##                          And the cleanup                                ##
