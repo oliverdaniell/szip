@@ -45,14 +45,16 @@ and 5,822,457 have been licensed to ICs Corp. for distribution with the
 HDF data storage and retrieval file format and software library products.
 All rights reserved.
 
-Revocable, royalty-free, nonexclusive sublicense to use SZIP decompression
-software routines and underlying patents is hereby granted by ICs Corp. to 
-all users of and in conjunction with HDF data storage and retrieval file 
-format and software library products.
+Revocable (in the event of breach by the user or if required by law), 
+royalty-free, nonexclusive sublicense to use SZIP decompression software 
+routines and underlying patents is hereby granted by ICs Corp. to all users 
+of and in conjunction with HDF data storage and retrieval file format and 
+software library products.
 
-Revocable, royalty-free, nonexclusive sublicense to use SZIP compression
-software routines and underlying patents for non-commercial, scientific use
-only is hereby granted by ICs Corp. to users of and in conjunction with HDF 
+Revocable (in the event of breach by the user or if required by law), 
+royalty-free, nonexclusive sublicense to use SZIP compression software 
+routines and underlying patents for non-commercial, scientific use only 
+is hereby granted by ICs Corp. to users of and in conjunction with HDF 
 data storage and retrieval file format and software library products.
 
 For commercial use license to SZIP compression software routines and underlying 
