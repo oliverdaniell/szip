@@ -40,6 +40,7 @@ Post Falls, ID 83854.  (208) 262-2008.
 #include <time.h>
 #include "mcgill.h"
 #include "szlib.h"
+#include "SZconfig.h"
 
 #define BLOCKS_PER_TEST	1024
 
@@ -530,7 +531,8 @@ char **argv;
 	int j;
 	int n;
 	long seed;
-
+/* Run tests only if encoding is enabled */
+if(SZ_encoder_enabled()) {
 	image_in  = (char *) malloc(ARRAY_SIZE);
 	image_in2 = (char *) malloc(ARRAY_SIZE);
 	image_out = (char *) malloc(ARRAY_SIZE);
@@ -567,5 +569,8 @@ char **argv;
 	printf("All tests passed.\n");
 
 	return 0;
+} /*endif encoding_enabled */
+        printf("Encoding is disabled...quitting...\n");
+        return 1;        
 }
 
