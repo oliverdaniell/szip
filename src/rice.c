@@ -3271,7 +3271,7 @@ char *out;
 	output_mode = MEMORY_DATA;
 #endif /* !HDF */
 
-	input_byte_data = (char *) in;
+	input_byte_data = (unsigned char *) in;
 	input_pixel_count = pixels;
 #if !HDF
 	strcpy(input_file_name, "*memory*");
@@ -3335,7 +3335,7 @@ char *out;
 	output_mode = MEMORY_DATA;
 #endif /* !HDF */
 
-	input_byte_data = (char *) in;
+	input_byte_data = (unsigned char *) in;
 	input_pixel_count = pixels;
 #if !HDF
 	strcpy(input_file_name, "*memory*");
