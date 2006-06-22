@@ -7,7 +7,9 @@ AC_CONFIG_SRCDIR([src/rice.h])
 AC_CONFIG_AUX_DIR([bin])
 AC_CONFIG_HEADER([src/SZconfig.h])
 
-AM_INIT_AUTOMAKE([SZIP], [2.0])
+# Tell automake that this is not a GNU package (and doesn't need NEWS,
+# AUTHORS, etc. files)
+AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
