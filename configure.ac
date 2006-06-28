@@ -72,7 +72,6 @@ fi
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
-AC_PROG_RANLIB
 
 # Fix up the INSTALL macro if it's a relative path. We want the
 # full-path to the binary instead.
