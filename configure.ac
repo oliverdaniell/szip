@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([SZIP], [2.1], [hdfhelp@ncsa.uiuc.edu])
+AC_INIT([SZIP], [2.1], [help@hdfgroup.org])
 AC_CONFIG_SRCDIR([src/rice.h])
 AC_CONFIG_AUX_DIR([bin])
 AC_CONFIG_HEADER([src/SZconfig.h])

@@ -1,18 +1,15 @@
 
-                      Relase notes for SZIP 2.0
-                          February, 2005
+                      Relase notes for SZIP 2.1
+                          August, 2007
 
 
 Bug fixes:
 
-   -- Few bugs that caused overflow of the output buffer were fixed.
+   -- On some platforms configure didn't add -lm flag; fixed
 
 New features:
 
-   -- For information about changes in the SZIP source code see
-      http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/Release_notes_2_0.pdf
-   -- This release supports shared libraries. 
-      See "Known problems" section for additional information.
+   -- Configure was updated to use GNU autotools version 1.5.14
 
 Know problems:
 
@@ -27,4 +24,5 @@ Know problems:
       before running "make install"
 
 User's support:
-    Report all problems to hdfhelp@ncsa.uiuc.edu
+    Report all problems to help@hdfgroup.org
+    For more information on SZIP see http://www.hdfgroup.org/doc_resource/SZIP/
