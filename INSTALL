@@ -1,4 +1,4 @@
-        Instructions for the SZIP 2.0 Library Installation
+        Instructions for the SZIP 2.1 Library Installation
         ==================================================
 
         CONTENTS
@@ -16,8 +16,10 @@
 1. Obtaining SZIP
 
    The latest supported public release of SZIP is available from
-   ftp://hdf.ncsa.uiuc.edu/szip/2.0. Binary distribution (with encoder
-   enabled) can be found under ftp://hdf.ncsa.uiuc.edu/szip/2.0/bin 
+   ftp://hdf.ncsa.uiuc.edu/szip/2.1. Since there were no changes to the source code, but
+   only configuration files, we do not provide binraies for this release. 
+   If you need binary distribution (with encoder enabled), it can be found under 
+   ftp://hdf.ncsa.uiuc.edu/szip/2.0/bin 
    For general information about SZIP see 
    http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/.
 
@@ -32,34 +34,34 @@
    
 3. Installation on UNIX and Mac OSX
 
-   Obtain source tar ball from ftp://hdf.ncsa.uiuc.edu/szip/2.0/src
+   Obtain source tar ball from ftp://hdf.ncsa.uiuc.edu/szip/2.1/src
 
    3.1 Installation with encoder (license may be required)
 
-   Untar the source into szip-2.0 directory
-   % tar -xvf szip-2.0.tar
+   Untar the source into szip-2.1 directory
+   % tar -xvf szip-2.1.tar
 
-   Change directory to the szip-2.0 directory; configure, build and 
+   Change directory to the szip-2.1 directory; configure, build and 
    test for your platform:  
 
-   % cd szip-2.0
+   % cd szip-2.1
    % ./configure --prefix=/where_to_install
    % make
    % make check
    % make install
 
    Encoder is available by default. If "prefix" flag is not specified,
-   library will be installed under the szip-2.0/szip directory. 
+   library will be installed under the szip-2.1/szip directory. 
 
    3.2 Installation without encoder (license not required)
 
-   Untar the source into the szip-2.0 directory
-   % tar -xvf szip-2.0.tar
+   Untar the source into the szip-2.1 directory
+   % tar -xvf szip-2.1.tar
 
    Change directory to the "szip" directory; configure and build for your 
    platform:
 
-   % cd szip-2.0
+   % cd szip-2.1
    % ./configure --disable-encoding --prefix=/where_to_install
    % make
    % make check (you should get an error message when you try to test since
@@ -87,20 +89,18 @@
 
 5. Supported OSs
 
-   Solaris 2.7, 2.8, 2.9 (32 and 64-bit)
-   FreeBSD
-   OSF1 V5.1
-   HPUX-11.00
-   Linux 2.4 32-bit and 64-bit
+   Solaris 2.10 (32 and 64-bit)
+   FreeBSD (32 and 64-bit)
+   Linux 2.6 32-bit and 64-bit
    Mac OSX
-   Windows 2000 and XP
-   AIX 5.1 and 5.2 (32 and 64-bit)
-   IRIX64-6.5 (32 and 64-bit)
+   Windows P
+   AIX 5.3 and 5.2 (32 and 64-bit)
    Altix SGI
+   HPUX 11.23
    
 6. User's Support
 
-   Report problems to hdfhelp@ncsa.uiuc.edu
+   Report problems to help@hdfgorup.org
  
 
 
