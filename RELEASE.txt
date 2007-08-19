@@ -1,6 +1,6 @@
 
                       Relase notes for SZIP 2.1
-                          August, 2007
+                          Augusti 19, 2007
 
 
 Bug fixes:
@@ -14,14 +14,7 @@ New features:
 Know problems:
 
    -- On IRIX64-6.5 shared library version 3.0 is created instead of 2.0
-   -- On AIX 5.1 shared library is built but not installed. To bypass
-      the problem modify libsz.la in the src/.libs directory: 
-      replace line #11 
-          library_names='libsz.a libsz.a' 
-      with
-          library_names='libsz.so.2' 
-
-      before running "make install"
+   -- There is no support for shared library on the AIX 5.*1 systems
 
 User's support:
     Report all problems to help@hdfgroup.org
