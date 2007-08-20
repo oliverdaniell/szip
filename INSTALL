@@ -15,33 +15,36 @@
 
 1. Obtaining SZIP
 
-   The latest supported public release of SZIP is available from
-   ftp://hdf.ncsa.uiuc.edu/szip/2.1. Since there were no changes to the source code, but
-   only configuration files, we do not provide binraies for this release. 
-   If you need binary distribution (with encoder enabled), it can be found under 
-   ftp://hdf.ncsa.uiuc.edu/szip/2.0/bin 
-   For general information about SZIP see 
-   http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/.
+   The latest supported public release of SZIP is available from The 
+   HDF Group's (THG) FTP server:
+       ftp://ftp.hdfgroup.org/lib-external/szip/2.1 
+   Since there were no changes to the source code, but only in configuration 
+   files, we are not providing binaries for this release.  If you need a
+   binary distribution (with encoder enabled), it can be found here: 
+       ftp://ftp.hdfgroup.org/lib-external/szip/2.0/bin
+   For general information about SZIP, see the following material:
+       http://hdfgroup.org/doc_resource/SZIP/
 
 2. License agreement
 
    SZIP comes with a license. SZIP distributed with HDF products is free for 
    non-commercial use; commercial licenses are available for commercial users 
    who wish to distribute an Szip-based software product. For details check
-   "License terms" section under http://hdf.ncsa.uiuc.edu/doc_resource/SZIP/
-   or COPYING file in the top-level directory of the SZIP source code 
+   the "License terms" section under http://hdfgroup.org/doc_resource/SZIP/
+   or the COPYING file in the top-level directory of the SZIP source code 
    distribution. 
    
 3. Installation on UNIX and Mac OSX
 
-   Obtain source tar ball from ftp://hdf.ncsa.uiuc.edu/szip/2.1/src
+   Obtain a source tar ball from 
+   ftp://ftp.hdfgroup.org/lib-external/szip/2.1/src/.  
 
    3.1 Installation with encoder (license may be required)
 
-   Untar the source into szip-2.1 directory
+   Untar the source into an szip-2.1 directory
    % tar -xvf szip-2.1.tar
 
-   Change directory to the szip-2.1 directory; configure, build and 
+   Change directory to the szip-2.1 directory; configure, build, and 
    test for your platform:  
 
    % cd szip-2.1
@@ -50,15 +53,15 @@
    % make check
    % make install
 
-   Encoder is available by default. If "prefix" flag is not specified,
-   library will be installed under the szip-2.1/szip directory. 
+   The encoder is available by default. If the "prefix" flag is not specified,
+   the library will be installed under the szip-2.1/szip directory. 
 
    3.2 Installation without encoder (license not required)
 
    Untar the source into the szip-2.1 directory
    % tar -xvf szip-2.1.tar
 
-   Change directory to the "szip" directory; configure and build for your 
+   Change directory to the szip-2.1 directory; configure and build for your 
    platform:
 
    % cd szip-2.1
@@ -70,11 +73,11 @@
 
    3.3 Using non-default compiler
    
-   By default, platform configuration file under config directory is used
-   to set up compiler and compilation flags. 
+   By default, the platform configuration file under the config directory 
+   is used to set up compiler and compilation flags. 
 
-   Use CC and CFLAGS environment variables if other compiler or additional 
-   flags are desired. For example:
+   Use CC and CFLAGS environment variables if a different compiler or 
+   additional flags are desired. For example:
 
    % setenv CC /my_compiler/bin/foo
    % setenv CFLAGS "-foo_flags"
@@ -84,7 +87,7 @@
 4. Installation for Windows platforms
 
    To install on Windows, extract project and instruction files from the 
-   szipproj.zip archive in the "windows" directory, and follow instructions 
+   szipproj.zip archive in the "windows" directory, and follow the instructions 
    in the INSTALL_SZIP.txt file.
 
 5. Supported OSs
@@ -98,9 +101,9 @@
    Altix SGI
    HPUX 11.23
    
-6. User's Support
+6. User Support
 
-   Report problems to help@hdfgorup.org
+   Report problems to help@hdfgroup.org.
  
 
 
