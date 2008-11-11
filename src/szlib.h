@@ -42,7 +42,7 @@ Post Falls, ID 83854.  (208) 262-2008.
 #include "ricehdf.h"
 #include "szip_adpt.h"
 
-#define SZLIB_VERSION "2.0"
+#define SZLIB_VERSION "2.1"
 
 /*
    The application must update next_in and avail_in when avail_in has
