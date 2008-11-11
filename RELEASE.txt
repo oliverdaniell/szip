@@ -1,15 +1,16 @@
 
                       Relase notes for SZIP 2.1
-                          August 20, 2007
+                          November 10, 2008
 
 
 Bug fixes:
 
-   -- On some platforms configure didn't add -lm flag; fixed.
+   -- Modified a test in a configure script forcing to perform 
+      a real calculation to determine if math library is needed.
 
 New features:
 
-   -- Configure was updated to use GNU autotools version 1.5.14.
+   -- None.
 
 Know problems:
 
