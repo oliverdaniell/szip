@@ -158,7 +158,7 @@ esac
 # ======================================================================
 
 AC_MSG_CHECKING([for math library support])
-AC_TRY_LINK([#include <math.h>], [volatile x = 37.927; sinh(37.927)],
+AC_TRY_LINK([#include <math.h>], [volatile x = 37.927; k=1.2; sinh(x*k/cosh(x/k)],
             [AC_MSG_RESULT([yes])],
             [AC_MSG_RESULT([no]); LIBS="$LIBS -lm"])
 

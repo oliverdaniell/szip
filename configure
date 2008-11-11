@@ -19496,7 +19496,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-volatile x = 37.927; sinh(37.927)
+volatile x = 37.927; k=1.2; sinh(x*k/cosh(x/k)
   ;
   return 0;
 }
