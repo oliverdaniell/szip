@@ -22,6 +22,7 @@ SET (SZIP_PACKAGE_BUGREPORT "help@hdfgroup.org")
 # Define some CMake variables for use later in the project
 #-----------------------------------------------------------------------------
 SET (SZIP_RESOURCES_DIR          ${SZIP_SOURCE_DIR}/config/cmake)
+SET (HDF_RESOURCES_DIR           ${SZIP_SOURCE_DIR}/config/cmake)
 SET (SZIP_SRC_DIR                ${SZIP_SOURCE_DIR}/src)
 SET (SZIP_TEST_SOURCE_DIR        ${SZIP_SOURCE_DIR}/test)
 SET (SZIP_EXAMPLES_SOURCE_DIR    ${SZIP_SOURCE_DIR}/examples)
@@ -47,6 +48,7 @@ SET (SZIP_TEST_LIB_TARGET         ${SZIP_TEST_LIB_CORENAME})
 #-----------------------------------------------------------------------------
 # Include some macros for reusable code
 #-----------------------------------------------------------------------------
+INCLUDE (${HDF_RESOURCES_DIR}/HDFMacros.cmake)
 INCLUDE (${SZIP_RESOURCES_DIR}/SZIPMacros.cmake)
 
 #-----------------------------------------------------------------------------
@@ -88,7 +90,7 @@ SET_GLOBAL_VARIABLE(SZIP_LIBRARIES_TO_EXPORT "")
 #-----------------------------------------------------------------------------
 # Run all the CMake configuration tests for our build environment
 #-----------------------------------------------------------------------------
-INCLUDE (${SZIP_RESOURCES_DIR}/ConfigureChecks.cmake)
+INCLUDE (${HDF_RESOURCES_DIR}/ConfigureChecks.cmake)
 
 #-----------------------------------------------------------------------------
 # Option to enable encoding
@@ -178,6 +180,12 @@ ENDIF (CMAKE_COMPILER_IS_GNUCC)
 IF (CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 ENDIF (CMAKE_COMPILER_IS_GNUCXX)
+
+# parse the full version number from szlib.h and include in SZLIB_FULL_VERSION
+FILE (READ ${SZIP_SRC_DIR}/szlib.h _szlib_h_contents)
+STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9A-Za-z.]+)\".*"
+    "\\1" SZLIB_FULL_VERSION ${_szlib_h_contents})
+#MESSAGE (STATUS "VERSION: ${SZLIB_FULL_VERSION}")
 
 #-----------------------------------------------------------------------------
 # All libs/tests/examples need the main include directories

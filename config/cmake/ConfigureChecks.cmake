@@ -13,26 +13,26 @@ INCLUDE (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
 # Always SET this for now IF we are on an OS X box
 #-----------------------------------------------------------------------------
 IF (APPLE)
-  SET (SZIP_AC_APPLE_UNIVERSAL_BUILD 1)
+  SET (H5_AC_APPLE_UNIVERSAL_BUILD 1)
 ENDIF (APPLE)
 
 SET (LINUX_LFS 0)
-SET (SZIP_EXTRA_FLAGS)
+SET (HDF_EXTRA_FLAGS)
 IF (CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
   # Linux Specific flags
   ADD_DEFINITIONS (-D_POSIX_SOURCE -D_BSD_SOURCE)
-  OPTION (SZIP_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
-  IF (SZIP_ENABLE_LARGE_FILE)
+  OPTION (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
+  IF (HDF_ENABLE_LARGE_FILE)
     SET (LARGEFILE 1)
-    SET (SZIP_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
-    SET (CMAKE_REQUIRED_DEFINITIONS ${SZIP_EXTRA_FLAGS})
-  ENDIF (SZIP_ENABLE_LARGE_FILE)
+    SET (HDF_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+    SET (CMAKE_REQUIRED_DEFINITIONS ${HDF_EXTRA_FLAGS})
+  ENDIF (HDF_ENABLE_LARGE_FILE)
 ENDIF (CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
 IF (LINUX_LFS)
-  SET (SZIP_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
-  SET (CMAKE_REQUIRED_DEFINITIONS ${SZIP_EXTRA_FLAGS})
+  SET (HDF_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+  SET (CMAKE_REQUIRED_DEFINITIONS ${HDF_EXTRA_FLAGS})
 ENDIF (LINUX_LFS)
-ADD_DEFINITIONS (${SZIP_EXTRA_FLAGS})
+ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
 
 SET (WINDOWS)
 IF (WIN32)
@@ -40,6 +40,16 @@ IF (WIN32)
     SET (WINDOWS 1)
   ENDIF (NOT UNIX)
 ENDIF (WIN32)
+
+# ----------------------------------------------------------------------
+# Set the flag to indicate that the machine can handle converting
+# floating-point to long long values.
+# (This flag should be _unset_ for all machines)
+#
+#  SET (H5_HW_FP_TO_LLONG_NOT_WORKS 0)
+
+# so far we have no check for this
+SET(HAVE_TMPFILE 1)
 
 #-----------------------------------------------------------------------------
 # This MACRO checks IF the symbol exists in the library and IF it
@@ -120,7 +130,7 @@ CHECK_INCLUDE_FILE_CONCAT ("sys/stat.h"      HAVE_SYS_STAT_H)
 IF (CMAKE_SYSTEM_NAME MATCHES "OSF")
   CHECK_INCLUDE_FILE_CONCAT ("sys/sysinfo.h" HAVE_SYS_SYSINFO_H)
 ELSE (CMAKE_SYSTEM_NAME MATCHES "OSF")
-  SET (H5_HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
+  SET (HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
 ENDIF (CMAKE_SYSTEM_NAME MATCHES "OSF")
 CHECK_INCLUDE_FILE_CONCAT ("sys/time.h"      HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILE_CONCAT ("time.h"          HAVE_TIME_H)
@@ -149,7 +159,7 @@ ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
 #-----------------------------------------------------------------------------
 #  Check the size in bytes of all the int and float types
 #-----------------------------------------------------------------------------
-MACRO (SZIP_CHECK_TYPE_SIZE type var)
+MACRO (H5_CHECK_TYPE_SIZE type var)
   SET (aType ${type})
   SET (aVar  ${var})
 #  MESSAGE (STATUS "Checking size of ${aType} and storing into ${aVar}")
@@ -158,62 +168,62 @@ MACRO (SZIP_CHECK_TYPE_SIZE type var)
     SET (${aVar} 0 CACHE INTERNAL "SizeOf for ${aType}")
 #    MESSAGE (STATUS "Size of ${aType} was NOT Found")
   ENDIF (NOT ${aVar})
-ENDMACRO (SZIP_CHECK_TYPE_SIZE)
+ENDMACRO (H5_CHECK_TYPE_SIZE)
 
 
 
-SZIP_CHECK_TYPE_SIZE (char           SZIP_SIZEOF_CHAR)
-SZIP_CHECK_TYPE_SIZE (short          SZIP_SIZEOF_SHORT)
-SZIP_CHECK_TYPE_SIZE (int            SZIP_SIZEOF_INT)
-SZIP_CHECK_TYPE_SIZE (unsigned       SZIP_SIZEOF_UNSIGNED)
+H5_CHECK_TYPE_SIZE (char           H5_SIZEOF_CHAR)
+H5_CHECK_TYPE_SIZE (short          H5_SIZEOF_SHORT)
+H5_CHECK_TYPE_SIZE (int            H5_SIZEOF_INT)
+H5_CHECK_TYPE_SIZE (unsigned       H5_SIZEOF_UNSIGNED)
 IF (NOT APPLE)
-  SZIP_CHECK_TYPE_SIZE (long         SZIP_SIZEOF_LONG)
+  H5_CHECK_TYPE_SIZE (long         H5_SIZEOF_LONG)
 ENDIF (NOT APPLE)
-SZIP_CHECK_TYPE_SIZE ("long long"    SZIP_SIZEOF_LONG_LONG)
-SZIP_CHECK_TYPE_SIZE (__int64        SZIP_SIZEOF___INT64)
-IF (NOT SZIP_SIZEOF___INT64)
-  SET (SZIP_SIZEOF___INT64 0)
-ENDIF (NOT SZIP_SIZEOF___INT64)
+H5_CHECK_TYPE_SIZE ("long long"    H5_SIZEOF_LONG_LONG)
+H5_CHECK_TYPE_SIZE (__int64        H5_SIZEOF___INT64)
+IF (NOT H5_SIZEOF___INT64)
+  SET (H5_SIZEOF___INT64 0)
+ENDIF (NOT H5_SIZEOF___INT64)
 
-SZIP_CHECK_TYPE_SIZE (float          SZIP_SIZEOF_FLOAT)
-SZIP_CHECK_TYPE_SIZE (double         SZIP_SIZEOF_DOUBLE)
-SZIP_CHECK_TYPE_SIZE ("long double"  SZIP_SIZEOF_LONG_DOUBLE)
-SZIP_CHECK_TYPE_SIZE (int8_t         SZIP_SIZEOF_INT8_T)
-SZIP_CHECK_TYPE_SIZE (uint8_t        SZIP_SIZEOF_UINT8_T)
-SZIP_CHECK_TYPE_SIZE (int_least8_t   SZIP_SIZEOF_INT_LEAST8_T)
-SZIP_CHECK_TYPE_SIZE (uint_least8_t  SZIP_SIZEOF_UINT_LEAST8_T)
-SZIP_CHECK_TYPE_SIZE (int_fast8_t    SZIP_SIZEOF_INT_FAST8_T)
-SZIP_CHECK_TYPE_SIZE (uint_fast8_t   SZIP_SIZEOF_UINT_FAST8_T)
-SZIP_CHECK_TYPE_SIZE (int16_t        SZIP_SIZEOF_INT16_T)
-SZIP_CHECK_TYPE_SIZE (uint16_t       SZIP_SIZEOF_UINT16_T)
-SZIP_CHECK_TYPE_SIZE (int_least16_t  SZIP_SIZEOF_INT_LEAST16_T)
-SZIP_CHECK_TYPE_SIZE (uint_least16_t SZIP_SIZEOF_UINT_LEAST16_T)
-SZIP_CHECK_TYPE_SIZE (int_fast16_t   SZIP_SIZEOF_INT_FAST16_T)
-SZIP_CHECK_TYPE_SIZE (uint_fast16_t  SZIP_SIZEOF_UINT_FAST16_T)
-SZIP_CHECK_TYPE_SIZE (int32_t        SZIP_SIZEOF_INT32_T)
-SZIP_CHECK_TYPE_SIZE (uint32_t       SZIP_SIZEOF_UINT32_T)
-SZIP_CHECK_TYPE_SIZE (int_least32_t  SZIP_SIZEOF_INT_LEAST32_T)
-SZIP_CHECK_TYPE_SIZE (uint_least32_t SZIP_SIZEOF_UINT_LEAST32_T)
-SZIP_CHECK_TYPE_SIZE (int_fast32_t   SZIP_SIZEOF_INT_FAST32_T)
-SZIP_CHECK_TYPE_SIZE (uint_fast32_t  SZIP_SIZEOF_UINT_FAST32_T)
-SZIP_CHECK_TYPE_SIZE (int64_t        SZIP_SIZEOF_INT64_T)
-SZIP_CHECK_TYPE_SIZE (uint64_t       SZIP_SIZEOF_UINT64_T)
-SZIP_CHECK_TYPE_SIZE (int_least64_t  SZIP_SIZEOF_INT_LEAST64_T)
-SZIP_CHECK_TYPE_SIZE (uint_least64_t SZIP_SIZEOF_UINT_LEAST64_T)
-SZIP_CHECK_TYPE_SIZE (int_fast64_t   SZIP_SIZEOF_INT_FAST64_T)
-SZIP_CHECK_TYPE_SIZE (uint_fast64_t  SZIP_SIZEOF_UINT_FAST64_T)
+H5_CHECK_TYPE_SIZE (float          H5_SIZEOF_FLOAT)
+H5_CHECK_TYPE_SIZE (double         H5_SIZEOF_DOUBLE)
+H5_CHECK_TYPE_SIZE ("long double"  H5_SIZEOF_LONG_DOUBLE)
+H5_CHECK_TYPE_SIZE (int8_t         H5_SIZEOF_INT8_T)
+H5_CHECK_TYPE_SIZE (uint8_t        H5_SIZEOF_UINT8_T)
+H5_CHECK_TYPE_SIZE (int_least8_t   H5_SIZEOF_INT_LEAST8_T)
+H5_CHECK_TYPE_SIZE (uint_least8_t  H5_SIZEOF_UINT_LEAST8_T)
+H5_CHECK_TYPE_SIZE (int_fast8_t    H5_SIZEOF_INT_FAST8_T)
+H5_CHECK_TYPE_SIZE (uint_fast8_t   H5_SIZEOF_UINT_FAST8_T)
+H5_CHECK_TYPE_SIZE (int16_t        H5_SIZEOF_INT16_T)
+H5_CHECK_TYPE_SIZE (uint16_t       H5_SIZEOF_UINT16_T)
+H5_CHECK_TYPE_SIZE (int_least16_t  H5_SIZEOF_INT_LEAST16_T)
+H5_CHECK_TYPE_SIZE (uint_least16_t H5_SIZEOF_UINT_LEAST16_T)
+H5_CHECK_TYPE_SIZE (int_fast16_t   H5_SIZEOF_INT_FAST16_T)
+H5_CHECK_TYPE_SIZE (uint_fast16_t  H5_SIZEOF_UINT_FAST16_T)
+H5_CHECK_TYPE_SIZE (int32_t        H5_SIZEOF_INT32_T)
+H5_CHECK_TYPE_SIZE (uint32_t       H5_SIZEOF_UINT32_T)
+H5_CHECK_TYPE_SIZE (int_least32_t  H5_SIZEOF_INT_LEAST32_T)
+H5_CHECK_TYPE_SIZE (uint_least32_t H5_SIZEOF_UINT_LEAST32_T)
+H5_CHECK_TYPE_SIZE (int_fast32_t   H5_SIZEOF_INT_FAST32_T)
+H5_CHECK_TYPE_SIZE (uint_fast32_t  H5_SIZEOF_UINT_FAST32_T)
+H5_CHECK_TYPE_SIZE (int64_t        H5_SIZEOF_INT64_T)
+H5_CHECK_TYPE_SIZE (uint64_t       H5_SIZEOF_UINT64_T)
+H5_CHECK_TYPE_SIZE (int_least64_t  H5_SIZEOF_INT_LEAST64_T)
+H5_CHECK_TYPE_SIZE (uint_least64_t H5_SIZEOF_UINT_LEAST64_T)
+H5_CHECK_TYPE_SIZE (int_fast64_t   H5_SIZEOF_INT_FAST64_T)
+H5_CHECK_TYPE_SIZE (uint_fast64_t  H5_SIZEOF_UINT_FAST64_T)
 IF (NOT APPLE)
-  SZIP_CHECK_TYPE_SIZE (size_t       SZIP_SIZEOF_SIZE_T)
-  SZIP_CHECK_TYPE_SIZE (ssize_t      SZIP_SIZEOF_SSIZE_T)
-  IF (NOT SZIP_SIZEOF_SSIZE_T)
-    SET (SZIP_SIZEOF_SSIZE_T 0)
-  ENDIF (NOT SZIP_SIZEOF_SSIZE_T)
+  H5_CHECK_TYPE_SIZE (size_t       H5_SIZEOF_SIZE_T)
+  H5_CHECK_TYPE_SIZE (ssize_t      H5_SIZEOF_SSIZE_T)
+  IF (NOT H5_SIZEOF_SSIZE_T)
+    SET (H5_SIZEOF_SSIZE_T 0)
+  ENDIF (NOT H5_SIZEOF_SSIZE_T)
 ENDIF (NOT APPLE)
-SZIP_CHECK_TYPE_SIZE (off_t          SZIP_SIZEOF_OFF_T)
-SZIP_CHECK_TYPE_SIZE (off64_t        SZIP_SIZEOF_OFF64_T)
-IF (NOT SZIP_SIZEOF_OFF64_T)
-  SET (SZIP_SIZEOF_OFF64_T 0)
-ENDIF (NOT SZIP_SIZEOF_OFF64_T)
+H5_CHECK_TYPE_SIZE (off_t          H5_SIZEOF_OFF_T)
+H5_CHECK_TYPE_SIZE (off64_t        H5_SIZEOF_OFF64_T)
+IF (NOT H5_SIZEOF_OFF64_T)
+  SET (H5_SIZEOF_OFF64_T 0)
+ENDIF (NOT H5_SIZEOF_OFF64_T)
 
 
 # For other tests to use the same libraries
@@ -226,7 +236,7 @@ IF (WINDOWS)
   SET (HAVE_SYSTEM 1)
   SET (HAVE_DIFFTIME 1)
   SET (HAVE_LONGJMP 1)
-  SET (SZIP_STDC_HEADERS 1)
+  SET (STDC_HEADERS 1)
   SET (HAVE_GETHOSTNAME 1)
 ENDIF (WINDOWS)
 
@@ -281,7 +291,7 @@ IF (NOT MSVC)
   IF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
     TRY_COMPILE (HAVE_TIME_GETTIMEOFDAY
         ${CMAKE_BINARY_DIR}
-        ${SZIP_RESOURCES_DIR}/GetTimeOfDayTest.c
+        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
         COMPILE_DEFINITIONS -DTRY_TIME_H
         OUTPUT_VARIABLE OUTPUT
     )
@@ -293,7 +303,7 @@ IF (NOT MSVC)
   IF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
     TRY_COMPILE (HAVE_SYS_TIME_GETTIMEOFDAY
         ${CMAKE_BINARY_DIR}
-        ${SZIP_RESOURCES_DIR}/GetTimeOfDayTest.c
+        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
         COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
         OUTPUT_VARIABLE OUTPUT
     )
@@ -326,15 +336,15 @@ ENDIF (NOT WINDOWS)
 
 
 # For other other specific tests, use this MACRO.
-MACRO (SZIP_FUNCTION_TEST OTHER_TEST)
-  IF ("SZIP_${OTHER_TEST}" MATCHES "^SZIP_${OTHER_TEST}$")
+MACRO (HDF_FUNCTION_TEST OTHER_TEST)
+  IF ("H5_${OTHER_TEST}" MATCHES "^H5_${OTHER_TEST}$")
     SET (MACRO_CHECK_FUNCTION_DEFINITIONS "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
     SET (OTHER_TEST_ADD_LIBRARIES)
     IF (CMAKE_REQUIRED_LIBRARIES)
       SET (OTHER_TEST_ADD_LIBRARIES "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
     ENDIF (CMAKE_REQUIRED_LIBRARIES)
 
-    FOREACH (def ${SZIP_EXTRA_TEST_DEFINITIONS})
+    FOREACH (def ${HDF_EXTRA_TEST_DEFINITIONS})
       SET (MACRO_CHECK_FUNCTION_DEFINITIONS "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}=${${def}}")
     ENDFOREACH (def)
 
@@ -358,24 +368,24 @@ MACRO (SZIP_FUNCTION_TEST OTHER_TEST)
     # (STATUS "Performing ${OTHER_TEST}")
     TRY_COMPILE (${OTHER_TEST}
         ${CMAKE_BINARY_DIR}
-        ${SZIP_RESOURCES_DIR}/SZIPTests.c
+        ${HDF_RESOURCES_DIR}/HDFTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
         "${OTHER_TEST_ADD_LIBRARIES}"
         OUTPUT_VARIABLE OUTPUT
     )
     IF (${OTHER_TEST})
-      SET (SZIP_${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
+      SET (H5_${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
       MESSAGE (STATUS "Performing Other Test ${OTHER_TEST} - Success")
     ELSE (${OTHER_TEST})
       MESSAGE (STATUS "Performing Other Test ${OTHER_TEST} - Failed")
-      SET (SZIP_${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
+      SET (H5_${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
       FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
           "Performing Other Test ${OTHER_TEST} failed with the following output:\n"
           "${OUTPUT}\n"
       )
     ENDIF (${OTHER_TEST})
-  ENDIF ("SZIP_${OTHER_TEST}" MATCHES "^SZIP_${OTHER_TEST}$")
-ENDMACRO (SZIP_FUNCTION_TEST)
+  ENDIF ("H5_${OTHER_TEST}" MATCHES "^H5_${OTHER_TEST}$")
+ENDMACRO (HDF_FUNCTION_TEST)
 
 #-----------------------------------------------------------------------------
 # Check a bunch of other functions
@@ -406,7 +416,7 @@ ELSE (WINDOWS)
       HAVE_C99_DESIGNATED_INITIALIZER
       CXX_HAVE_OFFSETOF
   )
-    SZIP_FUNCTION_TEST (${test})
+    HDF_FUNCTION_TEST (${test})
   ENDFOREACH (test)
 ENDIF (WINDOWS)
 
@@ -421,21 +431,21 @@ ENDIF (HAVE_OFF64_T)
 #-----------------------------------------------------------------------------
 # Determine how 'inline' is used
 #-----------------------------------------------------------------------------
-SET (SZIP_EXTRA_TEST_DEFINITIONS INLINE_TEST_INLINE)
+SET (HDF_EXTRA_TEST_DEFINITIONS INLINE_TEST_INLINE)
 FOREACH (inline_test inline __inline__ __inline)
   SET (INLINE_TEST_INLINE ${inline_test})
-  SZIP_FUNCTION_TEST (INLINE_TEST_${inline_test})
+  HDF_FUNCTION_TEST (INLINE_TEST_${inline_test})
 ENDFOREACH (inline_test)
 
-SET (SZIP_EXTRA_TEST_DEFINITIONS)
+SET (HDF_EXTRA_TEST_DEFINITIONS)
 IF (INLINE_TEST___inline__)
-  SET (SZIP_inline __inline__)
+  SET (H5_inline __inline__)
 ELSE (INLINE_TEST___inline__)
   IF (INLINE_TEST___inline)
-    SET (SZIP_inline __inline)
+    SET (H5_inline __inline)
   ELSE (INLINE_TEST___inline)
     IF (INLINE_TEST_inline)
-      SET (SZIP_inline inline)
+      SET (H5_inline inline)
     ENDIF (INLINE_TEST_inline)
   ENDIF (INLINE_TEST___inline)
 ENDIF (INLINE_TEST___inline__)
@@ -443,44 +453,44 @@ ENDIF (INLINE_TEST___inline__)
 #-----------------------------------------------------------------------------
 # Check how to print a Long Long integer
 #-----------------------------------------------------------------------------
-SET (SZIP_SZIP_PRINTF_LL_WIDTH "SZIP_PRINTF_LL_WIDTH")
-IF (SZIP_PRINTF_LL_WIDTH MATCHES "^SZIP_PRINTF_LL_WIDTH$")
+SET (H5_PRINTF_LL_WIDTH "H5_PRINTF_LL_WIDTH")
+IF (H5_PRINTF_LL_WIDTH MATCHES "^H5_PRINTF_LL_WIDTH$")
   SET (PRINT_LL_FOUND 0)
   MESSAGE (STATUS "Checking for appropriate format for 64 bit long:")
-  FOREACH (SZIP_PRINTF_LL l64 l L q I64 ll)
-    SET (CURRENT_TEST_DEFINITIONS "-DPRINTF_LL_WIDTH=${SZIP_PRINTF_LL}")
-    IF (SZIP_SIZEOF_LONG_LONG)
+  FOREACH (HDF_PRINTF_LL l64 l L q I64 ll)
+    SET (CURRENT_TEST_DEFINITIONS "-DPRINTF_LL_WIDTH=${HDF_PRINTF_LL}")
+    IF (H5_SIZEOF_LONG_LONG)
       SET (CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS} -DHAVE_LONG_LONG")
-    ENDIF (SZIP_SIZEOF_LONG_LONG)
-    TRY_RUN (SZIP_PRINTF_LL_TEST_RUN   SZIP_PRINTF_LL_TEST_COMPILE
+    ENDIF (H5_SIZEOF_LONG_LONG)
+    TRY_RUN (HDF_PRINTF_LL_TEST_RUN   HDF_PRINTF_LL_TEST_COMPILE
         ${SZIP_BINARY_DIR}/CMake
-        ${SZIP_RESOURCES_DIR}/SZIPTests.c
+        ${HDF_RESOURCES_DIR}/HDFTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CURRENT_TEST_DEFINITIONS}
         OUTPUT_VARIABLE OUTPUT
     )
-    IF (SZIP_PRINTF_LL_TEST_COMPILE)
-      IF (SZIP_PRINTF_LL_TEST_RUN MATCHES 0)
-        SET (SZIP_PRINTF_LL_WIDTH "\"${SZIP_PRINTF_LL}\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
+    IF (HDF_PRINTF_LL_TEST_COMPILE)
+      IF (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
+        SET (H5_PRINTF_LL_WIDTH "\"${HDF_PRINTF_LL}\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
         SET (PRINT_LL_FOUND 1)
-      ELSE (SZIP_PRINTF_LL_TEST_RUN MATCHES 0)
-        MESSAGE ("Width with ${SZIP_PRINTF_LL} failed with result: ${SZIP_PRINTF_LL_TEST_RUN}")
-      ENDIF (SZIP_PRINTF_LL_TEST_RUN MATCHES 0)
-    ELSE (SZIP_PRINTF_LL_TEST_COMPILE)
+      ELSE (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
+        MESSAGE ("Width with ${HDF_PRINTF_LL} failed with result: ${HDF_PRINTF_LL_TEST_RUN}")
+      ENDIF (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
+    ELSE (HDF_PRINTF_LL_TEST_COMPILE)
       FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-          "Test SZIP_PRINTF_LL_WIDTH for ${SZIP_PRINTF_LL} failed with the following output:\n ${OUTPUT}\n"
+          "Test H5_PRINTF_LL_WIDTH for ${HDF_PRINTF_LL} failed with the following output:\n ${OUTPUT}\n"
       )
-    ENDIF (SZIP_PRINTF_LL_TEST_COMPILE)
-  ENDFOREACH (SZIP_PRINTF_LL)
+    ENDIF (HDF_PRINTF_LL_TEST_COMPILE)
+  ENDFOREACH (HDF_PRINTF_LL)
 
   IF (PRINT_LL_FOUND)
-    MESSAGE (STATUS "Checking for apropriate format for 64 bit long: found ${SZIP_PRINTF_LL_WIDTH}")
+    MESSAGE (STATUS "Checking for apropriate format for 64 bit long: found ${H5_PRINTF_LL_WIDTH}")
   ELSE (PRINT_LL_FOUND)
     MESSAGE (STATUS "Checking for apropriate format for 64 bit long: not found")
-    SET (SZIP_PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL
+    SET (H5_PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL
         "Width for printf for type `long long' or `__int64', us. `ll"
     )
   ENDIF (PRINT_LL_FOUND)
-ENDIF (SZIP_PRINTF_LL_WIDTH MATCHES "^SZIP_PRINTF_LL_WIDTH$")
+ENDIF (H5_PRINTF_LL_WIDTH MATCHES "^H5_PRINTF_LL_WIDTH$")
 
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can handle converting
@@ -488,14 +498,8 @@ ENDIF (SZIP_PRINTF_LL_WIDTH MATCHES "^SZIP_PRINTF_LL_WIDTH$")
 # (This flag should be set for all machines, except for the Crays, where
 # the cache value is set in it's config file)
 #
-SET (SZIP_CONVERT_DENORMAL_FLOAT 1)
+SET (H5_CONVERT_DENORMAL_FLOAT 1)
 
-#-----------------------------------------------------------------------------
-#  Are we going to use HSIZE_T
-#-----------------------------------------------------------------------------
-IF (SZIP_ENABLE_HSIZET)
-  SET (HAVE_LARGE_HSIZET 1)
-ENDIF (SZIP_ENABLE_HSIZET)
 IF (CYGWIN)
   SET (HAVE_LSEEK64 0)
 ENDIF (CYGWIN)
@@ -503,12 +507,12 @@ ENDIF (CYGWIN)
 #-----------------------------------------------------------------------------
 # Macro to determine the various conversion capabilities
 #-----------------------------------------------------------------------------
-MACRO (SZIPConversionTests TEST msg)
+MACRO (HDFConversionTests TEST msg)
   IF ("${TEST}" MATCHES "^${TEST}$")
    # MESSAGE (STATUS "===> ${TEST}")
     TRY_RUN (${TEST}_RUN   ${TEST}_COMPILE
         ${SZIP_BINARY_DIR}/CMake
-        ${SZIP_RESOURCES_DIR}/ConversionTests.c
+        ${HDF_RESOURCES_DIR}/ConversionTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-D${TEST}_TEST
         OUTPUT_VARIABLE OUTPUT
     )
@@ -532,12 +536,12 @@ MACRO (SZIPConversionTests TEST msg)
     ENDIF (${TEST}_COMPILE)
 
   ENDIF("${TEST}" MATCHES "^${TEST}$")
-ENDMACRO (SZIPConversionTests)
+ENDMACRO (HDFConversionTests)
 
 #-----------------------------------------------------------------------------
 # Macro to make some of the conversion tests easier to write/read
 #-----------------------------------------------------------------------------
-MACRO (SZIPMiscConversionTest  VAR TEST msg)
+MACRO (HDFMiscConversionTest  VAR TEST msg)
   IF ("${TEST}" MATCHES "^${TEST}$")
     IF (${VAR})
       SET (${TEST} 1 CACHE INTERNAL ${msg})
@@ -547,7 +551,7 @@ MACRO (SZIPMiscConversionTest  VAR TEST msg)
       MESSAGE (STATUS "${msg}... no")
     ENDIF (${VAR})
   ENDIF ("${TEST}" MATCHES "^${TEST}$")
-ENDMACRO (SZIPMiscConversionTest)
+ENDMACRO (HDFMiscConversionTest)
 
 #-----------------------------------------------------------------------------
 # Check various conversion capabilities
@@ -560,7 +564,7 @@ ENDMACRO (SZIPMiscConversionTest)
 # incorrect and its cache value is set "no" in its config/irix6.x and
 # irix5.x.
 #
-SZIPMiscConversionTest (SZIP_SIZEOF_LONG_DOUBLE SZIP_LDOUBLE_TO_INTEGER_ACCURATE "checking IF converting from long double to integers is accurate")
+HDFMiscConversionTest (HDF_SIZEOF_LONG_DOUBLE HDF_LDOUBLE_TO_INTEGER_ACCURATE "checking IF converting from long double to integers is accurate")
 # -----------------------------------------------------------------------
 # Set flag to indicate that the machine can do conversion from
 # long double to integers regardless of accuracy.  This flag should be
@@ -569,7 +573,7 @@ SZIPMiscConversionTest (SZIP_SIZEOF_LONG_DOUBLE SZIP_LDOUBLE_TO_INTEGER_ACCURATE
 # integers except 'unsigned long long'.  Other HP-UX systems are unknown
 # yet. (1/8/05 - SLU)
 #
-SZIPConversionTests (SZIP_LDOUBLE_TO_INTEGER_WORKS "Checking IF converting from long double to integers works")
+HDFConversionTests (HDF_LDOUBLE_TO_INTEGER_WORKS "Checking IF converting from long double to integers works")
 # -----------------------------------------------------------------------
 # Set flag to indicate that the machine can handle conversion from
 # integers to long double.  (This flag should be set "yes" for all
@@ -577,7 +581,7 @@ SZIPConversionTests (SZIP_LDOUBLE_TO_INTEGER_WORKS "Checking IF converting from 
 # incorrect and its cache value is set "no" in its config/irix6.x and
 # irix5.x)
 #
-SZIPMiscConversionTest (SZIP_SIZEOF_LONG_DOUBLE SZIP_INTEGER_TO_LDOUBLE_ACCURATE "checking IF accurately converting from integers to long double")
+HDFMiscConversionTest (HDF_SIZEOF_LONG_DOUBLE HDF_INTEGER_TO_LDOUBLE_ACCURATE "checking IF accurately converting from integers to long double")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'unsigned long' to 'float' values.
@@ -586,7 +590,7 @@ SZIPMiscConversionTest (SZIP_SIZEOF_LONG_DOUBLE SZIP_INTEGER_TO_LDOUBLE_ACCURATE
 # values as negative when the first bit of 'unsigned long' is on during
 # the conversion to float.)
 #
-SZIPConversionTests (SZIP_ULONG_TO_FLOAT_ACCURATE "Checking IF accurately converting unsigned long to float values")
+HDFConversionTests (HDF_ULONG_TO_FLOAT_ACCURATE "Checking IF accurately converting unsigned long to float values")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'unsigned (long) long' values to 'float' and 'double' values.
@@ -595,7 +599,7 @@ SZIPConversionTests (SZIP_ULONG_TO_FLOAT_ACCURATE "Checking IF accurately conver
 # 64-bit machines, where the short program below tests if round-up is
 # correctly handled.
 #
-SZIPConversionTests (SZIP_ULONG_TO_FP_BOTTOM_BIT_ACCURATE "Checking IF accurately converting unsigned long long to floating-point values")
+HDFConversionTests (HDF_ULONG_TO_FP_BOTTOM_BIT_ACCURATE "Checking IF accurately converting unsigned long long to floating-point values")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'float' or 'double' to 'unsigned long long' values.
@@ -603,7 +607,7 @@ SZIPConversionTests (SZIP_ULONG_TO_FP_BOTTOM_BIT_ACCURATE "Checking IF accuratel
 # where round-up happens when the fraction of float-point value is greater
 # than 0.5.
 #
-SZIPConversionTests (SZIP_FP_TO_ULLONG_ACCURATE "Checking IF accurately roundup converting floating-point to unsigned long long values" )
+HDFConversionTests (HDF_FP_TO_ULLONG_ACCURATE "Checking IF accurately roundup converting floating-point to unsigned long long values" )
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'float', 'double' or 'long double' to 'unsigned long long' values.
@@ -611,31 +615,31 @@ SZIPConversionTests (SZIP_FP_TO_ULLONG_ACCURATE "Checking IF accurately roundup 
 # where the maximal number for unsigned long long is 0x7fffffffffffffff
 # during conversion.
 #
-SZIPConversionTests (SZIP_FP_TO_ULLONG_RIGHT_MAXIMUM "Checking IF right maximum converting floating-point to unsigned long long values" )
+HDFConversionTests (HDF_FP_TO_ULLONG_RIGHT_MAXIMUM "Checking IF right maximum converting floating-point to unsigned long long values" )
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'long double' to 'unsigned int' values.  (This flag should be set for
 # all machines, except for some Intel compilers on some Linux.)
 #
-SZIPConversionTests (SZIP_LDOUBLE_TO_UINT_ACCURATE "Checking IF correctly converting long double to unsigned int values")
+HDFConversionTests (HDF_LDOUBLE_TO_UINT_ACCURATE "Checking IF correctly converting long double to unsigned int values")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can _compile_
 # 'unsigned long long' to 'float' and 'double' typecasts.
 # (This flag should be set for all machines.)
 #
-IF (SZIP_ULLONG_TO_FP_CAST_WORKS MATCHES ^SZIP_ULLONG_TO_FP_CAST_WORKS$)
-  SET (SZIP_ULLONG_TO_FP_CAST_WORKS 1 CACHE INTERNAL "Checking IF compiling unsigned long long to floating-point typecasts work")
+IF (HDF_ULLONG_TO_FP_CAST_WORKS MATCHES ^HDF_ULLONG_TO_FP_CAST_WORKS$)
+  SET (HDF_ULLONG_TO_FP_CAST_WORKS 1 CACHE INTERNAL "Checking IF compiling unsigned long long to floating-point typecasts work")
   MESSAGE (STATUS "Checking IF compiling unsigned long long to floating-point typecasts work... yes")
-ENDIF (SZIP_ULLONG_TO_FP_CAST_WORKS MATCHES ^SZIP_ULLONG_TO_FP_CAST_WORKS$)
+ENDIF (HDF_ULLONG_TO_FP_CAST_WORKS MATCHES ^HDF_ULLONG_TO_FP_CAST_WORKS$)
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can _compile_
 # 'long long' to 'float' and 'double' typecasts.
 # (This flag should be set for all machines.)
 #
-IF (SZIP_LLONG_TO_FP_CAST_WORKS MATCHES ^SZIP_LLONG_TO_FP_CAST_WORKS$)
-  SET (SZIP_LLONG_TO_FP_CAST_WORKS 1 CACHE INTERNAL "Checking IF compiling long long to floating-point typecasts work")
+IF (HDF_LLONG_TO_FP_CAST_WORKS MATCHES ^HDF_LLONG_TO_FP_CAST_WORKS$)
+  SET (HDF_LLONG_TO_FP_CAST_WORKS 1 CACHE INTERNAL "Checking IF compiling long long to floating-point typecasts work")
   MESSAGE (STATUS "Checking IF compiling long long to floating-point typecasts work... yes")
-ENDIF (SZIP_LLONG_TO_FP_CAST_WORKS MATCHES ^SZIP_LLONG_TO_FP_CAST_WORKS$)
+ENDIF (HDF_LLONG_TO_FP_CAST_WORKS MATCHES ^HDF_LLONG_TO_FP_CAST_WORKS$)
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can convert from
 # 'unsigned long long' to 'long double' without precision loss.
@@ -643,7 +647,7 @@ ENDIF (SZIP_LLONG_TO_FP_CAST_WORKS MATCHES ^SZIP_LLONG_TO_FP_CAST_WORKS$)
 # where the last 2 bytes of mantissa are lost when compiler tries to do
 # the conversion, and Cygwin where compiler doesn't do rounding correctly.)
 #
-SZIPConversionTests (SZIP_ULLONG_TO_LDOUBLE_PRECISION "Checking IF converting unsigned long long to long double with precision")
+HDFConversionTests (HDF_ULLONG_TO_LDOUBLE_PRECISION "Checking IF converting unsigned long long to long double with precision")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can handle overflow converting
 # all floating-point to all integer types.
@@ -651,7 +655,7 @@ SZIPConversionTests (SZIP_ULLONG_TO_LDOUBLE_PRECISION "Checking IF converting un
 # floating exception is generated when the floating-point value is greater
 # than the maximal integer value).
 #
-SZIPConversionTests (SZIP_FP_TO_INTEGER_OVERFLOW_WORKS  "Checking IF overflows normally converting floating-point to integer values")
+HDFConversionTests (HDF_FP_TO_INTEGER_OVERFLOW_WORKS  "Checking IF overflows normally converting floating-point to integer values")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # 'long double' to '(unsigned) long long' values.  (This flag should be set for
@@ -661,7 +665,7 @@ SZIPConversionTests (SZIP_FP_TO_INTEGER_OVERFLOW_WORKS  "Checking IF overflows n
 # 0x4351ccf385ebc8a0dfcc... or 0x4351ccf385ebc8a0ffcc... will make the converted
 # values wildly wrong.  This test detects this wrong behavior and disable the test.
 #
-SZIPConversionTests (SZIP_LDOUBLE_TO_LLONG_ACCURATE "Checking IF correctly converting long double to (unsigned) long long values")
+HDFConversionTests (HDF_LDOUBLE_TO_LLONG_ACCURATE "Checking IF correctly converting long double to (unsigned) long long values")
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can accurately convert
 # '(unsigned) long long' to 'long double' values.  (This flag should be set for
@@ -669,8 +673,8 @@ SZIPConversionTests (SZIP_LDOUBLE_TO_LLONG_ACCURATE "Checking IF correctly conve
 # 007fff..., 00ffff..., 01ffff..., ..., 7fffff..., the converted values are twice
 # as big as they should be.
 #
-SZIPConversionTests (SZIP_LLONG_TO_LDOUBLE_CORRECT "Checking IF correctly converting (unsigned) long long to long double values")
-SZIPConversionTests (SZIP_NO_ALIGNMENT_RESTRICTIONS "Checking IF alignment restrictions are strictly enforced")
+HDFConversionTests (HDF_LLONG_TO_LDOUBLE_CORRECT "Checking IF correctly converting (unsigned) long long to long double values")
+HDFConversionTests (HDF_NO_ALIGNMENT_RESTRICTIONS "Checking IF alignment restrictions are strictly enforced")
 
 #-----------------------------------------------------------------------------
 # These tests need to be manually SET for windows since there is currently
@@ -678,5 +682,5 @@ SZIPConversionTests (SZIP_NO_ALIGNMENT_RESTRICTIONS "Checking IF alignment restr
 # the 'dt_arith' test and most likely lots of other code
 # ----------------------------------------------------------------------------
 IF (WINDOWS)
-  SET (SZIP_FP_TO_ULLONG_RIGHT_MAXIMUM "" CACHE INTERNAL "")
+  SET (HDF_FP_TO_ULLONG_RIGHT_MAXIMUM "" CACHE INTERNAL "")
 ENDIF (WINDOWS)

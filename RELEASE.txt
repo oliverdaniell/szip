@@ -1,16 +1,15 @@
 
                       Relase notes for SZIP 2.1
-                          November 10, 2008
+                          July 14, 2010
 
 
 Bug fixes:
 
-   -- Modified a test in a configure script forcing to perform 
-      a real calculation to determine if math library is needed.
+   -- None.
 
 New features:
 
-   -- None.
+   -- CMake support added, which allows for shared or static builds.
 
 Know problems:
 

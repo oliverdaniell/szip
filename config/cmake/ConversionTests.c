@@ -1,4 +1,4 @@
-#ifdef SZIP_FP_TO_INTEGER_OVERFLOW_WORKS_TEST
+#ifdef HDF_FP_TO_INTEGER_OVERFLOW_WORKS_TEST
 
 int main(void)
 {
@@ -13,7 +13,7 @@ int main(void)
 
 #endif
 
-#ifdef SZIP_FP_TO_ULLONG_ACCURATE_TEST
+#ifdef HDF_FP_TO_ULLONG_ACCURATE_TEST
 
 int main(void)
 {
@@ -34,7 +34,7 @@ int main(void)
 
 #endif
 
-#ifdef SZIP_FP_TO_ULLONG_RIGHT_MAXIMUM_TEST
+#ifdef HDF_FP_TO_ULLONG_RIGHT_MAXIMUM_TEST
 int main(void)
 {
   float f =        9701917572145405952.00f;
@@ -61,7 +61,7 @@ int main(void)
 
 #endif
 
-#ifdef SZIP_LDOUBLE_TO_INTEGER_WORKS_TEST
+#ifdef HDF_LDOUBLE_TO_INTEGER_WORKS_TEST
 int main(void)
 {
   void *align;
@@ -85,7 +85,7 @@ int main(void)
 
 #endif
 
-#ifdef SZIP_LDOUBLE_TO_LLONG_ACCURATE_TEST
+#ifdef HDF_LDOUBLE_TO_LLONG_ACCURATE_TEST
 int main(void)
 {
   long double ld = 20041683600089727.779961L;
@@ -126,7 +126,7 @@ int main(void)
 }
 #endif
 
-#ifdef SZIP_LDOUBLE_TO_UINT_ACCURATE_TEST
+#ifdef HDF_LDOUBLE_TO_UINT_ACCURATE_TEST
 int main(void)
 {
   long double ld = 2733248032.9183987530L;
@@ -142,7 +142,7 @@ int main(void)
 }
 #endif
 
-#ifdef SZIP_LLONG_TO_LDOUBLE_CORRECT_TEST
+#ifdef HDF_LLONG_TO_LDOUBLE_CORRECT_TEST
 int main(void)
 {
   long double ld;
@@ -188,7 +188,7 @@ int main(void)
 }
 #endif
 
-#ifdef SZIP_NO_ALIGNMENT_RESTRICTIONS_TEST
+#ifdef HDF_NO_ALIGNMENT_RESTRICTIONS_TEST
 
 #include <stdlib.h>
 #include <string.h>
@@ -245,7 +245,7 @@ main ()
 
 #endif
 
-#ifdef SZIP_ULLONG_TO_LDOUBLE_PRECISION_TEST
+#ifdef HDF_ULLONG_TO_LDOUBLE_PRECISION_TEST
 
 #include <stddef.h>
 
@@ -324,7 +324,7 @@ int main(void)
 #endif
 
 
-#ifdef SZIP_ULONG_TO_FLOAT_ACCURATE_TEST
+#ifdef HDF_ULONG_TO_FLOAT_ACCURATE_TEST
 
 int main(void)
 {
@@ -356,7 +356,7 @@ done:
 
 #endif
 
-#ifdef SZIP_ULONG_TO_FP_BOTTOM_BIT_ACCURATE_TEST
+#ifdef HDF_ULONG_TO_FP_BOTTOM_BIT_ACCURATE_TEST
 
 #include <string.h>
 

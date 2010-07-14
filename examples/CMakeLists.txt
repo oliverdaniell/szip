@@ -11,7 +11,7 @@ INCLUDE_DIRECTORIES (${SZIP_TEST_SOURCE_DIR})
 # Add Tests
 #-----------------------------------------------------------------------------
 ADD_EXECUTABLE (burst_szip burst_szip.c)
-SZIP_NAMING (burst_szip)
+TARGET_NAMING (burst_szip)
 IF (WIN32)
   IF (MSVC)
     IF (NOT BUILD_SHARED_LIBS)
@@ -28,7 +28,7 @@ ADD_TEST (NAME burst_szip COMMAND $<TARGET_FILE:burst_szip> -msb 8 8 1024 16 ima
 
 #-- Adding test for example
 ADD_EXECUTABLE(example example.c)
-SZIP_NAMING (example)
+TARGET_NAMING (example)
 IF (WIN32)
   IF (MSVC)
     IF (NOT BUILD_SHARED_LIBS)
