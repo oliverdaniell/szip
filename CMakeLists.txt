@@ -108,7 +108,7 @@ OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" OFF)
 SET (LIB_TYPE STATIC)
 IF (BUILD_SHARED_LIBS)
   SET (LIB_TYPE SHARED)
-  SET (SZ_BUILT_AS_DYNAMIC_LIB 1)
+  ADD_DEFINITIONS (-DSZ_BUILT_AS_DYNAMIC_LIB)
   IF (MSVC)
     SET (CMAKE_MFC_FLAG 0)
     FOREACH (flag_var
@@ -124,7 +124,7 @@ IF (BUILD_SHARED_LIBS)
 ELSE (BUILD_SHARED_LIBS)
   IF (NOT WIN32)
     # should this be a user setting : Everyone uses it anyway ?
-    ADD_DEFINITIONS(-DPIC)
+    ADD_DEFINITIONS (-DPIC)
   ENDIF (NOT WIN32)
   IF (MSVC)
     SET (CMAKE_MFC_FLAG 0)
@@ -223,41 +223,34 @@ CONFIGURE_FILE (${SZIP_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.
 # Add file(s) to CMake Install
 #-----------------------------------------------------------------------------
 INSTALL (
-    FILES
-        ${PROJECT_BINARY_DIR}/SZconfig.h
-    DESTINATION
-        include
-    COMPONENT
-        headers
+    FILES ${PROJECT_BINARY_DIR}/SZconfig.h
+    DESTINATION include
+    COMPONENT headers
 )
 
 #-----------------------------------------------------------------------------
 # Add Target(s) to CMake Install for import into other projects
 #-----------------------------------------------------------------------------
 INSTALL (
-    EXPORT
-        ${SZIP_EXPORTED_TARGETS}
-    DESTINATION
-        lib
-    FILE
-        SZIP-targets.cmake
+    EXPORT ${SZIP_EXPORTED_TARGETS}
+    DESTINATION lib
+    FILE SZIP-targets.cmake
 )
 
 #-----------------------------------------------------------------------------
 # Export all exported targets to the build tree for use by parent project
 #-----------------------------------------------------------------------------
 EXPORT (
-    TARGETS
-        ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
-    FILE
-        SZIP-targets.cmake
+    TARGETS ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
+    FILE SZIP-targets.cmake
 )
 
 #-----------------------------------------------------------------------------
 # Configure the SZIP-config.cmake file for the build directory
 #-----------------------------------------------------------------------------
 SET (SZIP_INCLUDES_BUILD_TIME
-    ${SZIP_SRC_DIR} ${SZIP_BINARY_DIR}
+    ${SZIP_SRC_DIR}
+    ${SZIP_BINARY_DIR}
 )
 SET (SZIP_VERSION_STRING @SZIP_PACKAGE_VERSION@)
 SET (SZIP_VERSION_MAJOR  @SZIP_PACKAGE_VERSION_MAJOR@)
@@ -271,12 +264,27 @@ CONFIGURE_FILE (
 #-----------------------------------------------------------------------------
 # Configure the SZIP-config.cmake file for the install directory
 #-----------------------------------------------------------------------------
-INSTALL (CODE
-    "SET (SZIP_INSTALL_SKIP_TARGETS 1)
-     INCLUDE (${SZIP_BINARY_DIR}/SZIP-config.cmake) 
-     CONFIGURE_FILE (
-         \"${SZIP_RESOURCES_DIR}/SZIP-config.cmake.install.in\" 
-         \"${CMAKE_INSTALL_PREFIX}/lib/SZIP-config.cmake\" @ONLY
-     )
-    "
-)
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  CONFIGURE_FILE (
+      ${SZIP_RESOURCES_DIR}/SZIP-config.cmake.install.in
+      ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config.cmake @ONLY
+  )
+  INSTALL (
+      FILES ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config.cmake
+      DESTINATION lib/cmake/SZIP-${SZIP_PACKAGE_VERSION}
+  )
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
+
+#-----------------------------------------------------------------------------
+# Configure the SZIP-config-version.cmake file for the install directory
+#-----------------------------------------------------------------------------
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  CONFIGURE_FILE (
+      ${SZIP_RESOURCES_DIR}/SZIP-config-version.cmake.in
+      ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config-version.cmake @ONLY
+  )
+  INSTALL (
+      FILES ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config-version.cmake
+      DESTINATION lib/cmake/SZIP-${SZIP_PACKAGE_VERSION}
+  )
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
