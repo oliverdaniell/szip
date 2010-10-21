@@ -4,24 +4,10 @@ PROJECT (SZIP C)
 #-----------------------------------------------------------------------------
 # Basic SZIP stuff here
 #-----------------------------------------------------------------------------
-SET (SZIP_VERS_MAJOR 2)
-SET (SZIP_VERS_MINOR 1)
-SET (SZIP_VERS_RELEASE 0)
-#-----------------------------------------------------------------------------
-SET (SZIP_PACKAGE "szip")
-SET (SZIP_PACKAGE_NAME "SZIP")
-SET (SZIP_PACKAGE_VERSION "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
-SET (SZIP_PACKAGE_VERSION_MAJOR "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
-SET (SZIP_PACKAGE_VERSION_MINOR "${SZIP_VERS_RELEASE}")
-SET (SZIP_PACKAGE_STRING "${SZIP_PACKAGE_NAME} ${SZIP_PACKAGE_VERSION}")
-SET (SZIP_PACKAGE_TARNAME "szip")
-SET (SZIP_PACKAGE_URL "htt://www.hdfgroup.org")
-SET (SZIP_PACKAGE_BUGREPORT "help@hdfgroup.org")
 
 #-----------------------------------------------------------------------------
 # Define some CMake variables for use later in the project
 #-----------------------------------------------------------------------------
-SET (SZIP_RESOURCES_DIR          ${SZIP_SOURCE_DIR}/config/cmake)
 SET (HDF_RESOURCES_DIR           ${SZIP_SOURCE_DIR}/config/cmake)
 SET (SZIP_SRC_DIR                ${SZIP_SOURCE_DIR}/src)
 SET (SZIP_TEST_SOURCE_DIR        ${SZIP_SOURCE_DIR}/test)
@@ -46,10 +32,32 @@ SET (SZIP_LIB_TARGET              ${SZIP_LIB_CORENAME})
 SET (SZIP_TEST_LIB_TARGET         ${SZIP_TEST_LIB_CORENAME})
 
 #-----------------------------------------------------------------------------
+# parse the full version number from szlib.h and include in SZLIB_FULL_VERSION
+#-----------------------------------------------------------------------------
+FILE (READ ${SZIP_SRC_DIR}/szlib.h _szlib_h_contents)
+STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9A-Za-z.]+)\".*"
+    "\\1" SZLIB_FULL_VERSION ${_szlib_h_contents})
+#MESSAGE (STATUS "VERSION: ${SZLIB_FULL_VERSION}")
+SET (SZIP_VERS_MAJOR 2)
+SET (SZIP_VERS_MINOR 1)
+SET (SZIP_VERS_RELEASE 0)
+
+#-----------------------------------------------------------------------------
+SET (SZIP_PACKAGE "szip")
+SET (SZIP_PACKAGE_NAME "SZIP")
+SET (SZIP_PACKAGE_VERSION "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
+SET (SZIP_PACKAGE_VERSION_MAJOR "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
+SET (SZIP_PACKAGE_VERSION_MINOR "${SZIP_VERS_RELEASE}")
+SET (SZIP_PACKAGE_STRING "${SZIP_PACKAGE_NAME} ${SZIP_PACKAGE_VERSION}")
+SET (SZIP_PACKAGE_TARNAME "szip")
+SET (SZIP_PACKAGE_URL "htt://www.hdfgroup.org")
+SET (SZIP_PACKAGE_BUGREPORT "help@hdfgroup.org")
+
+#-----------------------------------------------------------------------------
 # Include some macros for reusable code
 #-----------------------------------------------------------------------------
 INCLUDE (${HDF_RESOURCES_DIR}/HDFMacros.cmake)
-INCLUDE (${SZIP_RESOURCES_DIR}/SZIPMacros.cmake)
+INCLUDE (${HDF_RESOURCES_DIR}/SZIPMacros.cmake)
 
 #-----------------------------------------------------------------------------
 # Setup output Directories
@@ -181,12 +189,6 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
   SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fmessage-length=0")
 ENDIF (CMAKE_COMPILER_IS_GNUCXX)
 
-# parse the full version number from szlib.h and include in SZLIB_FULL_VERSION
-FILE (READ ${SZIP_SRC_DIR}/szlib.h _szlib_h_contents)
-STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9A-Za-z.]+)\".*"
-    "\\1" SZLIB_FULL_VERSION ${_szlib_h_contents})
-#MESSAGE (STATUS "VERSION: ${SZLIB_FULL_VERSION}")
-
 #-----------------------------------------------------------------------------
 # All libs/tests/examples need the main include directories
 #-----------------------------------------------------------------------------
@@ -217,7 +219,7 @@ ENDIF (BUILD_TESTING)
 #-----------------------------------------------------------------------------
 # Generate the SZconfig.h file containing user settings needed by compilation
 #-----------------------------------------------------------------------------
-CONFIGURE_FILE (${SZIP_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h @ONLY)
+CONFIGURE_FILE (${HDF_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h @ONLY)
 
 #-----------------------------------------------------------------------------
 # Add file(s) to CMake Install
@@ -257,7 +259,7 @@ SET (SZIP_VERSION_MAJOR  @SZIP_PACKAGE_VERSION_MAJOR@)
 SET (SZIP_VERSION_MINOR  @SZIP_PACKAGE_VERSION_MINOR@)
 
 CONFIGURE_FILE (
-    ${SZIP_RESOURCES_DIR}/SZIP-config.cmake.build.in 
+    ${HDF_RESOURCES_DIR}/SZIP-config.cmake.build.in 
     ${SZIP_BINARY_DIR}/SZIP-config.cmake @ONLY
 )
 
@@ -266,7 +268,7 @@ CONFIGURE_FILE (
 #-----------------------------------------------------------------------------
 IF (NOT SZIP_EXTERNALLY_CONFIGURED)
   CONFIGURE_FILE (
-      ${SZIP_RESOURCES_DIR}/SZIP-config.cmake.install.in
+      ${HDF_RESOURCES_DIR}/SZIP-config.cmake.install.in
       ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config.cmake @ONLY
   )
   INSTALL (
@@ -280,7 +282,7 @@ ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
 #-----------------------------------------------------------------------------
 IF (NOT SZIP_EXTERNALLY_CONFIGURED)
   CONFIGURE_FILE (
-      ${SZIP_RESOURCES_DIR}/SZIP-config-version.cmake.in
+      ${HDF_RESOURCES_DIR}/SZIP-config-version.cmake.in
       ${SZIP_BINARY_DIR}/CMakeFiles/SZIP-config-version.cmake @ONLY
   )
   INSTALL (

@@ -13,7 +13,15 @@ INCLUDE (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
 # Always SET this for now IF we are on an OS X box
 #-----------------------------------------------------------------------------
 IF (APPLE)
-  SET (H5_AC_APPLE_UNIVERSAL_BUILD 1)
+  LIST(LENGTH CMAKE_OSX_ARCHITECTURES ARCH_LENGTH)
+  IF(ARCH_LENGTH GREATER 1)
+    set (CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
+    message(FATAL_ERROR "Building Universal Binaries on OS X is NOT supported by the HDF5 project. This is"
+    "due to technical reasons. The best approach would be build each architecture in separate directories"
+    "and use the 'lipo' tool to combine them into a single executable or library. The 'CMAKE_OSX_ARCHITECTURES'"
+    "variable has been set to a blank value which will build the default architecture for this system.")
+  ENDIF()
+  SET (HDF_AC_APPLE_UNIVERSAL_BUILD 0)
 ENDIF (APPLE)
 
 SET (LINUX_LFS 0)
@@ -34,23 +42,6 @@ IF (LINUX_LFS)
 ENDIF (LINUX_LFS)
 ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
 
-SET (WINDOWS)
-IF (WIN32)
-  IF (NOT UNIX)
-    SET (WINDOWS 1)
-  ENDIF (NOT UNIX)
-ENDIF (WIN32)
-
-# ----------------------------------------------------------------------
-# Set the flag to indicate that the machine can handle converting
-# floating-point to long long values.
-# (This flag should be _unset_ for all machines)
-#
-#  SET (H5_HW_FP_TO_LLONG_NOT_WORKS 0)
-
-# so far we have no check for this
-SET(HAVE_TMPFILE 1)
-
 #-----------------------------------------------------------------------------
 # This MACRO checks IF the symbol exists in the library and IF it
 # does, it appends library to the list.
@@ -63,21 +54,55 @@ MACRO (CHECK_LIBRARY_EXISTS_CONCAT LIBRARY SYMBOL VARIABLE)
   ENDIF (${VARIABLE})
 ENDMACRO (CHECK_LIBRARY_EXISTS_CONCAT)
 
+# ----------------------------------------------------------------------
+# WINDOWS Hard code Values
+# ----------------------------------------------------------------------
+
+SET (WINDOWS)
+IF (WIN32)
+  IF (NOT UNIX AND NOT CYGWIN)
+    SET (WINDOWS 1)
+  ENDIF (NOT UNIX AND NOT CYGWIN)
+ENDIF (WIN32)
+
+IF (WINDOWS)
+  SET (HAVE_LIBM 1)
+  SET (HAVE_IO_H 1)
+  SET (HAVE_SETJMP_H 1)
+  SET (HAVE_STDDEF_H 1)
+  SET (HAVE_SYS_STAT_H 1)
+  SET (HAVE_SYS_TIMEB_H 1)
+  SET (HAVE_SYS_TYPES_H 1)
+  SET (HAVE_STRDUP 1)
+  SET (HAVE_SYSTEM 1)
+  SET (HAVE_DIFFTIME 1)
+  SET (HAVE_LONGJMP 1)
+  SET (STDC_HEADERS 1)
+  SET (HAVE_GETHOSTNAME 1)
+  SET (HAVE_TIMEZONE 1)
+  SET (HAVE_FUNCTION 1)
+ENDIF (WINDOWS)
+
+# ----------------------------------------------------------------------
+# END of WINDOWS Hard code Values
+# ----------------------------------------------------------------------
+
+IF (CYGWIN)
+  SET (HAVE_LSEEK64 0)
+ENDIF (CYGWIN)
+
 #-----------------------------------------------------------------------------
 #  Check for the math library "m"
 #-----------------------------------------------------------------------------
-IF (WINDOWS)
-  SET (HAVE_LIBM 1)
-ELSE (WINDOWS)
-  CHECK_LIBRARY_EXISTS_CONCAT ("m" printf     HAVE_LIBM)
-ENDIF (WINDOWS)
-CHECK_LIBRARY_EXISTS_CONCAT ("ws2_32" printf  HAVE_LIBWS2_32)
-CHECK_LIBRARY_EXISTS_CONCAT ("wsock32" printf HAVE_LIBWSOCK32)
+IF (NOT WINDOWS)
+  CHECK_LIBRARY_EXISTS_CONCAT ("m" random     HAVE_LIBM)
+ENDIF (NOT WINDOWS)
+CHECK_LIBRARY_EXISTS_CONCAT ("ws2_32" WSAStartup  HAVE_LIBWS2_32)
+CHECK_LIBRARY_EXISTS_CONCAT ("wsock32" gethostbyname HAVE_LIBWSOCK32)
 #CHECK_LIBRARY_EXISTS_CONCAT ("dl"     dlopen       HAVE_LIBDL)
 CHECK_LIBRARY_EXISTS_CONCAT ("ucb"    gethostname  HAVE_LIBUCB)
 CHECK_LIBRARY_EXISTS_CONCAT ("socket" connect      HAVE_LIBSOCKET)
 CHECK_LIBRARY_EXISTS ("c" gethostbyname "" NOT_NEED_LIBNSL)
-
 
 IF (NOT NOT_NEED_LIBNSL)
   CHECK_LIBRARY_EXISTS_CONCAT ("nsl"    gethostbyname  HAVE_LIBNSL)
@@ -94,19 +119,6 @@ MACRO (CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
     SET (USE_INCLUDES ${USE_INCLUDES} ${FILE})
   ENDIF (${VARIABLE})
 ENDMACRO (CHECK_INCLUDE_FILE_CONCAT)
-
-#-----------------------------------------------------------------------------
-# If we are on Windows we know some of the answers to these tests already
-#-----------------------------------------------------------------------------
-IF (WINDOWS)
-  SET (HAVE_IO_H 1)
-  SET (HAVE_SETJMP_H 1)
-  SET (HAVE_STDDEF_H 1)
-  SET (HAVE_SYS_STAT_H 1)
-  SET (HAVE_SYS_TIMEB_H 1)
-  SET (HAVE_SYS_TYPES_H 1)
-  SET (HAVE_WINSOCK_H 1)
-ENDIF (WINDOWS)
 
 #-----------------------------------------------------------------------------
 #  Check for the existence of certain header files
@@ -142,7 +154,6 @@ CHECK_INCLUDE_FILE_CONCAT ("memory.h"        HAVE_MEMORY_H)
 CHECK_INCLUDE_FILE_CONCAT ("dlfcn.h"         HAVE_DLFCN_H)
 CHECK_INCLUDE_FILE_CONCAT ("features.h"      HAVE_FEATURES_H)
 CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE_CONCAT ("winsock2.h"      HAVE_WINSOCK_H)
 CHECK_INCLUDE_FILE_CONCAT ("netinet/in.h"    HAVE_NETINET_IN_H)
 
 
@@ -159,7 +170,7 @@ ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
 #-----------------------------------------------------------------------------
 #  Check the size in bytes of all the int and float types
 #-----------------------------------------------------------------------------
-MACRO (H5_CHECK_TYPE_SIZE type var)
+MACRO (HDF_CHECK_TYPE_SIZE type var)
   SET (aType ${type})
   SET (aVar  ${var})
 #  MESSAGE (STATUS "Checking size of ${aType} and storing into ${aVar}")
@@ -168,62 +179,62 @@ MACRO (H5_CHECK_TYPE_SIZE type var)
     SET (${aVar} 0 CACHE INTERNAL "SizeOf for ${aType}")
 #    MESSAGE (STATUS "Size of ${aType} was NOT Found")
   ENDIF (NOT ${aVar})
-ENDMACRO (H5_CHECK_TYPE_SIZE)
+ENDMACRO (HDF_CHECK_TYPE_SIZE)
 
 
 
-H5_CHECK_TYPE_SIZE (char           H5_SIZEOF_CHAR)
-H5_CHECK_TYPE_SIZE (short          H5_SIZEOF_SHORT)
-H5_CHECK_TYPE_SIZE (int            H5_SIZEOF_INT)
-H5_CHECK_TYPE_SIZE (unsigned       H5_SIZEOF_UNSIGNED)
+HDF_CHECK_TYPE_SIZE (char           HDF_SIZEOF_CHAR)
+HDF_CHECK_TYPE_SIZE (short          HDF_SIZEOF_SHORT)
+HDF_CHECK_TYPE_SIZE (int            HDF_SIZEOF_INT)
+HDF_CHECK_TYPE_SIZE (unsigned       HDF_SIZEOF_UNSIGNED)
 IF (NOT APPLE)
-  H5_CHECK_TYPE_SIZE (long         H5_SIZEOF_LONG)
+  HDF_CHECK_TYPE_SIZE (long         HDF_SIZEOF_LONG)
 ENDIF (NOT APPLE)
-H5_CHECK_TYPE_SIZE ("long long"    H5_SIZEOF_LONG_LONG)
-H5_CHECK_TYPE_SIZE (__int64        H5_SIZEOF___INT64)
-IF (NOT H5_SIZEOF___INT64)
-  SET (H5_SIZEOF___INT64 0)
-ENDIF (NOT H5_SIZEOF___INT64)
+HDF_CHECK_TYPE_SIZE ("long long"    HDF_SIZEOF_LONG_LONG)
+HDF_CHECK_TYPE_SIZE (__int64        HDF_SIZEOF___INT64)
+IF (NOT HDF_SIZEOF___INT64)
+  SET (HDF_SIZEOF___INT64 0)
+ENDIF (NOT HDF_SIZEOF___INT64)
 
-H5_CHECK_TYPE_SIZE (float          H5_SIZEOF_FLOAT)
-H5_CHECK_TYPE_SIZE (double         H5_SIZEOF_DOUBLE)
-H5_CHECK_TYPE_SIZE ("long double"  H5_SIZEOF_LONG_DOUBLE)
-H5_CHECK_TYPE_SIZE (int8_t         H5_SIZEOF_INT8_T)
-H5_CHECK_TYPE_SIZE (uint8_t        H5_SIZEOF_UINT8_T)
-H5_CHECK_TYPE_SIZE (int_least8_t   H5_SIZEOF_INT_LEAST8_T)
-H5_CHECK_TYPE_SIZE (uint_least8_t  H5_SIZEOF_UINT_LEAST8_T)
-H5_CHECK_TYPE_SIZE (int_fast8_t    H5_SIZEOF_INT_FAST8_T)
-H5_CHECK_TYPE_SIZE (uint_fast8_t   H5_SIZEOF_UINT_FAST8_T)
-H5_CHECK_TYPE_SIZE (int16_t        H5_SIZEOF_INT16_T)
-H5_CHECK_TYPE_SIZE (uint16_t       H5_SIZEOF_UINT16_T)
-H5_CHECK_TYPE_SIZE (int_least16_t  H5_SIZEOF_INT_LEAST16_T)
-H5_CHECK_TYPE_SIZE (uint_least16_t H5_SIZEOF_UINT_LEAST16_T)
-H5_CHECK_TYPE_SIZE (int_fast16_t   H5_SIZEOF_INT_FAST16_T)
-H5_CHECK_TYPE_SIZE (uint_fast16_t  H5_SIZEOF_UINT_FAST16_T)
-H5_CHECK_TYPE_SIZE (int32_t        H5_SIZEOF_INT32_T)
-H5_CHECK_TYPE_SIZE (uint32_t       H5_SIZEOF_UINT32_T)
-H5_CHECK_TYPE_SIZE (int_least32_t  H5_SIZEOF_INT_LEAST32_T)
-H5_CHECK_TYPE_SIZE (uint_least32_t H5_SIZEOF_UINT_LEAST32_T)
-H5_CHECK_TYPE_SIZE (int_fast32_t   H5_SIZEOF_INT_FAST32_T)
-H5_CHECK_TYPE_SIZE (uint_fast32_t  H5_SIZEOF_UINT_FAST32_T)
-H5_CHECK_TYPE_SIZE (int64_t        H5_SIZEOF_INT64_T)
-H5_CHECK_TYPE_SIZE (uint64_t       H5_SIZEOF_UINT64_T)
-H5_CHECK_TYPE_SIZE (int_least64_t  H5_SIZEOF_INT_LEAST64_T)
-H5_CHECK_TYPE_SIZE (uint_least64_t H5_SIZEOF_UINT_LEAST64_T)
-H5_CHECK_TYPE_SIZE (int_fast64_t   H5_SIZEOF_INT_FAST64_T)
-H5_CHECK_TYPE_SIZE (uint_fast64_t  H5_SIZEOF_UINT_FAST64_T)
+HDF_CHECK_TYPE_SIZE (float          HDF_SIZEOF_FLOAT)
+HDF_CHECK_TYPE_SIZE (double         HDF_SIZEOF_DOUBLE)
+HDF_CHECK_TYPE_SIZE ("long double"  HDF_SIZEOF_LONG_DOUBLE)
+HDF_CHECK_TYPE_SIZE (int8_t         HDF_SIZEOF_INT8_T)
+HDF_CHECK_TYPE_SIZE (uint8_t        HDF_SIZEOF_UINT8_T)
+HDF_CHECK_TYPE_SIZE (int_least8_t   HDF_SIZEOF_INT_LEAST8_T)
+HDF_CHECK_TYPE_SIZE (uint_least8_t  HDF_SIZEOF_UINT_LEAST8_T)
+HDF_CHECK_TYPE_SIZE (int_fast8_t    HDF_SIZEOF_INT_FAST8_T)
+HDF_CHECK_TYPE_SIZE (uint_fast8_t   HDF_SIZEOF_UINT_FAST8_T)
+HDF_CHECK_TYPE_SIZE (int16_t        HDF_SIZEOF_INT16_T)
+HDF_CHECK_TYPE_SIZE (uint16_t       HDF_SIZEOF_UINT16_T)
+HDF_CHECK_TYPE_SIZE (int_least16_t  HDF_SIZEOF_INT_LEAST16_T)
+HDF_CHECK_TYPE_SIZE (uint_least16_t HDF_SIZEOF_UINT_LEAST16_T)
+HDF_CHECK_TYPE_SIZE (int_fast16_t   HDF_SIZEOF_INT_FAST16_T)
+HDF_CHECK_TYPE_SIZE (uint_fast16_t  HDF_SIZEOF_UINT_FAST16_T)
+HDF_CHECK_TYPE_SIZE (int32_t        HDF_SIZEOF_INT32_T)
+HDF_CHECK_TYPE_SIZE (uint32_t       HDF_SIZEOF_UINT32_T)
+HDF_CHECK_TYPE_SIZE (int_least32_t  HDF_SIZEOF_INT_LEAST32_T)
+HDF_CHECK_TYPE_SIZE (uint_least32_t HDF_SIZEOF_UINT_LEAST32_T)
+HDF_CHECK_TYPE_SIZE (int_fast32_t   HDF_SIZEOF_INT_FAST32_T)
+HDF_CHECK_TYPE_SIZE (uint_fast32_t  HDF_SIZEOF_UINT_FAST32_T)
+HDF_CHECK_TYPE_SIZE (int64_t        HDF_SIZEOF_INT64_T)
+HDF_CHECK_TYPE_SIZE (uint64_t       HDF_SIZEOF_UINT64_T)
+HDF_CHECK_TYPE_SIZE (int_least64_t  HDF_SIZEOF_INT_LEAST64_T)
+HDF_CHECK_TYPE_SIZE (uint_least64_t HDF_SIZEOF_UINT_LEAST64_T)
+HDF_CHECK_TYPE_SIZE (int_fast64_t   HDF_SIZEOF_INT_FAST64_T)
+HDF_CHECK_TYPE_SIZE (uint_fast64_t  HDF_SIZEOF_UINT_FAST64_T)
 IF (NOT APPLE)
-  H5_CHECK_TYPE_SIZE (size_t       H5_SIZEOF_SIZE_T)
-  H5_CHECK_TYPE_SIZE (ssize_t      H5_SIZEOF_SSIZE_T)
-  IF (NOT H5_SIZEOF_SSIZE_T)
-    SET (H5_SIZEOF_SSIZE_T 0)
-  ENDIF (NOT H5_SIZEOF_SSIZE_T)
+  HDF_CHECK_TYPE_SIZE (size_t       HDF_SIZEOF_SIZE_T)
+  HDF_CHECK_TYPE_SIZE (ssize_t      HDF_SIZEOF_SSIZE_T)
+  IF (NOT HDF_SIZEOF_SSIZE_T)
+    SET (HDF_SIZEOF_SSIZE_T 0)
+  ENDIF (NOT HDF_SIZEOF_SSIZE_T)
 ENDIF (NOT APPLE)
-H5_CHECK_TYPE_SIZE (off_t          H5_SIZEOF_OFF_T)
-H5_CHECK_TYPE_SIZE (off64_t        H5_SIZEOF_OFF64_T)
-IF (NOT H5_SIZEOF_OFF64_T)
-  SET (H5_SIZEOF_OFF64_T 0)
-ENDIF (NOT H5_SIZEOF_OFF64_T)
+HDF_CHECK_TYPE_SIZE (off_t          HDF_SIZEOF_OFF_T)
+HDF_CHECK_TYPE_SIZE (off64_t        HDF_SIZEOF_OFF64_T)
+IF (NOT HDF_SIZEOF_OFF64_T)
+  SET (HDF_SIZEOF_OFF64_T 0)
+ENDIF (NOT HDF_SIZEOF_OFF64_T)
 
 
 # For other tests to use the same libraries
@@ -231,15 +242,7 @@ SET (CMAKE_REQUIRED_LIBRARIES ${LINK_LIBS})
 
 #-----------------------------------------------------------------------------
 # Check for some functions that are used
-IF (WINDOWS)
-  SET (HAVE_STRDUP 1)
-  SET (HAVE_SYSTEM 1)
-  SET (HAVE_DIFFTIME 1)
-  SET (HAVE_LONGJMP 1)
-  SET (STDC_HEADERS 1)
-  SET (HAVE_GETHOSTNAME 1)
-ENDIF (WINDOWS)
-
+#
 CHECK_FUNCTION_EXISTS (alarm             HAVE_ALARM)
 CHECK_FUNCTION_EXISTS (fork              HAVE_FORK)
 CHECK_FUNCTION_EXISTS (frexpf            HAVE_FREXPF)
@@ -278,6 +281,8 @@ CHECK_FUNCTION_EXISTS (ioctl             HAVE_IOCTL)
 CHECK_FUNCTION_EXISTS (difftime          HAVE_DIFFTIME)
 CHECK_FUNCTION_EXISTS (fseeko            HAVE_FSEEKO)
 CHECK_FUNCTION_EXISTS (ftello            HAVE_FTELLO)
+CHECK_FUNCTION_EXISTS (fseeko64          HAVE_FSEEKO64)
+CHECK_FUNCTION_EXISTS (ftello64          HAVE_FTELLO64)
 CHECK_FUNCTION_EXISTS (fstat64           HAVE_FSTAT64)
 CHECK_FUNCTION_EXISTS (stat64            HAVE_STAT64)
 
@@ -337,7 +342,7 @@ ENDIF (NOT WINDOWS)
 
 # For other other specific tests, use this MACRO.
 MACRO (HDF_FUNCTION_TEST OTHER_TEST)
-  IF ("H5_${OTHER_TEST}" MATCHES "^H5_${OTHER_TEST}$")
+  IF ("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
     SET (MACRO_CHECK_FUNCTION_DEFINITIONS "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
     SET (OTHER_TEST_ADD_LIBRARIES)
     IF (CMAKE_REQUIRED_LIBRARIES)
@@ -374,26 +379,23 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
         OUTPUT_VARIABLE OUTPUT
     )
     IF (${OTHER_TEST})
-      SET (H5_${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
+      SET (${OTHER_TEST} 1 CACHE INTERNAL "Other test ${FUNCTION}")
       MESSAGE (STATUS "Performing Other Test ${OTHER_TEST} - Success")
     ELSE (${OTHER_TEST})
       MESSAGE (STATUS "Performing Other Test ${OTHER_TEST} - Failed")
-      SET (H5_${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
+      SET (${OTHER_TEST} "" CACHE INTERNAL "Other test ${FUNCTION}")
       FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
           "Performing Other Test ${OTHER_TEST} failed with the following output:\n"
           "${OUTPUT}\n"
       )
     ENDIF (${OTHER_TEST})
-  ENDIF ("H5_${OTHER_TEST}" MATCHES "^H5_${OTHER_TEST}$")
+  ENDIF ("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
 ENDMACRO (HDF_FUNCTION_TEST)
 
 #-----------------------------------------------------------------------------
 # Check a bunch of other functions
 #-----------------------------------------------------------------------------
-IF (WINDOWS)
-  SET (HAVE_TIMEZONE 1)
-  SET (HAVE_FUNCTION 1)
-ELSE (WINDOWS)
+IF (NOT WINDOWS)
   FOREACH (test
       TIME_WITH_SYS_TIME
       STDC_HEADERS
@@ -402,7 +404,7 @@ ELSE (WINDOWS)
       HAVE_ATTRIBUTE
       HAVE_FUNCTION
       HAVE_TM_GMTOFF
-      HAVE_TIMEZONE
+#      HAVE_TIMEZONE
       HAVE_STRUCT_TIMEZONE
       HAVE_STAT_ST_BLOCKS
       HAVE_FUNCTION
@@ -417,8 +419,12 @@ ELSE (WINDOWS)
       CXX_HAVE_OFFSETOF
   )
     HDF_FUNCTION_TEST (${test})
+    IF (NOT CYGWIN)
+      HDF_FUNCTION_TEST (HAVE_TIMEZONE)
+#      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+    ENDIF (NOT CYGWIN)
   ENDFOREACH (test)
-ENDIF (WINDOWS)
+ENDIF (NOT WINDOWS)
 
 #-----------------------------------------------------------------------------
 # Look for 64 bit file stream capability
@@ -439,13 +445,13 @@ ENDFOREACH (inline_test)
 
 SET (HDF_EXTRA_TEST_DEFINITIONS)
 IF (INLINE_TEST___inline__)
-  SET (H5_inline __inline__)
+  SET (HDF_inline __inline__)
 ELSE (INLINE_TEST___inline__)
   IF (INLINE_TEST___inline)
-    SET (H5_inline __inline)
+    SET (HDF_inline __inline)
   ELSE (INLINE_TEST___inline)
     IF (INLINE_TEST_inline)
-      SET (H5_inline inline)
+      SET (HDF_inline inline)
     ENDIF (INLINE_TEST_inline)
   ENDIF (INLINE_TEST___inline)
 ENDIF (INLINE_TEST___inline__)
@@ -453,44 +459,43 @@ ENDIF (INLINE_TEST___inline__)
 #-----------------------------------------------------------------------------
 # Check how to print a Long Long integer
 #-----------------------------------------------------------------------------
-SET (H5_PRINTF_LL_WIDTH "H5_PRINTF_LL_WIDTH")
-IF (H5_PRINTF_LL_WIDTH MATCHES "^H5_PRINTF_LL_WIDTH$")
+IF (NOT HDF_PRINTF_LL_WIDTH OR HDF_PRINTF_LL_WIDTH MATCHES "unknown")
   SET (PRINT_LL_FOUND 0)
   MESSAGE (STATUS "Checking for appropriate format for 64 bit long:")
   FOREACH (HDF_PRINTF_LL l64 l L q I64 ll)
     SET (CURRENT_TEST_DEFINITIONS "-DPRINTF_LL_WIDTH=${HDF_PRINTF_LL}")
-    IF (H5_SIZEOF_LONG_LONG)
+    IF (HDF_SIZEOF_LONG_LONG)
       SET (CURRENT_TEST_DEFINITIONS "${CURRENT_TEST_DEFINITIONS} -DHAVE_LONG_LONG")
-    ENDIF (H5_SIZEOF_LONG_LONG)
+    ENDIF (HDF_SIZEOF_LONG_LONG)
     TRY_RUN (HDF_PRINTF_LL_TEST_RUN   HDF_PRINTF_LL_TEST_COMPILE
-        ${SZIP_BINARY_DIR}/CMake
+        ${ZLIB_BINARY_DIR}/CMake
         ${HDF_RESOURCES_DIR}/HDFTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CURRENT_TEST_DEFINITIONS}
         OUTPUT_VARIABLE OUTPUT
     )
     IF (HDF_PRINTF_LL_TEST_COMPILE)
       IF (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
-        SET (H5_PRINTF_LL_WIDTH "\"${HDF_PRINTF_LL}\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
+        SET (HDF_PRINTF_LL_WIDTH "\"${HDF_PRINTF_LL}\"" CACHE INTERNAL "Width for printf for type `long long' or `__int64', us. `ll")
         SET (PRINT_LL_FOUND 1)
       ELSE (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
         MESSAGE ("Width with ${HDF_PRINTF_LL} failed with result: ${HDF_PRINTF_LL_TEST_RUN}")
       ENDIF (HDF_PRINTF_LL_TEST_RUN MATCHES 0)
     ELSE (HDF_PRINTF_LL_TEST_COMPILE)
       FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-          "Test H5_PRINTF_LL_WIDTH for ${HDF_PRINTF_LL} failed with the following output:\n ${OUTPUT}\n"
+          "Test HDF_PRINTF_LL_WIDTH for ${HDF_PRINTF_LL} failed with the following output:\n ${OUTPUT}\n"
       )
     ENDIF (HDF_PRINTF_LL_TEST_COMPILE)
   ENDFOREACH (HDF_PRINTF_LL)
 
   IF (PRINT_LL_FOUND)
-    MESSAGE (STATUS "Checking for apropriate format for 64 bit long: found ${H5_PRINTF_LL_WIDTH}")
+    MESSAGE (STATUS "Checking for apropriate format for 64 bit long: found ${HDF_PRINTF_LL_WIDTH}")
   ELSE (PRINT_LL_FOUND)
     MESSAGE (STATUS "Checking for apropriate format for 64 bit long: not found")
-    SET (H5_PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL
+    SET (HDF_PRINTF_LL_WIDTH "\"unknown\"" CACHE INTERNAL
         "Width for printf for type `long long' or `__int64', us. `ll"
     )
   ENDIF (PRINT_LL_FOUND)
-ENDIF (H5_PRINTF_LL_WIDTH MATCHES "^H5_PRINTF_LL_WIDTH$")
+ENDIF (NOT HDF_PRINTF_LL_WIDTH OR HDF_PRINTF_LL_WIDTH MATCHES "unknown")
 
 # ----------------------------------------------------------------------
 # Set the flag to indicate that the machine can handle converting
@@ -498,20 +503,23 @@ ENDIF (H5_PRINTF_LL_WIDTH MATCHES "^H5_PRINTF_LL_WIDTH$")
 # (This flag should be set for all machines, except for the Crays, where
 # the cache value is set in it's config file)
 #
-SET (H5_CONVERT_DENORMAL_FLOAT 1)
+SET (HDF_CONVERT_DENORMAL_FLOAT 1)
 
-IF (CYGWIN)
-  SET (HAVE_LSEEK64 0)
-ENDIF (CYGWIN)
+#-----------------------------------------------------------------------------
+#  Are we going to use HSIZE_T
+#-----------------------------------------------------------------------------
+IF (HDF_ENABLE_HSIZET)
+  SET (HAVE_LARGE_HSIZET 1)
+ENDIF (HDF_ENABLE_HSIZET)
 
 #-----------------------------------------------------------------------------
 # Macro to determine the various conversion capabilities
 #-----------------------------------------------------------------------------
 MACRO (HDFConversionTests TEST msg)
   IF ("${TEST}" MATCHES "^${TEST}$")
-   # MESSAGE (STATUS "===> ${TEST}")
+    #MESSAGE (STATUS "===> ${TEST}")
     TRY_RUN (${TEST}_RUN   ${TEST}_COMPILE
-        ${SZIP_BINARY_DIR}/CMake
+        ${ZLIB_BINARY_DIR}/CMake
         ${HDF_RESOURCES_DIR}/ConversionTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-D${TEST}_TEST
         OUTPUT_VARIABLE OUTPUT
@@ -519,12 +527,12 @@ MACRO (HDFConversionTests TEST msg)
     IF (${TEST}_COMPILE)
       IF (${TEST}_RUN  MATCHES 0)
         SET (${TEST} 1 CACHE INTERNAL ${msg})
-        MESSAGE(STATUS "${msg}... yes")
+        MESSAGE (STATUS "${msg}... yes")
       ELSE (${TEST}_RUN  MATCHES 0)
         SET (${TEST} "" CACHE INTERNAL ${msg})
         MESSAGE (STATUS "${msg}... no")
         FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-              "Test ${TEST} Run failed with the following output and exit code:\n ${OUTPUT}\n"
+            "Test ${TEST} Run failed with the following output and exit code:\n ${OUTPUT}\n"
         )
       ENDIF (${TEST}_RUN  MATCHES 0)
     ELSE (${TEST}_COMPILE )
@@ -535,13 +543,13 @@ MACRO (HDFConversionTests TEST msg)
       )
     ENDIF (${TEST}_COMPILE)
 
-  ENDIF("${TEST}" MATCHES "^${TEST}$")
+  ENDIF ("${TEST}" MATCHES "^${TEST}$")
 ENDMACRO (HDFConversionTests)
 
 #-----------------------------------------------------------------------------
 # Macro to make some of the conversion tests easier to write/read
 #-----------------------------------------------------------------------------
-MACRO (HDFMiscConversionTest  VAR TEST msg)
+MACRO (HDFMiscConversionTest VAR TEST msg)
   IF ("${TEST}" MATCHES "^${TEST}$")
     IF (${VAR})
       SET (${TEST} 1 CACHE INTERNAL ${msg})
