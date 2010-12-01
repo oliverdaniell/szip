@@ -35,19 +35,23 @@ SET (SZIP_TEST_LIB_TARGET         ${SZIP_TEST_LIB_CORENAME})
 # parse the full version number from szlib.h and include in SZLIB_FULL_VERSION
 #-----------------------------------------------------------------------------
 FILE (READ ${SZIP_SRC_DIR}/szlib.h _szlib_h_contents)
-STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9A-Za-z.]+)\".*"
+STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9]*.[0-9]*)\".*"
     "\\1" SZLIB_FULL_VERSION ${_szlib_h_contents})
+STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"([0-9]*).*$"
+    "\\1" SZIP_VERS_MAJOR ${_szlib_h_contents})
+STRING (REGEX REPLACE ".*#define[ \t]+SZLIB_VERSION[ \t]+\"[0-9]*.([0-9]*)\".*$"
+    "\\1" SZIP_VERS_MINOR ${_szlib_h_contents})
 #MESSAGE (STATUS "VERSION: ${SZLIB_FULL_VERSION}")
-SET (SZIP_VERS_MAJOR 2)
-SET (SZIP_VERS_MINOR 1)
+#SET (SZIP_VERS_MAJOR 2)
+#SET (SZIP_VERS_MINOR 1)
 SET (SZIP_VERS_RELEASE 0)
 
 #-----------------------------------------------------------------------------
 SET (SZIP_PACKAGE "szip")
 SET (SZIP_PACKAGE_NAME "SZIP")
 SET (SZIP_PACKAGE_VERSION "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
-SET (SZIP_PACKAGE_VERSION_MAJOR "${SZIP_VERS_MAJOR}.${SZIP_VERS_MINOR}")
-SET (SZIP_PACKAGE_VERSION_MINOR "${SZIP_VERS_RELEASE}")
+SET (SZIP_PACKAGE_VERSION_MAJOR "${SZIP_VERS_MAJOR}")
+SET (SZIP_PACKAGE_VERSION_MINOR "${SZIP_VERS_MINOR}")
 SET (SZIP_PACKAGE_STRING "${SZIP_PACKAGE_NAME} ${SZIP_PACKAGE_VERSION}")
 SET (SZIP_PACKAGE_TARNAME "szip")
 SET (SZIP_PACKAGE_URL "htt://www.hdfgroup.org")
