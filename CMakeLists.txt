@@ -54,7 +54,7 @@ SET (SZIP_PACKAGE_VERSION_MAJOR "${SZIP_VERS_MAJOR}")
 SET (SZIP_PACKAGE_VERSION_MINOR "${SZIP_VERS_MINOR}")
 SET (SZIP_PACKAGE_STRING "${SZIP_PACKAGE_NAME} ${SZIP_PACKAGE_VERSION}")
 SET (SZIP_PACKAGE_TARNAME "szip")
-SET (SZIP_PACKAGE_URL "htt://www.hdfgroup.org")
+SET (SZIP_PACKAGE_URL "http://www.hdfgroup.org")
 SET (SZIP_PACKAGE_BUGREPORT "help@hdfgroup.org")
 
 #-----------------------------------------------------------------------------
