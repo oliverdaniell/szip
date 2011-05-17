@@ -31,6 +31,19 @@ SET (SZIP_TEST_LIB_NAME         "${SZIP_EXTERNAL_LIB_PREFIX}${SZIP_TEST_LIB_CORE
 SET (SZIP_LIB_TARGET              ${SZIP_LIB_CORENAME})
 SET (SZIP_TEST_LIB_TARGET         ${SZIP_TEST_LIB_CORENAME})
 
+IF (NOT SZIP_INSTALL_BIN_DIR)
+  SET (SZIP_INSTALL_BIN_DIR bin)
+ENDIF (NOT SZIP_INSTALL_BIN_DIR)
+IF (NOT SZIP_INSTALL_LIB_DIR)
+  SET (SZIP_INSTALL_LIB_DIR lib)
+ENDIF (NOT SZIP_INSTALL_LIB_DIR)
+IF (NOT SZIP_INSTALL_INCLUDE_DIR)
+  SET (SZIP_INSTALL_INCLUDE_DIR include)
+ENDIF (NOT SZIP_INSTALL_INCLUDE_DIR)
+IF (NOT SZIP_INSTALL_DATA_DIR)
+  SET (SZIP_INSTALL_DATA_DIR share)
+ENDIF (NOT SZIP_INSTALL_DATA_DIR)
+
 #-----------------------------------------------------------------------------
 # parse the full version number from szlib.h and include in SZLIB_FULL_VERSION
 #-----------------------------------------------------------------------------
@@ -210,7 +223,7 @@ CONFIGURE_FILE (${HDF_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h
 #-----------------------------------------------------------------------------
 INSTALL (
     FILES ${PROJECT_BINARY_DIR}/SZconfig.h
-    DESTINATION include
+    DESTINATION ${SZIP_INSTALL_INCLUDE_DIR}
     COMPONENT headers
 )
 
@@ -219,7 +232,7 @@ INSTALL (
 #-----------------------------------------------------------------------------
 INSTALL (
     EXPORT ${SZIP_EXPORTED_TARGETS}
-    DESTINATION lib
+    DESTINATION ${SZIP_INSTALL_LIB_DIR}
     FILE SZIP-targets.cmake
 )
 
@@ -274,3 +287,66 @@ IF (NOT SZIP_EXTERNALLY_CONFIGURED)
       DESTINATION lib/cmake/SZIP-${SZIP_PACKAGE_VERSION}
   )
 ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
+
+#-----------------------------------------------------------------------------
+# Add Document File(s) to CMake Install
+#-----------------------------------------------------------------------------
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  INSTALL (
+      FILES
+          ${SZIP_SOURCE_DIR}/COPYING
+          ${SZIP_SOURCE_DIR}/README
+          ${SZIP_SOURCE_DIR}/HISTORY.txt
+          ${SZIP_SOURCE_DIR}/INSTALL
+          ${SZIP_SOURCE_DIR}/RELEASE.txt
+      DESTINATION ${SZIP_INSTALL_DATA_DIR}
+      COMPONENT hdfdocuments
+  )
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
+
+#-----------------------------------------------------------------------------
+# Set the cpack variables
+#-----------------------------------------------------------------------------
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  SET (CPACK_PACKAGE_VENDOR "HDF Group")
+  SET (CPACK_PACKAGE_NAME "${SZIP_PACKAGE_NAME}")
+  SET (CPACK_PACKAGE_INSTALL_DIRECTORY "${SZIP_PACKAGE_NAME}")
+  SET (CPACK_PACKAGE_VERSION "${SZIP_PACKAGE_VERSION}")
+  SET (CPACK_PACKAGE_VERSION_MAJOR "${SZIP_PACKAGE_VERSION_MAJOR}")
+  SET (CPACK_PACKAGE_VERSION_MINOR "${SZIP_PACKAGE_VERSION_MINOR}")
+  SET (CPACK_PACKAGE_VERSION_PATCH "")
+  SET (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR/RELEASE.txt")
+  SET (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+  SET (CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.txt")
+  SET (CPACK_PACKAGE_RELOCATABLE TRUE)
+  IF (WIN32)
+    SET (CPACK_NSIS_CONTACT "help@hdfgroup.org")
+    SET (CPACK_NSIS_MODIFY_PATH ON)
+    SET (CPACK_NSIS_PACKAGE_NAME "SZIP ${SZIP_PACKAGE_VERSION}")
+  ELSE (WIN32)
+    SET (CPACK_RPM_COMPONENT_INSTALL ON)
+  ENDIF (WIN32)
+  SET (CPACK_MONOLITHIC_INSTALL ON)
+  
+  INCLUDE(InstallRequiredSystemLibraries)
+
+  SET (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;ALL;/")
+  
+  INCLUDE (CPack)
+
+  CPACK_ADD_COMPONENT (libraries 
+      DISPLAY_NAME "SZIP Libraries"
+      GROUP Runtime
+  )
+  CPACK_ADD_COMPONENT (headers 
+      DISPLAY_NAME "SZIP Headers" 
+      DEPENDS libraries
+      GROUP Development
+  )
+  CPACK_ADD_COMPONENT (hdfdocuments 
+      DISPLAY_NAME "SZIP Documents"
+      GROUP Documents
+  )
+  
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  
