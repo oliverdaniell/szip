@@ -221,35 +221,40 @@ CONFIGURE_FILE (${HDF_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h
 #-----------------------------------------------------------------------------
 # Add file(s) to CMake Install
 #-----------------------------------------------------------------------------
-INSTALL (
-    FILES ${PROJECT_BINARY_DIR}/SZconfig.h
-    DESTINATION ${SZIP_INSTALL_INCLUDE_DIR}
-    COMPONENT headers
-)
+IF (NOT SZIP_INSTALL_NO_DEVELOPMENT)
+  INSTALL (
+      FILES ${PROJECT_BINARY_DIR}/SZconfig.h
+      DESTINATION ${SZIP_INSTALL_INCLUDE_DIR}
+      COMPONENT headers
+  )
+ENDIF (NOT SZIP_INSTALL_NO_DEVELOPMENT)
 
 #-----------------------------------------------------------------------------
 # Add Target(s) to CMake Install for import into other projects
 #-----------------------------------------------------------------------------
-INSTALL (
-    EXPORT ${SZIP_EXPORTED_TARGETS}
-    DESTINATION ${SZIP_INSTALL_LIB_DIR}
-    FILE SZIP-targets.cmake
-)
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  INSTALL (
+      EXPORT ${SZIP_EXPORTED_TARGETS}
+      DESTINATION ${SZIP_INSTALL_DATA_DIR}/cmake/SZIP-${SZIP_PACKAGE_VERSION}
+      FILE SZIP-targets.cmake
+  )
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
 
 #-----------------------------------------------------------------------------
 # Export all exported targets to the build tree for use by parent project
 #-----------------------------------------------------------------------------
-EXPORT (
-    TARGETS ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
-    FILE SZIP-targets.cmake
-)
+IF (NOT SZIP_EXTERNALLY_CONFIGURED)
+  EXPORT (
+      TARGETS ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
+      FILE SZIP-targets.cmake
+  )
+ENDIF (NOT SZIP_EXTERNALLY_CONFIGURED)
 
 #-----------------------------------------------------------------------------
 # Configure the SZIP-config.cmake file for the build directory
 #-----------------------------------------------------------------------------
 SET (SZIP_INCLUDES_BUILD_TIME
-    ${SZIP_SRC_DIR}
-    ${SZIP_BINARY_DIR}
+    ${SZIP_SRC_DIR} ${SZIP_BINARY_DIR}
 )
 SET (SZIP_VERSION_STRING @SZIP_PACKAGE_VERSION@)
 SET (SZIP_VERSION_MAJOR  @SZIP_PACKAGE_VERSION_MAJOR@)
