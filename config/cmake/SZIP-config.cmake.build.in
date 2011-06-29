@@ -22,4 +22,5 @@ SET (SZIP_VERSION_MINOR  @SZIP_VERSION_MINOR@)
 #-----------------------------------------------------------------------------
 IF (NOT TARGET "SZIP")
   INCLUDE (${SELF_DIR}/SZIP-targets.cmake)
+  SET (SZIP_LIBRARIES "@SZIP_LIBRARIES_TO_EXPORT@")
 ENDIF (NOT TARGET "SZIP")
