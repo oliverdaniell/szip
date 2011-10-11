@@ -3,7 +3,7 @@ MACRO (SZIP_SET_LIB_OPTIONS libtarget libname libtype)
   # message (STATUS "${libname} libtype: ${libtype}")
   HDF_SET_LIB_OPTIONS (${libtarget} ${libname} ${libtype})
 
-  IF (BUILD_SHARED_LIBS)
+  IF (${libtype} MATCHES "SHARED")
     IF (WIN32)
       SET (LIBSZIP_VERSION ${SZIP_PACKAGE_VERSION_MAJOR})
     ELSE (WIN32)
@@ -11,7 +11,7 @@ MACRO (SZIP_SET_LIB_OPTIONS libtarget libname libtype)
     ENDIF (WIN32)
     SET_TARGET_PROPERTIES (${libtarget} PROPERTIES VERSION ${LIBSZIP_VERSION})
     SET_TARGET_PROPERTIES (${libtarget} PROPERTIES SOVERSION ${LIBSZIP_VERSION})
-  ENDIF (BUILD_SHARED_LIBS)
+  ENDIF (${libtype} MATCHES "SHARED")
 
   #-- Apple Specific install_name for libraries
   IF (APPLE)
