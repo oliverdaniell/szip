@@ -24,24 +24,6 @@ IF (APPLE)
   SET (HDF_AC_APPLE_UNIVERSAL_BUILD 0)
 ENDIF (APPLE)
 
-SET (LINUX_LFS 0)
-SET (HDF_EXTRA_FLAGS)
-IF (CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-  # Linux Specific flags
-  ADD_DEFINITIONS (-D_POSIX_SOURCE -D_BSD_SOURCE)
-  OPTION (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
-  IF (HDF_ENABLE_LARGE_FILE)
-    SET (LARGEFILE 1)
-    SET (HDF_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
-    SET (CMAKE_REQUIRED_DEFINITIONS ${HDF_EXTRA_FLAGS})
-  ENDIF (HDF_ENABLE_LARGE_FILE)
-ENDIF (CMAKE_SYSTEM MATCHES "Linux-([3-9]\\.[0-9]|2\\.[4-9])\\.")
-IF (LINUX_LFS)
-  SET (HDF_EXTRA_FLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
-  SET (CMAKE_REQUIRED_DEFINITIONS ${HDF_EXTRA_FLAGS})
-ENDIF (LINUX_LFS)
-ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
-
 #-----------------------------------------------------------------------------
 # This MACRO checks IF the symbol exists in the library and IF it
 # does, it appends library to the list.
@@ -60,9 +42,9 @@ ENDMACRO (CHECK_LIBRARY_EXISTS_CONCAT)
 
 SET (WINDOWS)
 IF (WIN32)
-  IF (NOT UNIX AND NOT CYGWIN)
+  IF (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
     SET (WINDOWS 1)
-  ENDIF (NOT UNIX AND NOT CYGWIN)
+  ENDIF (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
 ENDIF (WIN32)
 
 IF (WINDOWS)
@@ -110,6 +92,9 @@ ENDIF (NOT NOT_NEED_LIBNSL)
 
 
 SET (USE_INCLUDES "")
+IF (WINDOWS)
+  SET (USE_INCLUDES ${USE_INCLUDES} "windows.h")
+ENDIF (WINDOWS)
 #-----------------------------------------------------------------------------
 # Check IF header file exists and add it to the list.
 #-----------------------------------------------------------------------------
@@ -156,6 +141,9 @@ CHECK_INCLUDE_FILE_CONCAT ("features.h"      HAVE_FEATURES_H)
 CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
 CHECK_INCLUDE_FILE_CONCAT ("netinet/in.h"    HAVE_NETINET_IN_H)
 
+IF (NOT CYGWIN)
+  CHECK_INCLUDE_FILE_CONCAT ("winsock2.h"      H4_HAVE_WINSOCK_H)
+ENDIF (NOT CYGWIN)
 
 # IF the c compiler found stdint, check the C++ as well. On some systems this
 # file will be found by C but not C++, only do this test IF the C++ compiler
@@ -164,8 +152,55 @@ IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
   CHECK_INCLUDE_FILE_CXX ("stdint.h" HAVE_STDINT_H_CXX)
   IF (NOT HAVE_STDINT_H_CXX)
     SET (HAVE_STDINT_H "" CACHE INTERNAL "Have includes HAVE_STDINT_H")
+    SET (USE_INCLUDES ${USE_INCLUDES} "stdint.h")
   ENDIF (NOT HAVE_STDINT_H_CXX)
 ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
+
+#-----------------------------------------------------------------------------
+#  Check for large file support
+#-----------------------------------------------------------------------------
+
+# The linux-lfs option is deprecated.
+SET (LINUX_LFS 0)
+
+SET (HDF_EXTRA_FLAGS)
+IF (NOT WINDOWS)
+  # Linux Specific flags
+  SET (HDF_EXTRA_FLAGS -D_POSIX_SOURCE -D_BSD_SOURCE)
+  OPTION (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
+  IF (HDF_ENABLE_LARGE_FILE)
+    SET (msg "Performing TEST_LFS_WORKS")
+    TRY_RUN (TEST_LFS_WORKS_RUN   TEST_LFS_WORKS_COMPILE
+        ${CMAKE_BINARY_DIR}
+        ${HDF_RESOURCES_DIR}/HDFTests.c
+        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-DTEST_LFS_WORKS
+        OUTPUT_VARIABLE OUTPUT
+    )
+    IF (TEST_LFS_WORKS_COMPILE)
+      IF (TEST_LFS_WORKS_RUN  MATCHES 0)
+        SET (TEST_LFS_WORKS 1 CACHE INTERNAL ${msg})
+    SET (LARGEFILE 1)
+        SET (HDF_EXTRA_FLAGS ${HDF_EXTRA_FLAGS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+        MESSAGE (STATUS "${msg}... yes")
+      ELSE (TEST_LFS_WORKS_RUN  MATCHES 0)
+        SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
+        MESSAGE (STATUS "${msg}... no")
+        FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+              "Test TEST_LFS_WORKS Run failed with the following output and exit code:\n ${OUTPUT}\n"
+        )
+      ENDIF (TEST_LFS_WORKS_RUN  MATCHES 0)
+    ELSE (TEST_LFS_WORKS_COMPILE )
+      SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
+      MESSAGE (STATUS "${msg}... no")
+      FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+          "Test TEST_LFS_WORKS Compile failed with the following output:\n ${OUTPUT}\n"
+      )
+    ENDIF (TEST_LFS_WORKS_COMPILE)
+  ENDIF (HDF_ENABLE_LARGE_FILE)
+  SET (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${HDF_EXTRA_FLAGS})
+ENDIF (NOT WINDOWS)
+
+ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
 
 # For other tests to use the same libraries
 SET (CMAKE_REQUIRED_LIBRARIES ${LINK_LIBS})
@@ -230,6 +265,7 @@ IF (NOT MSVC)
     )
     IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
       SET (HAVE_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_TIME_GETTIMEOFDAY")
+      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
     ENDIF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
   ENDIF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
 
@@ -242,18 +278,19 @@ IF (NOT MSVC)
     )
     IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
       SET (HAVE_SYS_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_SYS_TIME_GETTIMEOFDAY")
+      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
     ENDIF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
   ENDIF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
-ENDIF (NOT MSVC)
 
-IF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
-  MESSAGE (STATUS "---------------------------------------------------------------")
-  MESSAGE (STATUS "Function 'gettimeofday()' was not found. SZIP will use its")
-  MESSAGE (STATUS "  own implementation.. This can happen on older versions of")
-  MESSAGE (STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
-  MESSAGE (STATUS "  to a newer version such as MinGW 3.12")
-  MESSAGE (STATUS "---------------------------------------------------------------")
-ENDIF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
+  IF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
+    MESSAGE (STATUS "---------------------------------------------------------------")
+    MESSAGE (STATUS "Function 'gettimeofday()' was not found. SZIP will use its")
+    MESSAGE (STATUS "  own implementation.. This can happen on older versions of")
+    MESSAGE (STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
+    MESSAGE (STATUS "  to a newer version such as MinGW 3.12")
+    MESSAGE (STATUS "---------------------------------------------------------------")
+  ENDIF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
+ENDIF (NOT MSVC)
 
 # Check for Symbols
 CHECK_SYMBOL_EXISTS (tzname "time.h" HAVE_DECL_TZNAME)
@@ -291,13 +328,13 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
       ENDIF ("${def}")
     ENDFOREACH (def)
 
-    IF (LINUX_LFS)
+    IF (LARGEFILE)
       SET (MACRO_CHECK_FUNCTION_DEFINITIONS
           "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE"
       )
-    ENDIF (LINUX_LFS)
+    ENDIF (LARGEFILE)
 
-    # (STATUS "Performing ${OTHER_TEST}")
+    #MESSAGE (STATUS "Performing ${OTHER_TEST}")
     TRY_COMPILE (${OTHER_TEST}
         ${CMAKE_BINARY_DIR}
         ${HDF_RESOURCES_DIR}/HDFTests.c
@@ -346,11 +383,11 @@ IF (NOT WINDOWS)
       CXX_HAVE_OFFSETOF
   )
     HDF_FUNCTION_TEST (${test})
-    IF (NOT CYGWIN)
+  ENDFOREACH (test)
+    IF (NOT CYGWIN AND NOT MINGW)
       HDF_FUNCTION_TEST (HAVE_TIMEZONE)
 #      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
-    ENDIF (NOT CYGWIN)
-  ENDFOREACH (test)
+    ENDIF (NOT CYGWIN AND NOT MINGW)
 ENDIF (NOT WINDOWS)
 
 #-----------------------------------------------------------------------------
