@@ -9,7 +9,14 @@ MACRO (SZIP_SET_LIB_OPTIONS libtarget libname libtype)
     ELSE (WIN32)
       SET (LIBSZIP_VERSION ${SZIP_PACKAGE_VERSION})
     ENDIF (WIN32)
-    SET_TARGET_PROPERTIES (${libtarget} PROPERTIES VERSION ${LIBSZIP_VERSION})
+
+    IF (NOT CYGWIN)
+      # This property causes shared libraries on Linux to have the full version
+      # encoded into their final filename.  We disable this on Cygwin because
+      # it causes cygszip-${SZIP_FULL_VERSION}.dll to be created when cygszip.dll
+      # seems to be the default.
+      SET_TARGET_PROPERTIES (${libtarget} PROPERTIES VERSION ${LIBSZIP_VERSION})
+    ENDIF (NOT CYGWIN)
     SET_TARGET_PROPERTIES (${libtarget} PROPERTIES SOVERSION ${LIBSZIP_VERSION})
   ENDIF (${libtype} MATCHES "SHARED")
 
