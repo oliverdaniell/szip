@@ -42,19 +42,25 @@ ENDMACRO (CHECK_LIBRARY_EXISTS_CONCAT)
 
 SET (WINDOWS)
 IF (WIN32)
-  IF (NOT UNIX AND NOT CYGWIN)
+  IF (MINGW)
+    SET (WINDOWS 1) # MinGW tries to imitate Windows
+  ENDIF (MINGW)
+  SET (CMAKE_REQUIRED_LIBRARIES "ws2_32.lib;wsock32.lib")
+  SET (CMAKE_REQUIRED_FLAGS "/DWIN32_LEAN_AND_MEAN=1 /DNOGDI=1")
+  IF (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
     SET (WINDOWS 1)
-  ENDIF (NOT UNIX AND NOT CYGWIN)
+  ENDIF (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
 ENDIF (WIN32)
 
 IF (WINDOWS)
-  SET (HAVE_LIBM 1)
   SET (HAVE_IO_H 1)
   SET (HAVE_SETJMP_H 1)
   SET (HAVE_STDDEF_H 1)
   SET (HAVE_SYS_STAT_H 1)
   SET (HAVE_SYS_TIMEB_H 1)
   SET (HAVE_SYS_TYPES_H 1)
+  SET (HAVE_WINSOCK_H 1)
+  SET (HAVE_LIBM 1)
   SET (HAVE_STRDUP 1)
   SET (HAVE_SYSTEM 1)
   SET (HAVE_DIFFTIME 1)
@@ -63,8 +69,11 @@ IF (WINDOWS)
   IF (NOT MINGW)
     SET (HAVE_GETHOSTNAME 1)
   ENDIF (NOT MINGW)
-  SET (HAVE_TIMEZONE 1)
   SET (HAVE_FUNCTION 1)
+  SET (HAVE_TIMEZONE 1)
+
+  SET (HAVE_LIBWS2_32 1)
+  SET (HAVE_LIBWSOCK32 1)
 ENDIF (WINDOWS)
 
 # ----------------------------------------------------------------------
@@ -79,10 +88,10 @@ ENDIF (CYGWIN)
 #  Check for the math library "m"
 #-----------------------------------------------------------------------------
 IF (NOT WINDOWS)
-  CHECK_LIBRARY_EXISTS_CONCAT ("m" random     HAVE_LIBM)
+  CHECK_LIBRARY_EXISTS_CONCAT ("m" ceil     HAVE_LIBM)
+  CHECK_LIBRARY_EXISTS_CONCAT ("ws2_32" WSAStartup  HAVE_LIBWS2_32)
+  CHECK_LIBRARY_EXISTS_CONCAT ("wsock32" gethostbyname HAVE_LIBWSOCK32)
 ENDIF (NOT WINDOWS)
-CHECK_LIBRARY_EXISTS_CONCAT ("ws2_32" WSAStartup  HAVE_LIBWS2_32)
-CHECK_LIBRARY_EXISTS_CONCAT ("wsock32" gethostbyname HAVE_LIBWSOCK32)
 #CHECK_LIBRARY_EXISTS_CONCAT ("dl"     dlopen       HAVE_LIBDL)
 CHECK_LIBRARY_EXISTS_CONCAT ("ucb"    gethostname  HAVE_LIBUCB)
 CHECK_LIBRARY_EXISTS_CONCAT ("socket" connect      HAVE_LIBSOCKET)
@@ -92,219 +101,13 @@ IF (NOT NOT_NEED_LIBNSL)
   CHECK_LIBRARY_EXISTS_CONCAT ("nsl"    gethostbyname  HAVE_LIBNSL)
 ENDIF (NOT NOT_NEED_LIBNSL)
 
+# For other tests to use the same libraries
+SET (CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${LINK_LIBS})
 
 SET (USE_INCLUDES "")
 IF (WINDOWS)
   SET (USE_INCLUDES ${USE_INCLUDES} "windows.h")
 ENDIF (WINDOWS)
-#-----------------------------------------------------------------------------
-# Check IF header file exists and add it to the list.
-#-----------------------------------------------------------------------------
-MACRO (CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
-  CHECK_INCLUDE_FILES ("${USE_INCLUDES};${FILE}" ${VARIABLE})
-  IF (${VARIABLE})
-    SET (USE_INCLUDES ${USE_INCLUDES} ${FILE})
-  ENDIF (${VARIABLE})
-ENDMACRO (CHECK_INCLUDE_FILE_CONCAT)
-
-#-----------------------------------------------------------------------------
-#  Check for the existence of certain header files
-#-----------------------------------------------------------------------------
-CHECK_INCLUDE_FILE_CONCAT ("globus/common.h" HAVE_GLOBUS_COMMON_H)
-CHECK_INCLUDE_FILE_CONCAT ("io.h"            HAVE_IO_H)
-CHECK_INCLUDE_FILE_CONCAT ("mfhdf.h"         HAVE_MFHDF_H)
-CHECK_INCLUDE_FILE_CONCAT ("pdb.h"           HAVE_PDB_H)
-CHECK_INCLUDE_FILE_CONCAT ("pthread.h"       HAVE_PTHREAD_H)
-CHECK_INCLUDE_FILE_CONCAT ("setjmp.h"        HAVE_SETJMP_H)
-CHECK_INCLUDE_FILE_CONCAT ("srbclient.h"     HAVE_SRBCLIENT_H)
-CHECK_INCLUDE_FILE_CONCAT ("stddef.h"        HAVE_STDDEF_H)
-CHECK_INCLUDE_FILE_CONCAT ("stdint.h"        HAVE_STDINT_H)
-CHECK_INCLUDE_FILE_CONCAT ("string.h"        HAVE_STRING_H)
-CHECK_INCLUDE_FILE_CONCAT ("strings.h"       HAVE_STRINGS_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/ioctl.h"     HAVE_SYS_IOCTL_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/proc.h"      HAVE_SYS_PROC_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/resource.h"  HAVE_SYS_RESOURCE_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/socket.h"    HAVE_SYS_SOCKET_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/stat.h"      HAVE_SYS_STAT_H)
-IF (CMAKE_SYSTEM_NAME MATCHES "OSF")
-  CHECK_INCLUDE_FILE_CONCAT ("sys/sysinfo.h" HAVE_SYS_SYSINFO_H)
-ELSE (CMAKE_SYSTEM_NAME MATCHES "OSF")
-  SET (HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
-ENDIF (CMAKE_SYSTEM_NAME MATCHES "OSF")
-CHECK_INCLUDE_FILE_CONCAT ("sys/time.h"      HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILE_CONCAT ("time.h"          HAVE_TIME_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/timeb.h"     HAVE_SYS_TIMEB_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/types.h"     HAVE_SYS_TYPES_H)
-CHECK_INCLUDE_FILE_CONCAT ("unistd.h"        HAVE_UNISTD_H)
-CHECK_INCLUDE_FILE_CONCAT ("stdlib.h"        HAVE_STDLIB_H)
-CHECK_INCLUDE_FILE_CONCAT ("memory.h"        HAVE_MEMORY_H)
-CHECK_INCLUDE_FILE_CONCAT ("dlfcn.h"         HAVE_DLFCN_H)
-CHECK_INCLUDE_FILE_CONCAT ("features.h"      HAVE_FEATURES_H)
-CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE_CONCAT ("netinet/in.h"    HAVE_NETINET_IN_H)
-
-IF (NOT CYGWIN)
-  CHECK_INCLUDE_FILE_CONCAT ("winsock2.h"      HAVE_WINSOCK_H)
-ENDIF (NOT CYGWIN)
-
-# IF the c compiler found stdint, check the C++ as well. On some systems this
-# file will be found by C but not C++, only do this test IF the C++ compiler
-# has been initialized (e.g. the project also includes some c++)
-IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
-  CHECK_INCLUDE_FILE_CXX ("stdint.h" HAVE_STDINT_H_CXX)
-  IF (NOT HAVE_STDINT_H_CXX)
-    SET (HAVE_STDINT_H "" CACHE INTERNAL "Have includes HAVE_STDINT_H")
-    SET (USE_INCLUDES ${USE_INCLUDES} "stdint.h")
-  ENDIF (NOT HAVE_STDINT_H_CXX)
-ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
-
-#-----------------------------------------------------------------------------
-#  Check for large file support
-#-----------------------------------------------------------------------------
-
-# The linux-lfs option is deprecated.
-SET (LINUX_LFS 0)
-
-SET (HDF_EXTRA_FLAGS)
-IF (NOT WINDOWS)
-  # Linux Specific flags
-  SET (HDF_EXTRA_FLAGS -D_POSIX_SOURCE -D_BSD_SOURCE)
-  OPTION (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
-  IF (HDF_ENABLE_LARGE_FILE)
-    SET (msg "Performing TEST_LFS_WORKS")
-    TRY_RUN (TEST_LFS_WORKS_RUN   TEST_LFS_WORKS_COMPILE
-        ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/HDFTests.c
-        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-DTEST_LFS_WORKS
-        OUTPUT_VARIABLE OUTPUT
-    )
-    IF (TEST_LFS_WORKS_COMPILE)
-      IF (TEST_LFS_WORKS_RUN  MATCHES 0)
-        SET (TEST_LFS_WORKS 1 CACHE INTERNAL ${msg})
-    SET (LARGEFILE 1)
-        SET (HDF_EXTRA_FLAGS ${HDF_EXTRA_FLAGS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
-        MESSAGE (STATUS "${msg}... yes")
-      ELSE (TEST_LFS_WORKS_RUN  MATCHES 0)
-        SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
-        MESSAGE (STATUS "${msg}... no")
-        FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-              "Test TEST_LFS_WORKS Run failed with the following output and exit code:\n ${OUTPUT}\n"
-        )
-      ENDIF (TEST_LFS_WORKS_RUN  MATCHES 0)
-    ELSE (TEST_LFS_WORKS_COMPILE )
-      SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
-      MESSAGE (STATUS "${msg}... no")
-      FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
-          "Test TEST_LFS_WORKS Compile failed with the following output:\n ${OUTPUT}\n"
-      )
-    ENDIF (TEST_LFS_WORKS_COMPILE)
-  ENDIF (HDF_ENABLE_LARGE_FILE)
-  SET (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${HDF_EXTRA_FLAGS})
-ENDIF (NOT WINDOWS)
-
-ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
-
-# For other tests to use the same libraries
-SET (CMAKE_REQUIRED_LIBRARIES ${LINK_LIBS})
-
-#-----------------------------------------------------------------------------
-# Check for some functions that are used
-#
-CHECK_FUNCTION_EXISTS (alarm             HAVE_ALARM)
-CHECK_FUNCTION_EXISTS (fork              HAVE_FORK)
-CHECK_FUNCTION_EXISTS (frexpf            HAVE_FREXPF)
-CHECK_FUNCTION_EXISTS (frexpl            HAVE_FREXPL)
-
-CHECK_FUNCTION_EXISTS (gethostname       HAVE_GETHOSTNAME)
-CHECK_FUNCTION_EXISTS (getpwuid          HAVE_GETPWUID)
-CHECK_FUNCTION_EXISTS (getrusage         HAVE_GETRUSAGE)
-CHECK_FUNCTION_EXISTS (lstat             HAVE_LSTAT)
-
-CHECK_FUNCTION_EXISTS (rand_r            HAVE_RAND_R)
-CHECK_FUNCTION_EXISTS (random            HAVE_RANDOM)
-CHECK_FUNCTION_EXISTS (setsysinfo        HAVE_SETSYSINFO)
-
-CHECK_FUNCTION_EXISTS (signal            HAVE_SIGNAL)
-CHECK_FUNCTION_EXISTS (longjmp           HAVE_LONGJMP)
-CHECK_FUNCTION_EXISTS (setjmp            HAVE_SETJMP)
-CHECK_FUNCTION_EXISTS (siglongjmp        HAVE_SIGLONGJMP)
-CHECK_FUNCTION_EXISTS (sigsetjmp         HAVE_SIGSETJMP)
-CHECK_FUNCTION_EXISTS (sigaction         HAVE_SIGACTION)
-CHECK_FUNCTION_EXISTS (sigprocmask       HAVE_SIGPROCMASK)
-
-CHECK_FUNCTION_EXISTS (snprintf          HAVE_SNPRINTF)
-CHECK_FUNCTION_EXISTS (srandom           HAVE_SRANDOM)
-CHECK_FUNCTION_EXISTS (strdup            HAVE_STRDUP)
-CHECK_FUNCTION_EXISTS (symlink           HAVE_SYMLINK)
-CHECK_FUNCTION_EXISTS (system            HAVE_SYSTEM)
-
-CHECK_FUNCTION_EXISTS (tmpfile           HAVE_TMPFILE)
-CHECK_FUNCTION_EXISTS (vasprintf         HAVE_VASPRINTF)
-CHECK_FUNCTION_EXISTS (waitpid           HAVE_WAITPID)
-
-CHECK_FUNCTION_EXISTS (vsnprintf         HAVE_VSNPRINTF)
-CHECK_FUNCTION_EXISTS (ioctl             HAVE_IOCTL)
-#CHECK_FUNCTION_EXISTS (gettimeofday      HAVE_GETTIMEOFDAY)
-CHECK_FUNCTION_EXISTS (difftime          HAVE_DIFFTIME)
-CHECK_FUNCTION_EXISTS (fseeko            HAVE_FSEEKO)
-CHECK_FUNCTION_EXISTS (ftello            HAVE_FTELLO)
-CHECK_FUNCTION_EXISTS (fseeko64          HAVE_FSEEKO64)
-CHECK_FUNCTION_EXISTS (ftello64          HAVE_FTELLO64)
-CHECK_FUNCTION_EXISTS (fstat64           HAVE_FSTAT64)
-CHECK_FUNCTION_EXISTS (stat64            HAVE_STAT64)
-
-#-----------------------------------------------------------------------------
-#  Since gettimeofday is not defined any where standard, lets look in all the
-#  usual places. On MSVC we are just going to use ::clock()
-#-----------------------------------------------------------------------------
-IF (NOT MSVC)
-  IF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
-    TRY_COMPILE (HAVE_TIME_GETTIMEOFDAY
-        ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
-        COMPILE_DEFINITIONS -DTRY_TIME_H
-        OUTPUT_VARIABLE OUTPUT
-    )
-    IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-      SET (HAVE_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_TIME_GETTIMEOFDAY")
-      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
-    ENDIF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-  ENDIF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
-
-  IF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
-    TRY_COMPILE (HAVE_SYS_TIME_GETTIMEOFDAY
-        ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
-        COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
-        OUTPUT_VARIABLE OUTPUT
-    )
-    IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-      SET (HAVE_SYS_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_SYS_TIME_GETTIMEOFDAY")
-      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
-    ENDIF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-  ENDIF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
-
-  IF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
-    MESSAGE (STATUS "---------------------------------------------------------------")
-    MESSAGE (STATUS "Function 'gettimeofday()' was not found. SZIP will use its")
-    MESSAGE (STATUS "  own implementation.. This can happen on older versions of")
-    MESSAGE (STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
-    MESSAGE (STATUS "  to a newer version such as MinGW 3.12")
-    MESSAGE (STATUS "---------------------------------------------------------------")
-  ENDIF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
-ENDIF (NOT MSVC)
-
-# Check for Symbols
-CHECK_SYMBOL_EXISTS (tzname "time.h" HAVE_DECL_TZNAME)
-
-#-----------------------------------------------------------------------------
-#
-#-----------------------------------------------------------------------------
-IF (NOT WINDOWS)
-  CHECK_SYMBOL_EXISTS (TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
-  CHECK_SYMBOL_EXISTS (TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
-ENDIF (NOT WINDOWS)
-
 
 # For other other specific tests, use this MACRO.
 MACRO (HDF_FUNCTION_TEST OTHER_TEST)
@@ -358,44 +161,301 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
   ENDIF ("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
 ENDMACRO (HDF_FUNCTION_TEST)
 
+IF (NOT WINDOWS)
+  HDF_FUNCTION_TEST (STDC_HEADERS)
+ENDIF (NOT WINDOWS)
+
 #-----------------------------------------------------------------------------
-# Check a bunch of other functions
+CHECK_FUNCTION_EXISTS (difftime           HAVE_DIFFTIME)
+#CHECK_FUNCTION_EXISTS (gettimeofday       HAVE_GETTIMEOFDAY)
+#  Since gettimeofday is not defined any where standard, lets look in all the
+#  usual places. On MSVC we are just going to use ::clock()
+#-----------------------------------------------------------------------------
+IF (NOT MSVC)
+  IF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
+    TRY_COMPILE (HAVE_TIME_GETTIMEOFDAY
+        ${CMAKE_BINARY_DIR}
+        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
+        COMPILE_DEFINITIONS -DTRY_TIME_H
+        OUTPUT_VARIABLE OUTPUT
+    )
+    IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+      SET (HAVE_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_TIME_GETTIMEOFDAY")
+      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
+    ENDIF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+  ENDIF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
+
+  IF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
+    TRY_COMPILE (HAVE_SYS_TIME_GETTIMEOFDAY
+        ${CMAKE_BINARY_DIR}
+        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
+        COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
+        OUTPUT_VARIABLE OUTPUT
+    )
+    IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+      SET (HAVE_SYS_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_SYS_TIME_GETTIMEOFDAY")
+      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
+    ENDIF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
+  ENDIF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
+
+  IF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
+    MESSAGE (STATUS "---------------------------------------------------------------")
+    MESSAGE (STATUS "Function 'gettimeofday()' was not found. SZIP will use its")
+    MESSAGE (STATUS "  own implementation.. This can happen on older versions of")
+    MESSAGE (STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
+    MESSAGE (STATUS "  to a newer version such as MinGW 3.12")
+    MESSAGE (STATUS "---------------------------------------------------------------")
+  ENDIF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
+ENDIF (NOT MSVC)
+
+#-----------------------------------------------------------------------------
+# Check IF header file exists and add it to the list.
+#-----------------------------------------------------------------------------
+MACRO (CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
+  CHECK_INCLUDE_FILES ("${USE_INCLUDES};${FILE}" ${VARIABLE})
+  IF (${VARIABLE})
+    SET (USE_INCLUDES ${USE_INCLUDES} ${FILE})
+  ENDIF (${VARIABLE})
+ENDMACRO (CHECK_INCLUDE_FILE_CONCAT)
+
+#-----------------------------------------------------------------------------
+#  Check for the existence of certain header files
+#-----------------------------------------------------------------------------
+CHECK_INCLUDE_FILE_CONCAT ("sys/resource.h"  HAVE_SYS_RESOURCE_H)
+CHECK_INCLUDE_FILE_CONCAT ("sys/time.h"      HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILE_CONCAT ("unistd.h"        HAVE_UNISTD_H)
+CHECK_INCLUDE_FILE_CONCAT ("sys/ioctl.h"     HAVE_SYS_IOCTL_H)
+CHECK_INCLUDE_FILE_CONCAT ("sys/stat.h"      HAVE_SYS_STAT_H)
+CHECK_INCLUDE_FILE_CONCAT ("sys/socket.h"    HAVE_SYS_SOCKET_H)
+CHECK_INCLUDE_FILE_CONCAT ("sys/types.h"     HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILE_CONCAT ("stddef.h"        HAVE_STDDEF_H)
+CHECK_INCLUDE_FILE_CONCAT ("setjmp.h"        HAVE_SETJMP_H)
+CHECK_INCLUDE_FILE_CONCAT ("features.h"      HAVE_FEATURES_H)
+CHECK_INCLUDE_FILE_CONCAT ("stdint.h"        HAVE_STDINT_H)
+
+# IF the c compiler found stdint, check the C++ as well. On some systems this
+# file will be found by C but not C++, only do this test IF the C++ compiler
+# has been initialized (e.g. the project also includes some c++)
+IF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
+  CHECK_INCLUDE_FILE_CXX ("stdint.h" HAVE_STDINT_H_CXX)
+  IF (NOT HAVE_STDINT_H_CXX)
+    SET (HAVE_STDINT_H "" CACHE INTERNAL "Have includes HAVE_STDINT_H")
+    SET (USE_INCLUDES ${USE_INCLUDES} "stdint.h")
+  ENDIF (NOT HAVE_STDINT_H_CXX)
+ENDIF (HAVE_STDINT_H AND CMAKE_CXX_COMPILER_LOADED)
+
+# Windows
+CHECK_INCLUDE_FILE_CONCAT ("io.h"            HAVE_IO_H)
+IF (NOT CYGWIN)
+  CHECK_INCLUDE_FILE_CONCAT ("winsock2.h"      HAVE_WINSOCK_H)
+ENDIF (NOT CYGWIN)
+CHECK_INCLUDE_FILE_CONCAT ("sys/timeb.h"     HAVE_SYS_TIMEB_H)
+
+IF (CMAKE_SYSTEM_NAME MATCHES "OSF")
+  CHECK_INCLUDE_FILE_CONCAT ("sys/sysinfo.h" HAVE_SYS_SYSINFO_H)
+  CHECK_INCLUDE_FILE_CONCAT ("sys/proc.h"    HAVE_SYS_PROC_H)
+ELSE (CMAKE_SYSTEM_NAME MATCHES "OSF")
+  SET (HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
+  SET (HAVE_SYS_PROC_H    "" CACHE INTERNAL "" FORCE)
+ENDIF (CMAKE_SYSTEM_NAME MATCHES "OSF")
+
+CHECK_INCLUDE_FILE_CONCAT ("globus/common.h" HAVE_GLOBUS_COMMON_H)
+CHECK_INCLUDE_FILE_CONCAT ("pdb.h"           HAVE_PDB_H)
+CHECK_INCLUDE_FILE_CONCAT ("pthread.h"       HAVE_PTHREAD_H)
+CHECK_INCLUDE_FILE_CONCAT ("srbclient.h"     HAVE_SRBCLIENT_H)
+CHECK_INCLUDE_FILE_CONCAT ("string.h"        HAVE_STRING_H)
+CHECK_INCLUDE_FILE_CONCAT ("strings.h"       HAVE_STRINGS_H)
+CHECK_INCLUDE_FILE_CONCAT ("time.h"          HAVE_TIME_H)
+CHECK_INCLUDE_FILE_CONCAT ("stdlib.h"        HAVE_STDLIB_H)
+CHECK_INCLUDE_FILE_CONCAT ("memory.h"        HAVE_MEMORY_H)
+CHECK_INCLUDE_FILE_CONCAT ("dlfcn.h"         HAVE_DLFCN_H)
+CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
+CHECK_INCLUDE_FILE_CONCAT ("netinet/in.h"    HAVE_NETINET_IN_H)
+
+#-----------------------------------------------------------------------------
+#  Check for large file support
+#-----------------------------------------------------------------------------
+
+# The linux-lfs option is deprecated.
+SET (LINUX_LFS 0)
+
+SET (HDF_EXTRA_FLAGS)
+IF (NOT WINDOWS)
+  # Linux Specific flags
+  SET (HDF_EXTRA_FLAGS -D_POSIX_SOURCE=199506L -D_BSD_SOURCE)
+  OPTION (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
+  IF (HDF_ENABLE_LARGE_FILE)
+    SET (msg "Performing TEST_LFS_WORKS")
+    TRY_RUN (TEST_LFS_WORKS_RUN   TEST_LFS_WORKS_COMPILE
+        ${CMAKE_BINARY_DIR}
+        ${HDF_RESOURCES_DIR}/HDFTests.c
+        CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-DTEST_LFS_WORKS
+        OUTPUT_VARIABLE OUTPUT
+    )
+    IF (TEST_LFS_WORKS_COMPILE)
+      IF (TEST_LFS_WORKS_RUN  MATCHES 0)
+        SET (TEST_LFS_WORKS 1 CACHE INTERNAL ${msg})
+        SET (LARGEFILE 1)
+        SET (HDF_EXTRA_FLAGS ${HDF_EXTRA_FLAGS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+        MESSAGE (STATUS "${msg}... yes")
+      ELSE (TEST_LFS_WORKS_RUN  MATCHES 0)
+        SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
+        MESSAGE (STATUS "${msg}... no")
+        FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+              "Test TEST_LFS_WORKS Run failed with the following output and exit code:\n ${OUTPUT}\n"
+        )
+      ENDIF (TEST_LFS_WORKS_RUN  MATCHES 0)
+    ELSE (TEST_LFS_WORKS_COMPILE )
+      SET (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
+      MESSAGE (STATUS "${msg}... no")
+      FILE (APPEND ${CMAKE_BINARY_DIR}/CMakeFiles/CMakeError.log
+          "Test TEST_LFS_WORKS Compile failed with the following output:\n ${OUTPUT}\n"
+      )
+    ENDIF (TEST_LFS_WORKS_COMPILE)
+  ENDIF (HDF_ENABLE_LARGE_FILE)
+  SET (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${HDF_EXTRA_FLAGS})
+ENDIF (NOT WINDOWS)
+
+ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
+
+#-----------------------------------------------------------------------------
+# Check for HAVE_OFF64_T functionality
+#-----------------------------------------------------------------------------
+IF (NOT WINDOWS)
+  HDF_FUNCTION_TEST (HAVE_OFF64_T)
+  IF (HAVE_OFF64_T)
+    CHECK_FUNCTION_EXISTS (lseek64            HAVE_LSEEK64)
+    CHECK_FUNCTION_EXISTS (fseeko64           HAVE_FSEEKO64)
+    CHECK_FUNCTION_EXISTS (ftello64           HAVE_FTELLO64)
+    CHECK_FUNCTION_EXISTS (ftruncate64        HAVE_FTRUNCATE64)
+  ENDIF (HAVE_OFF64_T)
+
+  CHECK_FUNCTION_EXISTS (fseeko               HAVE_FSEEKO)
+  CHECK_FUNCTION_EXISTS (ftello               HAVE_FTELLO)
+
+  HDF5_FUNCTION_TEST (HAVE_STAT64_STRUCT)
+  IF (HAVE_STAT64_STRUCT)
+    CHECK_FUNCTION_EXISTS (fstat64            HAVE_FSTAT64)
+    CHECK_FUNCTION_EXISTS (stat64             HAVE_STAT64)
+  ENDIF (HAVE_STAT64_STRUCT)
+ENDIF (NOT WINDOWS)
+
+#-----------------------------------------------------------------------------
+# Check if the dev_t type is a scalar type
+#-----------------------------------------------------------------------------
+IF (NOT WINDOWS)
+  HDF5_FUNCTION_TEST (DEV_T_IS_SCALAR)
+ENDIF (NOT WINDOWS)
+
+# ----------------------------------------------------------------------
+# Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
+# to be done after any POSIX/BSD defines to ensure that the test gets
+# the correct POSIX level on linux.
+CHECK_VARIABLE_EXISTS (CLOCK_MONOTONIC HAVE_CLOCK_MONOTONIC)
+
+#-----------------------------------------------------------------------------
+# Check a bunch of time functions
 #-----------------------------------------------------------------------------
 IF (NOT WINDOWS)
   FOREACH (test
-      TIME_WITH_SYS_TIME
-      STDC_HEADERS
-      HAVE_TM_ZONE
-      HAVE_STRUCT_TM_TM_ZONE
-      HAVE_ATTRIBUTE
-      HAVE_FUNCTION
       HAVE_TM_GMTOFF
+      HAVE___TM_GMTOFF
 #      HAVE_TIMEZONE
       HAVE_STRUCT_TIMEZONE
-      HAVE_STAT_ST_BLOCKS
+      GETTIMEOFDAY_GIVES_TZ
+      TIME_WITH_SYS_TIME
+      HAVE_TM_ZONE
+      HAVE_STRUCT_TM_TM_ZONE
+  )
+    HDF_FUNCTION_TEST (${test})
+  ENDFOREACH (test)
+  IF (NOT CYGWIN AND NOT MINGW)
+      HDF_FUNCTION_TEST (HAVE_TIMEZONE)
+#      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+  ENDIF (NOT CYGWIN AND NOT MINGW)
+ENDIF (NOT WINDOWS)
+
+# ----------------------------------------------------------------------
+# Does the struct stat have the st_blocks field?  This field is not Posix.
+#
+IF (NOT WINDOWS)
+  HDF5_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+ENDIF (NOT WINDOWS)
+
+# ----------------------------------------------------------------------
+# How do we figure out the width of a tty in characters?
+#
+CHECK_FUNCTION_EXISTS (_getvideoconfig   HAVE__GETVIDEOCONFIG)
+CHECK_FUNCTION_EXISTS (gettextinfo       HAVE_GETTEXTINFO)
+CHECK_FUNCTION_EXISTS (_scrsize          HAVE__SCRSIZE)
+CHECK_FUNCTION_EXISTS (ioctl             HAVE_IOCTL)
+HDF5_FUNCTION_TEST (HAVE_STRUCT_VIDEOCONFIG)
+HDF5_FUNCTION_TEST (HAVE_STRUCT_TEXT_INFO)
+IF (NOT WINDOWS)
+  CHECK_FUNCTION_EXISTS (GetConsoleScreenBufferInfo    HAVE_GETCONSOLESCREENBUFFERINFO)
+  CHECK_SYMBOL_EXISTS (TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
+  CHECK_SYMBOL_EXISTS (TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
+ENDIF (NOT WINDOWS)
+
+#-----------------------------------------------------------------------------
+# Check for some functions that are used
+#
+CHECK_FUNCTION_EXISTS (alarm             HAVE_ALARM)
+CHECK_FUNCTION_EXISTS (fork              HAVE_FORK)
+CHECK_FUNCTION_EXISTS (frexpf            HAVE_FREXPF)
+CHECK_FUNCTION_EXISTS (frexpl            HAVE_FREXPL)
+
+CHECK_FUNCTION_EXISTS (gethostname       HAVE_GETHOSTNAME)
+CHECK_FUNCTION_EXISTS (getpwuid          HAVE_GETPWUID)
+CHECK_FUNCTION_EXISTS (getrusage         HAVE_GETRUSAGE)
+CHECK_FUNCTION_EXISTS (lstat             HAVE_LSTAT)
+
+CHECK_FUNCTION_EXISTS (rand_r            HAVE_RAND_R)
+CHECK_FUNCTION_EXISTS (random            HAVE_RANDOM)
+CHECK_FUNCTION_EXISTS (setsysinfo        HAVE_SETSYSINFO)
+
+CHECK_FUNCTION_EXISTS (signal            HAVE_SIGNAL)
+CHECK_FUNCTION_EXISTS (longjmp           HAVE_LONGJMP)
+CHECK_FUNCTION_EXISTS (setjmp            HAVE_SETJMP)
+CHECK_FUNCTION_EXISTS (siglongjmp        HAVE_SIGLONGJMP)
+CHECK_FUNCTION_EXISTS (sigsetjmp         HAVE_SIGSETJMP)
+CHECK_FUNCTION_EXISTS (sigaction         HAVE_SIGACTION)
+CHECK_FUNCTION_EXISTS (sigprocmask       HAVE_SIGPROCMASK)
+
+CHECK_FUNCTION_EXISTS (snprintf          HAVE_SNPRINTF)
+CHECK_FUNCTION_EXISTS (srandom           HAVE_SRANDOM)
+CHECK_FUNCTION_EXISTS (strdup            HAVE_STRDUP)
+CHECK_FUNCTION_EXISTS (symlink           HAVE_SYMLINK)
+CHECK_FUNCTION_EXISTS (system            HAVE_SYSTEM)
+
+CHECK_FUNCTION_EXISTS (tmpfile           HAVE_TMPFILE)
+CHECK_FUNCTION_EXISTS (vasprintf         HAVE_VASPRINTF)
+CHECK_FUNCTION_EXISTS (waitpid           HAVE_WAITPID)
+
+CHECK_FUNCTION_EXISTS (vsnprintf         HAVE_VSNPRINTF)
+IF (HAVE_VSNPRINTF)
+  HDF_FUNCTION_TEST (VSNPRINTF_WORKS)
+ENDIF (HAVE_VSNPRINTF)
+
+
+# Check for Symbols
+CHECK_SYMBOL_EXISTS (tzname "time.h" HAVE_DECL_TZNAME)
+
+#-----------------------------------------------------------------------------
+#
+#-----------------------------------------------------------------------------
+IF (NOT WINDOWS)
+  FOREACH (test
+      LONE_COLON
+      HAVE_ATTRIBUTE
+      HAVE_C99_FUNC
       HAVE_FUNCTION
+      HAVE_C99_DESIGNATED_INITIALIZER
       SYSTEM_SCOPE_THREADS
       HAVE_SOCKLEN_T
-      DEV_T_IS_SCALAR
-      HAVE_OFF64_T
-      GETTIMEOFDAY_GIVES_TZ
-      VSNPRINTF_WORKS
-      HAVE_C99_FUNC
-      HAVE_C99_DESIGNATED_INITIALIZER
       CXX_HAVE_OFFSETOF
   )
     HDF_FUNCTION_TEST (${test})
   ENDFOREACH (test)
-    IF (NOT CYGWIN AND NOT MINGW)
-      HDF_FUNCTION_TEST (HAVE_TIMEZONE)
-#      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
-    ENDIF (NOT CYGWIN AND NOT MINGW)
 ENDIF (NOT WINDOWS)
 
-#-----------------------------------------------------------------------------
-# Look for 64 bit file stream capability
-#-----------------------------------------------------------------------------
-IF (HAVE_OFF64_T)
-  CHECK_FUNCTION_EXISTS (lseek64           HAVE_LSEEK64)
-  CHECK_FUNCTION_EXISTS (fseek64           HAVE_FSEEK64)
-ENDIF (HAVE_OFF64_T)
