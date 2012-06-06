@@ -8,6 +8,7 @@ INCLUDE (${CMAKE_ROOT}/Modules/CheckIncludeFiles.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckLibraryExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
+INCLUDE (${CMAKE_ROOT}/Modules/CheckVariableExists.cmake)
 
 #-----------------------------------------------------------------------------
 # Always SET this for now IF we are on an OS X box
@@ -318,10 +319,11 @@ ENDIF (NOT WINDOWS)
 
 ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
 
-#-----------------------------------------------------------------------------
-# Check for HAVE_OFF64_T functionality
-#-----------------------------------------------------------------------------
 IF (NOT WINDOWS)
+
+  #-----------------------------------------------------------------------------
+  # Check for HAVE_OFF64_T functionality
+  #-----------------------------------------------------------------------------
   HDF_FUNCTION_TEST (HAVE_OFF64_T)
   IF (HAVE_OFF64_T)
     CHECK_FUNCTION_EXISTS (lseek64            HAVE_LSEEK64)
@@ -338,25 +340,21 @@ IF (NOT WINDOWS)
     CHECK_FUNCTION_EXISTS (fstat64            HAVE_FSTAT64)
     CHECK_FUNCTION_EXISTS (stat64             HAVE_STAT64)
   ENDIF (HAVE_STAT64_STRUCT)
-ENDIF (NOT WINDOWS)
 
-#-----------------------------------------------------------------------------
-# Check if the dev_t type is a scalar type
-#-----------------------------------------------------------------------------
-IF (NOT WINDOWS)
+  #-----------------------------------------------------------------------------
+  # Check if the dev_t type is a scalar type
+  #-----------------------------------------------------------------------------
   HDF5_FUNCTION_TEST (DEV_T_IS_SCALAR)
-ENDIF (NOT WINDOWS)
 
-# ----------------------------------------------------------------------
-# Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
-# to be done after any POSIX/BSD defines to ensure that the test gets
-# the correct POSIX level on linux.
-CHECK_VARIABLE_EXISTS (CLOCK_MONOTONIC HAVE_CLOCK_MONOTONIC)
+  # ----------------------------------------------------------------------
+  # Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
+  # to be done after any POSIX/BSD defines to ensure that the test gets
+  # the correct POSIX level on linux.
+  CHECK_VARIABLE_EXISTS (CLOCK_MONOTONIC HAVE_CLOCK_MONOTONIC)
 
-#-----------------------------------------------------------------------------
-# Check a bunch of time functions
-#-----------------------------------------------------------------------------
-IF (NOT WINDOWS)
+  #-----------------------------------------------------------------------------
+  # Check a bunch of time functions
+  #-----------------------------------------------------------------------------
   FOREACH (test
       HAVE_TM_GMTOFF
       HAVE___TM_GMTOFF
@@ -373,13 +371,12 @@ IF (NOT WINDOWS)
       HDF_FUNCTION_TEST (HAVE_TIMEZONE)
 #      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
   ENDIF (NOT CYGWIN AND NOT MINGW)
-ENDIF (NOT WINDOWS)
 
-# ----------------------------------------------------------------------
-# Does the struct stat have the st_blocks field?  This field is not Posix.
-#
-IF (NOT WINDOWS)
+  # ----------------------------------------------------------------------
+  # Does the struct stat have the st_blocks field?  This field is not Posix.
+  #
   HDF5_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+  
 ENDIF (NOT WINDOWS)
 
 # ----------------------------------------------------------------------
