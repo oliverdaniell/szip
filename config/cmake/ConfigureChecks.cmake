@@ -335,7 +335,7 @@ IF (NOT WINDOWS)
   CHECK_FUNCTION_EXISTS (fseeko               HAVE_FSEEKO)
   CHECK_FUNCTION_EXISTS (ftello               HAVE_FTELLO)
 
-  HDF5_FUNCTION_TEST (HAVE_STAT64_STRUCT)
+  HDF_FUNCTION_TEST (HAVE_STAT64_STRUCT)
   IF (HAVE_STAT64_STRUCT)
     CHECK_FUNCTION_EXISTS (fstat64            HAVE_FSTAT64)
     CHECK_FUNCTION_EXISTS (stat64             HAVE_STAT64)
@@ -344,7 +344,7 @@ IF (NOT WINDOWS)
   #-----------------------------------------------------------------------------
   # Check if the dev_t type is a scalar type
   #-----------------------------------------------------------------------------
-  HDF5_FUNCTION_TEST (DEV_T_IS_SCALAR)
+  HDF_FUNCTION_TEST (DEV_T_IS_SCALAR)
 
   # ----------------------------------------------------------------------
   # Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
@@ -375,7 +375,7 @@ IF (NOT WINDOWS)
   # ----------------------------------------------------------------------
   # Does the struct stat have the st_blocks field?  This field is not Posix.
   #
-  HDF5_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+  HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
   
 ENDIF (NOT WINDOWS)
 
@@ -386,8 +386,8 @@ CHECK_FUNCTION_EXISTS (_getvideoconfig   HAVE__GETVIDEOCONFIG)
 CHECK_FUNCTION_EXISTS (gettextinfo       HAVE_GETTEXTINFO)
 CHECK_FUNCTION_EXISTS (_scrsize          HAVE__SCRSIZE)
 CHECK_FUNCTION_EXISTS (ioctl             HAVE_IOCTL)
-HDF5_FUNCTION_TEST (HAVE_STRUCT_VIDEOCONFIG)
-HDF5_FUNCTION_TEST (HAVE_STRUCT_TEXT_INFO)
+HDF_FUNCTION_TEST (HAVE_STRUCT_VIDEOCONFIG)
+HDF_FUNCTION_TEST (HAVE_STRUCT_TEXT_INFO)
 IF (NOT WINDOWS)
   CHECK_FUNCTION_EXISTS (GetConsoleScreenBufferInfo    HAVE_GETCONSOLESCREENBUFFERINFO)
   CHECK_SYMBOL_EXISTS (TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
