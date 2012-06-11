@@ -81,10 +81,6 @@ ENDIF (WINDOWS)
 # END of WINDOWS Hard code Values
 # ----------------------------------------------------------------------
 
-IF (CYGWIN)
-  SET (HAVE_LSEEK64 0)
-ENDIF (CYGWIN)
-
 #-----------------------------------------------------------------------------
 #  Check for the math library "m"
 #-----------------------------------------------------------------------------
@@ -167,47 +163,6 @@ IF (NOT WINDOWS)
 ENDIF (NOT WINDOWS)
 
 #-----------------------------------------------------------------------------
-CHECK_FUNCTION_EXISTS (difftime           HAVE_DIFFTIME)
-#CHECK_FUNCTION_EXISTS (gettimeofday       HAVE_GETTIMEOFDAY)
-#  Since gettimeofday is not defined any where standard, lets look in all the
-#  usual places. On MSVC we are just going to use ::clock()
-#-----------------------------------------------------------------------------
-IF (NOT MSVC)
-  IF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
-    TRY_COMPILE (HAVE_TIME_GETTIMEOFDAY
-        ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
-        COMPILE_DEFINITIONS -DTRY_TIME_H
-        OUTPUT_VARIABLE OUTPUT
-    )
-    IF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-      SET (HAVE_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_TIME_GETTIMEOFDAY")
-      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
-    ENDIF (HAVE_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-  ENDIF ("HAVE_TIME_GETTIMEOFDAY" MATCHES "^HAVE_TIME_GETTIMEOFDAY$")
-
-  IF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
-    TRY_COMPILE (HAVE_SYS_TIME_GETTIMEOFDAY
-        ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/GetTimeOfDayTest.c
-        COMPILE_DEFINITIONS -DTRY_SYS_TIME_H
-        OUTPUT_VARIABLE OUTPUT
-    )
-    IF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-      SET (HAVE_SYS_TIME_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_SYS_TIME_GETTIMEOFDAY")
-      SET (HAVE_GETTIMEOFDAY "1" CACHE INTERNAL "HAVE_GETTIMEOFDAY")
-    ENDIF (HAVE_SYS_TIME_GETTIMEOFDAY STREQUAL "TRUE")
-  ENDIF ("HAVE_SYS_TIME_GETTIMEOFDAY" MATCHES "^HAVE_SYS_TIME_GETTIMEOFDAY$")
-
-  IF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
-    MESSAGE (STATUS "---------------------------------------------------------------")
-    MESSAGE (STATUS "Function 'gettimeofday()' was not found. SZIP will use its")
-    MESSAGE (STATUS "  own implementation.. This can happen on older versions of")
-    MESSAGE (STATUS "  MinGW on Windows. Consider upgrading your MinGW installation")
-    MESSAGE (STATUS "  to a newer version such as MinGW 3.12")
-    MESSAGE (STATUS "---------------------------------------------------------------")
-  ENDIF (NOT HAVE_SYS_TIME_GETTIMEOFDAY AND NOT HAVE_GETTIMEOFDAY AND NOT MSVC)
-ENDIF (NOT MSVC)
 
 #-----------------------------------------------------------------------------
 # Check IF header file exists and add it to the list.
@@ -225,13 +180,10 @@ ENDMACRO (CHECK_INCLUDE_FILE_CONCAT)
 CHECK_INCLUDE_FILE_CONCAT ("sys/resource.h"  HAVE_SYS_RESOURCE_H)
 CHECK_INCLUDE_FILE_CONCAT ("sys/time.h"      HAVE_SYS_TIME_H)
 CHECK_INCLUDE_FILE_CONCAT ("unistd.h"        HAVE_UNISTD_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/ioctl.h"     HAVE_SYS_IOCTL_H)
 CHECK_INCLUDE_FILE_CONCAT ("sys/stat.h"      HAVE_SYS_STAT_H)
-CHECK_INCLUDE_FILE_CONCAT ("sys/socket.h"    HAVE_SYS_SOCKET_H)
 CHECK_INCLUDE_FILE_CONCAT ("sys/types.h"     HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE_CONCAT ("stddef.h"        HAVE_STDDEF_H)
 CHECK_INCLUDE_FILE_CONCAT ("setjmp.h"        HAVE_SETJMP_H)
-CHECK_INCLUDE_FILE_CONCAT ("features.h"      HAVE_FEATURES_H)
 CHECK_INCLUDE_FILE_CONCAT ("stdint.h"        HAVE_STDINT_H)
 
 # IF the c compiler found stdint, check the C++ as well. On some systems this
@@ -250,28 +202,16 @@ CHECK_INCLUDE_FILE_CONCAT ("io.h"            HAVE_IO_H)
 IF (NOT CYGWIN)
   CHECK_INCLUDE_FILE_CONCAT ("winsock2.h"      HAVE_WINSOCK_H)
 ENDIF (NOT CYGWIN)
-CHECK_INCLUDE_FILE_CONCAT ("sys/timeb.h"     HAVE_SYS_TIMEB_H)
 
-IF (CMAKE_SYSTEM_NAME MATCHES "OSF")
-  CHECK_INCLUDE_FILE_CONCAT ("sys/sysinfo.h" HAVE_SYS_SYSINFO_H)
-  CHECK_INCLUDE_FILE_CONCAT ("sys/proc.h"    HAVE_SYS_PROC_H)
-ELSE (CMAKE_SYSTEM_NAME MATCHES "OSF")
-  SET (HAVE_SYS_SYSINFO_H "" CACHE INTERNAL "" FORCE)
-  SET (HAVE_SYS_PROC_H    "" CACHE INTERNAL "" FORCE)
-ENDIF (CMAKE_SYSTEM_NAME MATCHES "OSF")
-
-CHECK_INCLUDE_FILE_CONCAT ("globus/common.h" HAVE_GLOBUS_COMMON_H)
-CHECK_INCLUDE_FILE_CONCAT ("pdb.h"           HAVE_PDB_H)
 CHECK_INCLUDE_FILE_CONCAT ("pthread.h"       HAVE_PTHREAD_H)
-CHECK_INCLUDE_FILE_CONCAT ("srbclient.h"     HAVE_SRBCLIENT_H)
 CHECK_INCLUDE_FILE_CONCAT ("string.h"        HAVE_STRING_H)
 CHECK_INCLUDE_FILE_CONCAT ("strings.h"       HAVE_STRINGS_H)
 CHECK_INCLUDE_FILE_CONCAT ("time.h"          HAVE_TIME_H)
 CHECK_INCLUDE_FILE_CONCAT ("stdlib.h"        HAVE_STDLIB_H)
 CHECK_INCLUDE_FILE_CONCAT ("memory.h"        HAVE_MEMORY_H)
 CHECK_INCLUDE_FILE_CONCAT ("dlfcn.h"         HAVE_DLFCN_H)
+CHECK_INCLUDE_FILE_CONCAT ("fcntl.h"         HAVE_FCNTL_H)
 CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
-CHECK_INCLUDE_FILE_CONCAT ("netinet/in.h"    HAVE_NETINET_IN_H)
 
 #-----------------------------------------------------------------------------
 #  Check for large file support
@@ -347,51 +287,10 @@ IF (NOT WINDOWS)
   HDF_FUNCTION_TEST (DEV_T_IS_SCALAR)
 
   # ----------------------------------------------------------------------
-  # Check for MONOTONIC_TIMER support (used in clock_gettime).  This has
-  # to be done after any POSIX/BSD defines to ensure that the test gets
-  # the correct POSIX level on linux.
-  CHECK_VARIABLE_EXISTS (CLOCK_MONOTONIC HAVE_CLOCK_MONOTONIC)
-
-  #-----------------------------------------------------------------------------
-  # Check a bunch of time functions
-  #-----------------------------------------------------------------------------
-  FOREACH (test
-      HAVE_TM_GMTOFF
-      HAVE___TM_GMTOFF
-#      HAVE_TIMEZONE
-      HAVE_STRUCT_TIMEZONE
-      GETTIMEOFDAY_GIVES_TZ
-      TIME_WITH_SYS_TIME
-      HAVE_TM_ZONE
-      HAVE_STRUCT_TM_TM_ZONE
-  )
-    HDF_FUNCTION_TEST (${test})
-  ENDFOREACH (test)
-  IF (NOT CYGWIN AND NOT MINGW)
-      HDF_FUNCTION_TEST (HAVE_TIMEZONE)
-#      HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
-  ENDIF (NOT CYGWIN AND NOT MINGW)
-
-  # ----------------------------------------------------------------------
   # Does the struct stat have the st_blocks field?  This field is not Posix.
   #
   HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
   
-ENDIF (NOT WINDOWS)
-
-# ----------------------------------------------------------------------
-# How do we figure out the width of a tty in characters?
-#
-CHECK_FUNCTION_EXISTS (_getvideoconfig   HAVE__GETVIDEOCONFIG)
-CHECK_FUNCTION_EXISTS (gettextinfo       HAVE_GETTEXTINFO)
-CHECK_FUNCTION_EXISTS (_scrsize          HAVE__SCRSIZE)
-CHECK_FUNCTION_EXISTS (ioctl             HAVE_IOCTL)
-HDF_FUNCTION_TEST (HAVE_STRUCT_VIDEOCONFIG)
-HDF_FUNCTION_TEST (HAVE_STRUCT_TEXT_INFO)
-IF (NOT WINDOWS)
-  CHECK_FUNCTION_EXISTS (GetConsoleScreenBufferInfo    HAVE_GETCONSOLESCREENBUFFERINFO)
-  CHECK_SYMBOL_EXISTS (TIOCGWINSZ "sys/ioctl.h" HAVE_TIOCGWINSZ)
-  CHECK_SYMBOL_EXISTS (TIOCGETD   "sys/ioctl.h" HAVE_TIOCGETD)
 ENDIF (NOT WINDOWS)
 
 #-----------------------------------------------------------------------------
@@ -427,29 +326,18 @@ CHECK_FUNCTION_EXISTS (system            HAVE_SYSTEM)
 
 CHECK_FUNCTION_EXISTS (tmpfile           HAVE_TMPFILE)
 CHECK_FUNCTION_EXISTS (vasprintf         HAVE_VASPRINTF)
-CHECK_FUNCTION_EXISTS (waitpid           HAVE_WAITPID)
 
 CHECK_FUNCTION_EXISTS (vsnprintf         HAVE_VSNPRINTF)
-IF (HAVE_VSNPRINTF)
-  HDF_FUNCTION_TEST (VSNPRINTF_WORKS)
-ENDIF (HAVE_VSNPRINTF)
-
-
-# Check for Symbols
-CHECK_SYMBOL_EXISTS (tzname "time.h" HAVE_DECL_TZNAME)
-
-#-----------------------------------------------------------------------------
-#
-#-----------------------------------------------------------------------------
 IF (NOT WINDOWS)
+  IF (H5_HAVE_VSNPRINTF)
+    HDF5_FUNCTION_TEST (VSNPRINTF_WORKS)
+  ENDIF (H5_HAVE_VSNPRINTF)
   FOREACH (test
-      LONE_COLON
       HAVE_ATTRIBUTE
       HAVE_C99_FUNC
       HAVE_FUNCTION
       HAVE_C99_DESIGNATED_INITIALIZER
       SYSTEM_SCOPE_THREADS
-      HAVE_SOCKLEN_T
       CXX_HAVE_OFFSETOF
   )
     HDF_FUNCTION_TEST (${test})
