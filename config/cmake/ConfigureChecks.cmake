@@ -262,8 +262,7 @@ ENDIF (NOT WINDOWS)
 
 ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
 
-IF (NOT WINDOWS)
-
+IF (NOT WINDOWS OR MINGW)
   #-----------------------------------------------------------------------------
   # Check for HAVE_OFF64_T functionality
   #-----------------------------------------------------------------------------
@@ -294,7 +293,7 @@ IF (NOT WINDOWS)
   #
   HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
   
-ENDIF (NOT WINDOWS)
+ENDIF (NOT WINDOWS OR MINGW)
 
 #-----------------------------------------------------------------------------
 # Check for some functions that are used
