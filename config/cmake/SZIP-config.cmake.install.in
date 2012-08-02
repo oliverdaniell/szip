@@ -21,6 +21,6 @@ SET (SZIP_VERSION_MINOR  @SZIP_VERSION_MINOR@)
 # project which has already build SZIP as a subproject
 #-----------------------------------------------------------------------------
 IF (NOT TARGET "@SZIP_PACKAGE@")
-  INCLUDE (${SELF_DIR}/@SZIP_PACKAGE_NAME@@HDF_PACKAGE_EXT@-targets.cmake)
+  INCLUDE (${SELF_DIR}/@SZIP_PACKAGE@@HDF_PACKAGE_EXT@-targets.cmake)
   SET (SZIP_LIBRARIES "@SZIP_LIBRARIES_TO_EXPORT@")
 ENDIF (NOT TARGET "@SZIP_PACKAGE@")
