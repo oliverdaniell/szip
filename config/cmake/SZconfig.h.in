@@ -76,4 +76,4 @@
 #cmakedefine size_t
 
 /* Define if cmake is used and building dynamic libraries */
-#cmakedefine SZIP_BUILT_AS_DYNAMIC_LIB @SZIP_BUILT_AS_DYNAMIC_LIB@
+#cmakedefine SZ_BUILT_AS_DYNAMIC_LIB @SZ_BUILT_AS_DYNAMIC_LIB@
