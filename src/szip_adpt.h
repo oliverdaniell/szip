@@ -6,6 +6,7 @@
 
 #ifndef SZAPI_ADPT_H
 #define SZAPI_ADPT_H
+#include "SZconfig.h"
 
 /* This will only be defined if szip was built with CMake shared libs*/
 #ifdef SZ_BUILT_AS_DYNAMIC_LIB
