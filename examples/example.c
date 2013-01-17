@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "SZconfig.h"
 #include "szlib.h"
 
 #define MAX_IMAGE_SIZE (1024*1024L)

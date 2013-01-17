@@ -41,6 +41,7 @@ Post Falls, ID 83854.  (208) 262-2008.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "SZconfig.h"
 #include "szlib.h"
 
 long szip_compress_memory(

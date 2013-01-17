@@ -39,8 +39,8 @@ Post Falls, ID 83854.  (208) 262-2008.
 #include <string.h>
 #include <time.h>
 #include "mcgill.h"
-#include "szlib.h"
 #include "SZconfig.h"
+#include "szlib.h"
 
 #define BLOCKS_PER_TEST	1024
 
