@@ -24,3 +24,4 @@ TARGET_C_PROPERTIES (example " " " ")
 target_link_libraries (example ${SZIP_LIB_TARGET})
 
 add_test (NAME example COMMAND $<TARGET_FILE:example>)
+set_tests_properties (example PROPERTIES DEPENDS burst_szip)
