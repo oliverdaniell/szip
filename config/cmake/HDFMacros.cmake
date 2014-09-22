@@ -45,7 +45,7 @@ ENDMACRO (TARGET_NAMING)
 #-------------------------------------------------------------------------------
 MACRO (INSTALL_TARGET_PDB libtarget targetdestination targetcomponent)
   if (WIN32 AND MSVC)
-    get_target_property (target_name ${libtarget} RELWITHDEBINFO_OUTPUT_NAME)
+    get_target_property (target_name ${libtarget} OUTPUT_NAME_RELWITHDEBINFO)
     install (
       FILES
           ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${target_name}.pdb
@@ -60,7 +60,7 @@ ENDMACRO (INSTALL_TARGET_PDB)
 #-------------------------------------------------------------------------------
 MACRO (INSTALL_PROGRAM_PDB progtarget targetdestination targetcomponent)
   if (WIN32 AND MSVC)
-    get_target_property (target_name ${progtarget} RELWITHDEBINFO_OUTPUT_NAME)
+    get_target_property (target_name ${progtarget} OUTPUT_NAME_RELWITHDEBINFO)
     get_target_property (target_prefix ${progtarget} PREFIX)
     install (
       FILES
@@ -102,10 +102,10 @@ MACRO (HDF_SET_LIB_OPTIONS libtarget libname libtype)
   
   set_target_properties (${libtarget}
       PROPERTIES
-      DEBUG_OUTPUT_NAME          ${LIB_DEBUG_NAME}
-      RELEASE_OUTPUT_NAME        ${LIB_RELEASE_NAME}
-      MINSIZEREL_OUTPUT_NAME     ${LIB_RELEASE_NAME}
-      RELWITHDEBINFO_OUTPUT_NAME ${LIB_RELEASE_NAME}
+      OUTPUT_NAME_DEBUG          ${LIB_DEBUG_NAME}
+      OUTPUT_NAME_RELEASE        ${LIB_RELEASE_NAME}
+      OUTPUT_NAME_MINSIZEREL     ${LIB_RELEASE_NAME}
+      OUTPUT_NAME_RELWITHDEBINFO ${LIB_RELEASE_NAME}
   )
   
   #----- Use MSVC Naming conventions for Shared Libraries
@@ -119,6 +119,62 @@ MACRO (HDF_SET_LIB_OPTIONS libtarget libname libtype)
   endif (MINGW AND ${libtype} MATCHES "SHARED")
 
 ENDMACRO (HDF_SET_LIB_OPTIONS)
+
+#-------------------------------------------------------------------------------
+MACRO (HDF_IMPORT_SET_LIB_OPTIONS libtarget libname libtype libversion)
+  HDF_SET_LIB_OPTIONS (${libtarget} ${libname} ${libtype})
+
+  if (${importtype} MATCHES "IMPORT")
+        set (importprefix "${CMAKE_STATIC_LIBRARY_PREFIX}")
+  endif (${importtype} MATCHES "IMPORT")
+  if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    set (IMPORT_LIB_NAME ${LIB_DEBUG_NAME})
+  else (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    set (IMPORT_LIB_NAME ${LIB_RELEASE_NAME})
+  endif (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+
+  if (${libtype} MATCHES "SHARED")
+    if (WIN32)
+      if (MINGW)
+        set_target_properties (${libtarget} PROPERTIES
+            IMPORTED_IMPLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${IMPORT_LIB_NAME}.lib"
+            IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        )
+      else (MINGW)
+        set_target_properties (${libtarget} PROPERTIES
+            IMPORTED_IMPLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+            IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        )
+      endif (MINGW)
+    else (WIN32)
+      if (CYGWIN)
+        set_target_properties (${libtarget} PROPERTIES
+            IMPORTED_IMPLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+            IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        )
+      else (CYGWIN)
+        set_target_properties (${libtarget} PROPERTIES
+            IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            IMPORTED_SONAME "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}.${libversion}"
+            SOVERSION "${libversion}"
+        )
+      endif (CYGWIN)
+    endif (WIN32)
+  else (${libtype} MATCHES "SHARED")
+    if (WIN32 AND NOT MINGW)
+      set_target_properties (${libtarget} PROPERTIES
+          IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${IMPORT_LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+          IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+      )
+    else (WIN32 AND NOT MINGW)
+      set_target_properties (${libtarget} PROPERTIES
+          IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_STATIC_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+          IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+      )
+    endif (WIN32 AND NOT MINGW)
+  endif (${libtype} MATCHES "SHARED")
+
+ENDMACRO (HDF_IMPORT_SET_LIB_OPTIONS)
 
 #-------------------------------------------------------------------------------
 MACRO (TARGET_C_PROPERTIES wintarget addcompileflags addlinkflags)

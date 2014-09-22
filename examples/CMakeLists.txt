@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES (${SZIP_TEST_SOURCE_DIR})
 add_executable (burst_szip burst_szip.c)
 TARGET_NAMING (burst_szip ${LIB_TYPE})
 TARGET_C_PROPERTIES (burst_szip " " " ")
-target_link_libraries (burst_szip ${SZIP_LIB_TARGET} ${SZIP_TEST_LIB_TARGET})
+target_link_libraries (burst_szip ${SZIP_TEST_LIB_TARGET} ${SZIP_LIB_TARGET})
 
 add_test (NAME burst_szip COMMAND $<TARGET_FILE:burst_szip> -msb 8 8 1024 16 image.8.in)
 
