@@ -17,19 +17,16 @@ set (SZIP_EXAMPLES_SOURCE_DIR    ${SZIP_SOURCE_DIR}/examples)
 # Set the core names of all the libraries
 #-----------------------------------------------------------------------------
 set (SZIP_LIB_CORENAME              "szip")
-set (SZIP_TEST_LIB_CORENAME         "mcgill")
 
 #-----------------------------------------------------------------------------
 # Set the true names of all the libraries if customized by external project
 #-----------------------------------------------------------------------------
 set (SZIP_LIB_NAME              "${SZIP_EXTERNAL_LIB_PREFIX}${SZIP_LIB_CORENAME}")
-set (SZIP_TEST_LIB_NAME         "${SZIP_EXTERNAL_LIB_PREFIX}${SZIP_TEST_LIB_CORENAME}")
 
 #-----------------------------------------------------------------------------
 # Set the target names of all the libraries
 #-----------------------------------------------------------------------------
 set (SZIP_LIB_TARGET              ${SZIP_LIB_CORENAME})
-set (SZIP_TEST_LIB_TARGET         ${SZIP_TEST_LIB_CORENAME})
 
 if (NOT SZIP_INSTALL_BIN_DIR)
   set (SZIP_INSTALL_BIN_DIR bin)
@@ -215,14 +212,6 @@ if (BUILD_TESTING)
   enable_testing ()
   include (CTest)
   add_subdirectory (${SZIP_SOURCE_DIR}/test ${PROJECT_BINARY_DIR}/test)
-
-#-----------------------------------------------------------------------------
-# Option to build examples
-#-----------------------------------------------------------------------------
-  option (SZIP_BUILD_EXAMPLES  "Build SZIP Library Examples" OFF)
-  if (SZIP_BUILD_EXAMPLES AND BUILD_TESTING)
-    add_subdirectory (${SZIP_SOURCE_DIR}/examples ${PROJECT_BINARY_DIR}/examples)
-  endif (SZIP_BUILD_EXAMPLES AND BUILD_TESTING)
 endif (BUILD_TESTING)
 
 #-----------------------------------------------------------------------------

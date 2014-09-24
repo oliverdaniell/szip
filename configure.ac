@@ -196,7 +196,6 @@ if test "X$ENCODING" = "Xyes"; then
      echo "no"
 fi
 AC_CONFIG_FILES([Makefile
-                 examples/Makefile
                  src/Makefile
                  test/Makefile])
 AC_OUTPUT
