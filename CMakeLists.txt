@@ -220,9 +220,9 @@ if (BUILD_TESTING)
 # Option to build examples
 #-----------------------------------------------------------------------------
   option (SZIP_BUILD_EXAMPLES  "Build SZIP Library Examples" OFF)
-  if (SZIP_BUILD_EXAMPLES)
+  if (SZIP_BUILD_EXAMPLES AND BUILD_TESTING)
     add_subdirectory (${SZIP_SOURCE_DIR}/examples ${PROJECT_BINARY_DIR}/examples)
-  endif (SZIP_BUILD_EXAMPLES)
+  endif (SZIP_BUILD_EXAMPLES AND BUILD_TESTING)
 endif (BUILD_TESTING)
 
 #-----------------------------------------------------------------------------
