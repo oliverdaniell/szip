@@ -9,7 +9,7 @@ if (NOT WIN32)
   GET_FILENAME_COMPONENT(_IMPORT_PREFIX "${_IMPORT_PREFIX}" PATH)
 endif (NOT WIN32)
 
-GET_FILENAME_COMPONENT (SZIP_INCLUDE_DIRS "${_IMPORT_PREFIX}/include")
+set (SZIP_INCLUDE_DIR "${_IMPORT_PREFIX}/include")
 
 #-----------------------------------------------------------------------------
 # Version Strings
