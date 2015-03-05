@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.11)
+cmake_minimum_required (VERSION 3.1.0)
 PROJECT (SZIP C)
 
 #-----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ endif (BUILD_SHARED_LIBS)
 set (EXE_EXT "")
 if (WIN32)
   set (EXE_EXT ".exe")
-  add_definitions (-DBIND_TO_CURRENT_VCLIBS_VERSION=1)
+  add_definitions (-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
   add_definitions (-D_CRT_SECURE_NO_WARNINGS)
 endif (WIN32)
 
@@ -198,7 +198,7 @@ include (UserMacros.cmake)
 #-----------------------------------------------------------------------------
 # All libs/tests/examples need the main include directories
 #-----------------------------------------------------------------------------
-INCLUDE_DIRECTORIES (${SZIP_BINARY_DIR} ${SZIP_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES (${SZIP_BINARY_DIR} ${SZIP_SOURCE_DIR}/src ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_subdirectory (${SZIP_SOURCE_DIR}/src ${PROJECT_BINARY_DIR}/src)
 
@@ -250,6 +250,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
       TARGETS ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
       FILE ${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
   )
+  export (PACKAGE ${SZIP_PACKAGE}${HDF_PACKAGE_EXT})
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 
 #-----------------------------------------------------------------------------
@@ -258,6 +259,10 @@ endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 set (SZIP_INCLUDES_BUILD_TIME
     ${SZIP_SRC_DIR} ${SZIP_BINARY_DIR}
 )
+
+#-----------------------------------------------------------------------------
+# Set variables needed for installation
+#-----------------------------------------------------------------------------
 set (SZIP_VERSION_STRING ${SZIP_PACKAGE_VERSION})
 set (SZIP_VERSION_MAJOR  ${SZIP_PACKAGE_VERSION_MAJOR})
 set (SZIP_VERSION_MINOR  ${SZIP_PACKAGE_VERSION_MINOR})
@@ -305,7 +310,6 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
       FILES
           ${SZIP_SOURCE_DIR}/COPYING
           ${SZIP_SOURCE_DIR}/README
-          ${SZIP_SOURCE_DIR}/HISTORY.txt
           ${SZIP_SOURCE_DIR}/INSTALL
           ${SZIP_SOURCE_DIR}/RELEASE.txt
       DESTINATION ${SZIP_INSTALL_DATA_DIR}
@@ -314,36 +318,173 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 
 #-----------------------------------------------------------------------------
+# Check for Installation Utilities
+#-----------------------------------------------------------------------------
+if (WIN32)
+  set (PF_ENV_EXT "(x86)")
+  find_program (NSIS_EXECUTABLE NSIS.exe PATHS "$ENV{ProgramFiles}\\NSIS" "$ENV{ProgramFiles${PF_ENV_EXT}}\\NSIS")
+  if(NOT CPACK_WIX_ROOT)
+    file(TO_CMAKE_PATH "$ENV{WIX}" CPACK_WIX_ROOT)
+  endif()
+  find_program (WIX_EXECUTABLE candle  PATHS "${CPACK_WIX_ROOT}/bin")
+endif (WIN32)
+
+#-----------------------------------------------------------------------------
+# Configure the COPYING.txt file for the windows binary package
+#-----------------------------------------------------------------------------
+if (WIN32)
+  configure_file (${SZIP_SOURCE_DIR}/COPYING ${SZIP_BINARY_DIR}/COPYING.txt @ONLY)
+endif (WIN32)
+
+#-----------------------------------------------------------------------------
 # Set the cpack variables
 #-----------------------------------------------------------------------------
 if (NOT SZIP_EXTERNALLY_CONFIGURED)
   set (CPACK_PACKAGE_VENDOR "HDF_Group")
   set (CPACK_PACKAGE_NAME "${SZIP_PACKAGE_NAME}")
-  set (CPACK_PACKAGE_INSTALL_DIRECTORY "${SZIP_PACKAGE_NAME}")
-  set (CPACK_PACKAGE_VERSION "${SZIP_PACKAGE_VERSION}")
+  if (CDASH_LOCAL)
+    set (CPACK_PACKAGE_VERSION "${SZIP_PACKAGE_VERSION}")
+  else (CDASH_LOCAL)
+    set (CPACK_PACKAGE_VERSION "${SZIP_PACKAGE_VERSION_STRING}")
+  endif (CDASH_LOCAL)
   set (CPACK_PACKAGE_VERSION_MAJOR "${SZIP_PACKAGE_VERSION_MAJOR}")
   set (CPACK_PACKAGE_VERSION_MINOR "${SZIP_PACKAGE_VERSION_MINOR}")
   set (CPACK_PACKAGE_VERSION_PATCH "")
-  set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.txt")
   set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+  set (CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.txt")
   set (CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.txt")
   set (CPACK_PACKAGE_RELOCATABLE TRUE)
+  set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "szip Installation")
+  set (CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_VENDOR}/${CPACK_PACKAGE_NAME}/${CPACK_PACKAGE_VERSION}")
+
+  set (CPACK_GENERATOR "TGZ") 
   if (WIN32)
+    set (CPACK_GENERATOR "ZIP") 
+
+    if (NSIS_EXECUTABLE)    
+      list (APPEND CPACK_GENERATOR "NSIS") 
+    endif (NSIS_EXECUTABLE)    
+    # Installers for 32- vs. 64-bit CMake:
+    #  - Root install directory (displayed to end user at installer-run time)
+    #  - "NSIS package/display name" (text used in the installer GUI)
+    #  - Registry key used to store info about the installation
+    set (CPACK_NSIS_PACKAGE_NAME "${SZIP_PACKAGE_STRING}")
+    if (CMAKE_CL_64)
+      set (CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
+      set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION} (Win64)")
+    else (CMAKE_CL_64)
+      set (CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES")
+      set (CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+    endif (CMAKE_CL_64)
+    # set the install/unistall icon used for the installer itself
+    # There is a bug in NSI that does not handle full unix paths properly.
+    #set (CPACK_NSIS_MUI_ICON "${SZIP_RESOURCES_DIR}\\\\SZIP.ico")
+    #set (CPACK_NSIS_MUI_UNIICON "${SZIP_RESOURCES_DIR}\\\\SZIP.ico")
+    # set the package header icon for MUI
+    #set (CPACK_PACKAGE_ICON "${SZIP_RESOURCES_DIR}\\\\SZIP.bmp")
+    set (CPACK_NSIS_DISPLAY_NAME "${CPACK_NSIS_PACKAGE_NAME}")
+    set (CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_VENDOR}\\\\${CPACK_PACKAGE_NAME}\\\\${CPACK_PACKAGE_VERSION}")
     set (CPACK_MONOLITHIC_INSTALL ON)
-    set (CPACK_NSIS_CONTACT "help@hdfgroup.org")
+    set (CPACK_NSIS_CONTACT "${SZIP_PACKAGE_BUGREPORT}")
     set (CPACK_NSIS_MODIFY_PATH ON)
     set (CPACK_NSIS_PACKAGE_NAME "SZIP ${SZIP_PACKAGE_VERSION}")
+    if (WIX_EXECUTABLE)    
+      list (APPEND CPACK_GENERATOR "WIX") 
+    endif (WIX_EXECUTABLE)    
+#WiX variables
+    set (CPACK_WIX_UNINSTALL "1")
+# .. variable:: CPACK_WIX_LICENSE_RTF
+#  RTF License File
+#
+#  If CPACK_RESOURCE_FILE_LICENSE has an .rtf extension it is used as-is.
+#
+#  If CPACK_RESOURCE_FILE_LICENSE has an .txt extension it is implicitly
+#  converted to RTF by the WiX Generator.
+#  The expected encoding of the .txt file is UTF-8.
+#
+#  With CPACK_WIX_LICENSE_RTF you can override the license file used by the
+#  WiX Generator in case CPACK_RESOURCE_FILE_LICENSE is in an unsupported
+#  format or the .txt -> .rtf conversion does not work as expected.
+    set (CPACK_RESOURCE_FILE_LICENSE "${SZIP_BINARY_DIR}/COPYING.txt")
+# .. variable:: CPACK_WIX_PRODUCT_ICON
+#  The Icon shown next to the program name in Add/Remove programs.
+#    set(CPACK_WIX_PRODUCT_ICON "${SZIP_RESOURCES_DIR}\\\\hdf.ico")
+#
+# .. variable:: CPACK_WIX_UI_BANNER
+#
+#  The bitmap will appear at the top of all installer pages other than the
+#  welcome and completion dialogs.
+#
+#  If set, this image will replace the default banner image.
+#
+#  This image must be 493 by 58 pixels.
+#
+# .. variable:: CPACK_WIX_UI_DIALOG
+#
+#  Background bitmap used on the welcome and completion dialogs.
+#
+#  If this variable is set, the installer will replace the default dialog
+#  image.
+#
+#  This image must be 493 by 312 pixels.
+#
+  elseif (APPLE)
+    list (APPEND CPACK_GENERATOR "DragNDrop") 
+    set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
+    set (CPACK_PACKAGING_INSTALL_PREFIX "/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
+    if (SZIP_PACK_MACOSX_BUNDLE)
+      list (APPEND CPACK_GENERATOR "Bundle")
+      set (CPACK_BUNDLE_NAME "${SZIP_PACKAGE_STRING}")
+      set (CPACK_BUNDLE_LOCATION "/")    # make sure CMAKE_INSTALL_PREFIX ends in /
+      set (CMAKE_INSTALL_PREFIX "/${CPACK_BUNDLE_NAME}.framework/Versions/${CPACK_PACKAGE_VERSION}/${CPACK_PACKAGE_NAME}/")
+#      set (CPACK_BUNDLE_ICON "${SZIP_RESOURCES_DIR}/SZIP.icns")
+#      set (CPACK_BUNDLE_PLIST "${SZIP_BINARY_DIR}/CMakeFiles/Info.plist")
+      set (CPACK_APPLE_GUI_INFO_STRING "SZIP Library and Utilities")
+      set (CPACK_APPLE_GUI_COPYRIGHT "Copyright © ???. All rights reserved.")
+      set (CPACK_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}")
+      set (CPACK_APPLE_GUI_BUNDLE_NAME "${SZIP_PACKAGE_STRING}")
+      set (CPACK_APPLE_GUI_VERSION_STRING "${CPACK_PACKAGE_VERSION_STRING}")
+      set (CPACK_APPLE_GUI_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}")
+      #-----------------------------------------------------------------------------
+      # Configure the Info.plist file for the install bundle
+      #-----------------------------------------------------------------------------
+#      configure_file (
+#          ${SZIP_RESOURCES_DIR}/CPack.Info.plist.in
+#          ${SZIP_BINARY_DIR}/CMakeFiles/Info.plist @ONLY
+#      )
+#      configure_file (
+#          ${SZIP_RESOURCES_DIR}/PkgInfo.in
+#          ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo @ONLY
+#      )
+#      configure_file (
+#          ${SZIP_RESOURCES_DIR}/version.plist.in
+#          ${SZIP_BINARY_DIR}/CMakeFiles/version.plist @ONLY
+#      )
+#      install (
+#          FILES ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo
+#                ${SZIP_BINARY_DIR}/CMakeFiles/version.plist
+#          DESTINATION ..
+#      )
+    endif (SZIP_PACK_MACOSX_BUNDLE)
   else (WIN32)
-    set (CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+    list (APPEND CPACK_GENERATOR "STGZ") 
+    set (CPACK_PACKAGING_INSTALL_PREFIX "/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
     set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 
     set (CPACK_DEBIAN_PACKAGE_SECTION "Libraries")
     set (CPACK_DEBIAN_PACKAGE_MAINTAINER "${SZIP_PACKAGE_BUGREPORT}")
     
+#      list (APPEND CPACK_GENERATOR "RPM") 
+    set (CPACK_RPM_PACKAGE_RELEASE "1")
     set (CPACK_RPM_COMPONENT_INSTALL ON)
     set (CPACK_RPM_PACKAGE_RELOCATABLE ON)
   endif (WIN32)
   
+
+  # By default, do not warn when built on machines using only VS Express:
+  if (NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
+    set (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+  endif (NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
   include (InstallRequiredSystemLibraries)
 
   set (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;ALL;/")

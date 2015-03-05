@@ -39,6 +39,10 @@ MACRO (TARGET_NAMING libtarget libtype)
     if (${libtype} MATCHES "SHARED")
       set_target_properties (${libtarget} PROPERTIES OUTPUT_NAME "${libtarget}dll")
     endif (${libtype} MATCHES "SHARED")
+  else (WIN32)
+    if (${libtype} MATCHES "SHARED")
+      set_target_properties (${libtarget} PROPERTIES OUTPUT_NAME "${libtarget}${ARGN}")
+    endif (${libtype} MATCHES "SHARED")
   endif (WIN32)
 ENDMACRO (TARGET_NAMING)
 
@@ -125,7 +129,7 @@ MACRO (HDF_IMPORT_SET_LIB_OPTIONS libtarget libname libtype libversion)
   HDF_SET_LIB_OPTIONS (${libtarget} ${libname} ${libtype})
 
   if (${importtype} MATCHES "IMPORT")
-        set (importprefix "${CMAKE_STATIC_LIBRARY_PREFIX}")
+    set (importprefix "${CMAKE_STATIC_LIBRARY_PREFIX}")
   endif (${importtype} MATCHES "IMPORT")
   if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     set (IMPORT_LIB_NAME ${LIB_DEBUG_NAME})
@@ -144,7 +148,7 @@ MACRO (HDF_IMPORT_SET_LIB_OPTIONS libtarget libname libtype libversion)
         set_target_properties (${libtarget} PROPERTIES
             IMPORTED_IMPLIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_IMPORT_LIBRARY_SUFFIX}"
             IMPORTED_LOCATION "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/${CMAKE_IMPORT_LIBRARY_PREFIX}${IMPORT_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        )
+         )
       endif (MINGW)
     else (WIN32)
       if (CYGWIN)
