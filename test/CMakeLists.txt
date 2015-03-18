@@ -19,7 +19,7 @@ set (TEST_LIB_HEADERS
 )
 add_executable (burst_szip ${TEST_LIB_SRCS} ${TEST_LIB_HEADERS})
 TARGET_NAMING (burst_szip ${LIB_TYPE})
-TARGET_C_PROPERTIES (burst_szip " " " ")
+TARGET_C_PROPERTIES (burst_szip ${LIB_TYPE} " " " ")
 target_link_libraries (burst_szip ${SZIP_LIB_TARGET})
 
 #-- Adding test 
@@ -29,7 +29,7 @@ add_test (NAME burst_szip COMMAND $<TARGET_FILE:burst_szip> -msb 8 8 1024 16 ima
 if (SZIP_ENABLE_ENCODING)
   ADD_EXECUTABLE (gentest gentest.c mcgill.c)
   TARGET_NAMING (gentest ${LIB_TYPE})
-  TARGET_C_PROPERTIES (gentest " " " ")
+  TARGET_C_PROPERTIES (gentest ${LIB_TYPE} " " " ")
   target_link_libraries (gentest ${SZIP_LIB_TARGET})
 
   add_test (NAME gentest COMMAND $<TARGET_FILE:gentest>)
@@ -38,7 +38,7 @@ endif (SZIP_ENABLE_ENCODING)
 #-- Adding test for example
 add_executable (example example.c)
 TARGET_NAMING (example ${LIB_TYPE})
-TARGET_C_PROPERTIES (example " " " ")
+TARGET_C_PROPERTIES (example ${LIB_TYPE} " " " ")
 target_link_libraries (example ${SZIP_LIB_TARGET})
 
 add_test (NAME example COMMAND $<TARGET_FILE:example>)

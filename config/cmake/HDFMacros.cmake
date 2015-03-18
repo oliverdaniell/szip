@@ -181,67 +181,51 @@ MACRO (HDF_IMPORT_SET_LIB_OPTIONS libtarget libname libtype libversion)
 ENDMACRO (HDF_IMPORT_SET_LIB_OPTIONS)
 
 #-------------------------------------------------------------------------------
-MACRO (TARGET_C_PROPERTIES wintarget addcompileflags addlinkflags)
+MACRO (TARGET_C_PROPERTIES wintarget libtype addcompileflags addlinkflags)
   if (MSVC)
-    TARGET_MSVC_PROPERTIES (${wintarget} "${addcompileflags} ${WIN_COMPILE_FLAGS}" "${addlinkflags} ${WIN_LINK_FLAGS}")
+    TARGET_MSVC_PROPERTIES (${wintarget} ${libtype} "${addcompileflags} ${WIN_COMPILE_FLAGS}" "${addlinkflags} ${WIN_LINK_FLAGS}")
   else (MSVC)
-    if (BUILD_SHARED_LIBS)
-      set_target_properties (${wintarget}
-          PROPERTIES
-              COMPILE_FLAGS "${addcompileflags}"
-              LINK_FLAGS "${addlinkflags}"
-      ) 
-    else (BUILD_SHARED_LIBS)
-      set_target_properties (${wintarget}
-          PROPERTIES
-              COMPILE_FLAGS "${addcompileflags}"
-              LINK_FLAGS "${addlinkflags}"
-      ) 
-    endif (BUILD_SHARED_LIBS)
+    set_target_properties (${wintarget}
+        PROPERTIES
+            COMPILE_FLAGS "${addcompileflags}"
+            LINK_FLAGS "${addlinkflags}"
+    ) 
   endif (MSVC)
 ENDMACRO (TARGET_C_PROPERTIES)
 
 #-------------------------------------------------------------------------------
-MACRO (TARGET_MSVC_PROPERTIES wintarget addcompileflags addlinkflags)
+MACRO (TARGET_MSVC_PROPERTIES wintarget libtype addcompileflags addlinkflags)
   if (MSVC)
-    if (BUILD_SHARED_LIBS)
-      set_target_properties (${wintarget}
-          PROPERTIES
-              COMPILE_FLAGS "${addcompileflags}"
-              LINK_FLAGS "${addlinkflags}"
-      ) 
-    else (BUILD_SHARED_LIBS)
-      set_target_properties (${wintarget}
-          PROPERTIES
-              COMPILE_FLAGS "${addcompileflags}"
-              LINK_FLAGS "${addlinkflags}"
-      ) 
-    endif (BUILD_SHARED_LIBS)
+    set_target_properties (${wintarget}
+        PROPERTIES
+            COMPILE_FLAGS "${addcompileflags}"
+            LINK_FLAGS "${addlinkflags}"
+    ) 
   endif (MSVC)
 ENDMACRO (TARGET_MSVC_PROPERTIES)
 
 #-------------------------------------------------------------------------------
-MACRO (TARGET_FORTRAN_PROPERTIES forttarget addcompileflags addlinkflags)
+MACRO (TARGET_FORTRAN_PROPERTIES forttarget libtype addcompileflags addlinkflags)
   if (WIN32)
-    TARGET_FORTRAN_WIN_PROPERTIES (${forttarget} "${addcompileflags} ${WIN_COMPILE_FLAGS}" "${addlinkflags} ${WIN_LINK_FLAGS}")
+    TARGET_FORTRAN_WIN_PROPERTIES (${forttarget} ${libtype} "${addcompileflags} ${WIN_COMPILE_FLAGS}" "${addlinkflags} ${WIN_LINK_FLAGS}")
   endif (WIN32)
 ENDMACRO (TARGET_FORTRAN_PROPERTIES)
 
 #-------------------------------------------------------------------------------
-MACRO (TARGET_FORTRAN_WIN_PROPERTIES forttarget addcompileflags addlinkflags)
+MACRO (TARGET_FORTRAN_WIN_PROPERTIES forttarget libtype addcompileflags addlinkflags)
   if (MSVC)
-    if (BUILD_SHARED_LIBS)
+    if (${libtype} MATCHES "SHARED")
       set_target_properties (${forttarget}
           PROPERTIES
               COMPILE_FLAGS "/dll ${addcompileflags}"
               LINK_FLAGS "/SUBSYSTEM:CONSOLE ${addlinkflags}"
       ) 
-    else (BUILD_SHARED_LIBS)
+    else (${libtype} MATCHES "SHARED")
       set_target_properties (${forttarget}
           PROPERTIES
               COMPILE_FLAGS "${addcompileflags}"
               LINK_FLAGS "/SUBSYSTEM:CONSOLE ${addlinkflags}"
       ) 
-    endif (BUILD_SHARED_LIBS)
+    endif (${libtype} MATCHES "SHARED")
   endif (MSVC)
 ENDMACRO (TARGET_FORTRAN_WIN_PROPERTIES)
