@@ -10,7 +10,7 @@
 /* This will only be defined if szip was built with CMake shared libs*/
 #ifdef SZ_BUILT_AS_DYNAMIC_LIB
 
-#if defined (szip_shared_EXPORTS)
+#if defined (szip_EXPORTS)
   #define _SZDLL_
   #if defined (_MSC_VER)  /* MSVC Compiler Case */
     #define __SZ_DLL__ __declspec(dllexport)
