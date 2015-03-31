@@ -44,18 +44,6 @@ SZIP_SET_LIB_OPTIONS (${SZIP_LIB_TARGET} ${SZIP_LIB_NAME} ${LIB_TYPE})
 set (install_targets ${SZIP_LIB_TARGET})
 
 #-----------------------------------------------------------------------------
-# Add file(s) to CMake Install 
-#-----------------------------------------------------------------------------
-install (
-    FILES
-        ${SZIP_PUBLIC_HEADERS}
-    DESTINATION
-        ${SZIP_INSTALL_INCLUDE_DIR}
-    COMPONENT
-        headers
-)
-
-#-----------------------------------------------------------------------------
 # Add Target(s) to CMake Install for import into other projects
 #-----------------------------------------------------------------------------
 if (SZIP_EXPORTED_TARGETS)

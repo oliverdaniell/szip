@@ -8,7 +8,7 @@ PROJECT (SZIP C)
 #-----------------------------------------------------------------------------
 # Define some CMake variables for use later in the project
 #-----------------------------------------------------------------------------
-set (HDF_RESOURCES_DIR           ${SZIP_SOURCE_DIR}/config/cmake)
+set (SZIP_RESOURCES_DIR          ${SZIP_SOURCE_DIR}/config/cmake)
 set (SZIP_SRC_DIR                ${SZIP_SOURCE_DIR}/src)
 set (SZIP_TEST_SOURCE_DIR        ${SZIP_SOURCE_DIR}/test)
 set (SZIP_EXAMPLES_SOURCE_DIR    ${SZIP_SOURCE_DIR}/examples)
