@@ -11,18 +11,18 @@ include (${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
 include (${CMAKE_ROOT}/Modules/CheckVariableExists.cmake)
 
 #-----------------------------------------------------------------------------
-# Always SET this for now IF we are on an OS X box
+# APPLE/Darwin setup
 #-----------------------------------------------------------------------------
 if (APPLE)
   list (LENGTH CMAKE_OSX_ARCHITECTURES ARCH_LENGTH)
   if (ARCH_LENGTH GREATER 1)
     set (CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
-    message(FATAL_ERROR "Building Universal Binaries on OS X is NOT supported by the HDF5 project. This is"
+    message(FATAL_ERROR "Building Universal Binaries on OS X is NOT supported by the SZIP project. This is"
     "due to technical reasons. The best approach would be build each architecture in separate directories"
     "and use the 'lipo' tool to combine them into a single executable or library. The 'CMAKE_OSX_ARCHITECTURES'"
     "variable has been set to a blank value which will build the default architecture for this system.")
   endif ()
-  set (HDF_AC_APPLE_UNIVERSAL_BUILD 0)
+  set (SZIP_AC_APPLE_UNIVERSAL_BUILD 0)
 endif (APPLE)
 
 #-----------------------------------------------------------------------------
@@ -48,10 +48,10 @@ if (WIN32)
     set (CMAKE_REQUIRED_FLAGS "-DWIN32_LEAN_AND_MEAN=1 -DNOGDI=1")
   endif (MINGW)
   set (CMAKE_REQUIRED_LIBRARIES "ws2_32.lib;wsock32.lib")
-  if (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
+  if (NOT UNIX AND NOT MINGW)
     set (WINDOWS 1)
     set (CMAKE_REQUIRED_FLAGS "/DWIN32_LEAN_AND_MEAN=1 /DNOGDI=1")
-  endif (NOT UNIX AND NOT CYGWIN AND NOT MINGW)
+  endif (NOT UNIX AND NOT MINGW)
 endif (WIN32)
 
 if (WINDOWS)
@@ -67,7 +67,6 @@ if (WINDOWS)
   set (HAVE_SYSTEM 1)
   set (HAVE_DIFFTIME 1)
   set (HAVE_LONGJMP 1)
-  set (STDC_HEADERS 1)
   if (NOT MINGW)
     set (HAVE_GETHOSTNAME 1)
   endif (NOT MINGW)
@@ -110,7 +109,7 @@ if (WINDOWS)
 endif (WINDOWS)
 
 # For other other specific tests, use this MACRO.
-MACRO (HDF_FUNCTION_TEST OTHER_TEST)
+MACRO (SZIP_FUNCTION_TEST OTHER_TEST)
   if ("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
     set (MACRO_CHECK_FUNCTION_DEFINITIONS "-D${OTHER_TEST} ${CMAKE_REQUIRED_FLAGS}")
     set (OTHER_TEST_ADD_LIBRARIES)
@@ -118,7 +117,7 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
       set (OTHER_TEST_ADD_LIBRARIES "-DLINK_LIBRARIES:STRING=${CMAKE_REQUIRED_LIBRARIES}")
     endif (CMAKE_REQUIRED_LIBRARIES)
 
-    foreach (def ${HDF_EXTRA_TEST_DEFINITIONS})
+    foreach (def ${SZIP_EXTRA_TEST_DEFINITIONS})
       set (MACRO_CHECK_FUNCTION_DEFINITIONS "${MACRO_CHECK_FUNCTION_DEFINITIONS} -D${def}=${${def}}")
     endforeach (def)
 
@@ -142,7 +141,7 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
     #MESSAGE (STATUS "Performing ${OTHER_TEST}")
     try_compile (${OTHER_TEST}
         ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/HDFTests.c
+        ${SZIP_RESOURCES_DIR}/SZIPTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${MACRO_CHECK_FUNCTION_DEFINITIONS}
         "${OTHER_TEST_ADD_LIBRARIES}"
         OUTPUT_VARIABLE OUTPUT
@@ -159,11 +158,9 @@ MACRO (HDF_FUNCTION_TEST OTHER_TEST)
       )
     endif (${OTHER_TEST})
   endif ("${OTHER_TEST}" MATCHES "^${OTHER_TEST}$")
-ENDMACRO (HDF_FUNCTION_TEST)
+ENDMACRO (SZIP_FUNCTION_TEST)
 
-if (NOT WINDOWS)
-  HDF_FUNCTION_TEST (STDC_HEADERS)
-endif (NOT WINDOWS)
+SZIP_FUNCTION_TEST (STDC_HEADERS)
 
 #-----------------------------------------------------------------------------
 
@@ -223,16 +220,16 @@ CHECK_INCLUDE_FILE_CONCAT ("inttypes.h"      HAVE_INTTYPES_H)
 # The linux-lfs option is deprecated.
 set (LINUX_LFS 0)
 
-set (HDF_EXTRA_FLAGS)
+set (SZIP_EXTRA_FLAGS)
 if (NOT WINDOWS)
   # Linux Specific flags
-  set (HDF_EXTRA_FLAGS -D_POSIX_SOURCE -D_BSD_SOURCE)
-  option (HDF_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
-  if (HDF_ENABLE_LARGE_FILE)
+  set (SZIP_EXTRA_FLAGS -D_POSIX_SOURCE -D_BSD_SOURCE)
+  option (SZIP_ENABLE_LARGE_FILE "Enable support for large (64-bit) files on Linux." ON)
+  if (SZIP_ENABLE_LARGE_FILE)
     set (msg "Performing TEST_LFS_WORKS")
     try_run (TEST_LFS_WORKS_RUN   TEST_LFS_WORKS_COMPILE
         ${CMAKE_BINARY_DIR}
-        ${HDF_RESOURCES_DIR}/HDFTests.c
+        ${SZIP_RESOURCES_DIR}/SZIPTests.c
         CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-DTEST_LFS_WORKS
         OUTPUT_VARIABLE OUTPUT
     )
@@ -240,7 +237,7 @@ if (NOT WINDOWS)
       if (TEST_LFS_WORKS_RUN  MATCHES 0)
         set (TEST_LFS_WORKS 1 CACHE INTERNAL ${msg})
         set (LARGEFILE 1)
-        set (HDF_EXTRA_FLAGS ${HDF_EXTRA_FLAGS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
+        set (SZIP_EXTRA_FLAGS ${SZIP_EXTRA_FLAGS} -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE)
         message (STATUS "${msg}... yes")
       else (TEST_LFS_WORKS_RUN  MATCHES 0)
         set (TEST_LFS_WORKS "" CACHE INTERNAL ${msg})
@@ -256,17 +253,17 @@ if (NOT WINDOWS)
           "Test TEST_LFS_WORKS Compile failed with the following output:\n ${OUTPUT}\n"
       )
     endif (TEST_LFS_WORKS_COMPILE)
-  endif (HDF_ENABLE_LARGE_FILE)
-  set (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${HDF_EXTRA_FLAGS})
+  endif (SZIP_ENABLE_LARGE_FILE)
+  set (CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS} ${SZIP_EXTRA_FLAGS})
 endif (NOT WINDOWS)
 
-ADD_DEFINITIONS (${HDF_EXTRA_FLAGS})
+add_definitions (${SZIP_EXTRA_FLAGS})
 
 if (NOT WINDOWS OR MINGW)
   #-----------------------------------------------------------------------------
   # Check for HAVE_OFF64_T functionality
   #-----------------------------------------------------------------------------
-  HDF_FUNCTION_TEST (HAVE_OFF64_T)
+  SZIP_FUNCTION_TEST (HAVE_OFF64_T)
   if (HAVE_OFF64_T)
     CHECK_FUNCTION_EXISTS (lseek64            HAVE_LSEEK64)
     CHECK_FUNCTION_EXISTS (fseeko64           HAVE_FSEEKO64)
@@ -277,7 +274,7 @@ if (NOT WINDOWS OR MINGW)
   CHECK_FUNCTION_EXISTS (fseeko               HAVE_FSEEKO)
   CHECK_FUNCTION_EXISTS (ftello               HAVE_FTELLO)
 
-  HDF_FUNCTION_TEST (HAVE_STAT64_STRUCT)
+  SZIP_FUNCTION_TEST (HAVE_STAT64_STRUCT)
   if (HAVE_STAT64_STRUCT)
     CHECK_FUNCTION_EXISTS (fstat64            HAVE_FSTAT64)
     CHECK_FUNCTION_EXISTS (stat64             HAVE_STAT64)
@@ -286,12 +283,12 @@ if (NOT WINDOWS OR MINGW)
   #-----------------------------------------------------------------------------
   # Check if the dev_t type is a scalar type
   #-----------------------------------------------------------------------------
-  HDF_FUNCTION_TEST (DEV_T_IS_SCALAR)
+  SZIP_FUNCTION_TEST (DEV_T_IS_SCALAR)
 
   # ----------------------------------------------------------------------
   # Does the struct stat have the st_blocks field?  This field is not Posix.
   #
-  HDF_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
+  SZIP_FUNCTION_TEST (HAVE_STAT_ST_BLOCKS)
   
 endif (NOT WINDOWS OR MINGW)
 
@@ -331,9 +328,9 @@ CHECK_FUNCTION_EXISTS (vasprintf         HAVE_VASPRINTF)
 
 CHECK_FUNCTION_EXISTS (vsnprintf         HAVE_VSNPRINTF)
 if (NOT WINDOWS)
-  if (H5_HAVE_VSNPRINTF)
-    HDF5_FUNCTION_TEST (VSNPRINTF_WORKS)
-  endif (H5_HAVE_VSNPRINTF)
+  if (HAVE_VSNPRINTF)
+    SZIP_FUNCTION_TEST (VSNPRINTF_WORKS)
+  endif (HAVE_VSNPRINTF)
   foreach (test
       HAVE_ATTRIBUTE
       HAVE_C99_FUNC
@@ -342,7 +339,7 @@ if (NOT WINDOWS)
       SYSTEM_SCOPE_THREADS
       CXX_HAVE_OFFSETOF
   )
-    HDF_FUNCTION_TEST (${test})
+    SZIP_FUNCTION_TEST (${test})
   endforeach (test)
 endif (NOT WINDOWS)
 

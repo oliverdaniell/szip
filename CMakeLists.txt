@@ -76,8 +76,7 @@ set (SZIP_PACKAGE_BUGREPORT "help@hdfgroup.org")
 #-----------------------------------------------------------------------------
 # Include some macros for reusable code
 #-----------------------------------------------------------------------------
-include (${HDF_RESOURCES_DIR}/HDFMacros.cmake)
-include (${HDF_RESOURCES_DIR}/SZIPMacros.cmake)
+include (${SZIP_RESOURCES_DIR}/SZIPMacros.cmake)
 
 #-----------------------------------------------------------------------------
 # Setup output Directories
@@ -118,7 +117,7 @@ set_global_variable (SZIP_LIBRARIES_TO_EXPORT "")
 #-----------------------------------------------------------------------------
 # Run all the CMake configuration tests for our build environment
 #-----------------------------------------------------------------------------
-include (${HDF_RESOURCES_DIR}/ConfigureChecks.cmake)
+include (${SZIP_RESOURCES_DIR}/ConfigureChecks.cmake)
 
 #-----------------------------------------------------------------------------
 # Option to enable encoding
@@ -239,7 +238,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
   install (
       EXPORT ${SZIP_EXPORTED_TARGETS}
       DESTINATION ${SZIP_INSTALL_CMAKE_DIR}
-      FILE ${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+      FILE ${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-targets.cmake
       COMPONENT configinstall
   )
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
@@ -250,7 +249,7 @@ endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 if (NOT SZIP_EXTERNALLY_CONFIGURED)
   export (
       TARGETS ${SZIP_LIBRARIES_TO_EXPORT} ${SZIP_LIB_DEPENDENCIES}
-      FILE ${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-targets.cmake
+      FILE ${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-targets.cmake
   )
   export (PACKAGE ${SZIP_PACKAGE}${HDF_PACKAGE_EXT})
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
@@ -276,8 +275,8 @@ set(INCLUDE_INSTALL_DIR ${SZIP_INSTALL_INCLUDE_DIR} )
 set(SHARE_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SZIP_INSTALL_CMAKE_DIR}" )
 set(CURRENT_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}" )
 configure_package_config_file (
-    ${HDF_RESOURCES_DIR}/szip-config.cmake.in
-    "${SZIP_BINARY_DIR}/${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
+    ${SZIP_RESOURCES_DIR}/szip-config.cmake.in
+    "${SZIP_BINARY_DIR}/${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-config.cmake"
     INSTALL_DESTINATION "${SZIP_INSTALL_CMAKE_DIR}"
     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
     INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}"
@@ -290,14 +289,14 @@ set(INCLUDE_INSTALL_DIR ${SZIP_INSTALL_INCLUDE_DIR} )
 set(SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${SZIP_INSTALL_CMAKE_DIR}" )
 set(CURRENT_BUILD_DIR "${CMAKE_INSTALL_PREFIX}" )
 configure_package_config_file (
-    ${HDF_RESOURCES_DIR}/szip-config.cmake.in
-    "${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake"
+    ${SZIP_RESOURCES_DIR}/szip-config.cmake.in
+    "${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-config.cmake"
     INSTALL_DESTINATION "${SZIP_INSTALL_CMAKE_DIR}"
     PATH_VARS INCLUDE_INSTALL_DIR SHARE_INSTALL_DIR CURRENT_BUILD_DIR
 )
 if (NOT SZIP_EXTERNALLY_CONFIGURED)
   install (
-      FILES ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-config.cmake
+      FILES ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-config.cmake
       DESTINATION ${SZIP_INSTALL_CMAKE_DIR}
       COMPONENT configinstall
   )
@@ -308,11 +307,11 @@ endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 #-----------------------------------------------------------------------------
 if (NOT SZIP_EXTERNALLY_CONFIGURED)
   configure_file (
-      ${HDF_RESOURCES_DIR}/szip-config-version.cmake.in
-      ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-config-version.cmake @ONLY
+      ${SZIP_RESOURCES_DIR}/szip-config-version.cmake.in
+      ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-config-version.cmake @ONLY
   )
   install (
-      FILES ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${HDF_PACKAGE_EXT}-config-version.cmake
+      FILES ${SZIP_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${SZIP_PACKAGE}${SZIP_PACKAGE_EXT}-config-version.cmake
       DESTINATION ${SZIP_INSTALL_CMAKE_DIR}
       COMPONENT configinstall
   )
@@ -402,7 +401,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
     set (CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_VENDOR}\\\\${CPACK_PACKAGE_NAME}\\\\${CPACK_PACKAGE_VERSION}")
     set (CPACK_NSIS_CONTACT "${SZIP_PACKAGE_BUGREPORT}")
     set (CPACK_NSIS_MODIFY_PATH ON)
-    set (CPACK_NSIS_PACKAGE_NAME "SZIP ${SZIP_PACKAGE_VERSION}")
+
     if (WIX_EXECUTABLE)    
       list (APPEND CPACK_GENERATOR "WIX") 
     endif (WIX_EXECUTABLE)    
@@ -547,7 +546,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
       DISPLAY_NAME "SZIP CMake files" 
       DEPENDS libraries
       GROUP Development
-      INSTALL_TYPES Full Developer
+      INSTALL_TYPES Full Developer User
   )
   
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
