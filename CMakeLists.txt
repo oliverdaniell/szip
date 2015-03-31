@@ -216,7 +216,7 @@ endif (BUILD_TESTING)
 #-----------------------------------------------------------------------------
 # Generate the SZconfig.h file containing user settings needed by compilation
 #-----------------------------------------------------------------------------
-configure_file (${HDF_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h @ONLY)
+configure_file (${SZIP_RESOURCES_DIR}/SZconfig.h.in ${SZIP_BINARY_DIR}/SZconfig.h @ONLY)
 
 include (CMakePackageConfigHelpers)
 
