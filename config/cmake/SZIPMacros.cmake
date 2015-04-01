@@ -159,7 +159,7 @@ macro (SZIP_SET_BASE_OPTIONS libtarget libname libtype)
     )
   endif (MINGW AND ${libtype} MATCHES "SHARED")
 
-endmacro (SZIP_BASE_LIB_OPTIONS)
+endmacro (SZIP_SET_BASE_OPTIONS)
 
 #-------------------------------------------------------------------------------
 macro (SZIP_IMPORT_SET_LIB_OPTIONS libtarget libname libtype libversion)
