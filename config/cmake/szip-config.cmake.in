@@ -35,3 +35,5 @@ if (NOT TARGET "@SZIP_PACKAGE@")
 endif ()
 
 check_required_components (${SZIP_PACKAGE_NAME})
+
+set (${SZIP_PACKAGE_NAME}_LIBRARIES ${SZIP_PACKAGE_NAME}_EXPORT_LIBRARIES)
