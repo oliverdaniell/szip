@@ -328,7 +328,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
           ${SZIP_SOURCE_DIR}/INSTALL
           ${SZIP_SOURCE_DIR}/RELEASE.txt
       DESTINATION ${SZIP_INSTALL_DATA_DIR}
-      COMPONENT hdfdocuments
+      COMPONENT documents
   )
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 
@@ -504,12 +504,14 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
   endif (NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
   include (InstallRequiredSystemLibraries)
 
-  set (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;ALL;/")
+  set (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;libraries;/")
+  set (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;headers;/")
+  set (CPACK_INSTALL_CMAKE_PROJECTS "${SZIP_BINARY_DIR};SZIP;configinstall;/")
 
   set (CPACK_ALL_INSTALL_TYPES Full Developer User)
   set (CPACK_INSTALL_TYPE_FULL_DISPLAY_NAME "Everything")
 
-  set(CPACK_COMPONENTS_ALL libraries headers hdfdocuments configinstall)
+  set(CPACK_COMPONENTS_ALL libraries headers documents configinstall)
   
   include (CPack)
 
@@ -537,7 +539,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
       GROUP Development
       INSTALL_TYPES Full Developer
   )
-  cpack_add_component (hdfdocuments 
+  cpack_add_component (documents 
       DISPLAY_NAME "SZIP Documents"
       GROUP Documents
       INSTALL_TYPES Full Developer
