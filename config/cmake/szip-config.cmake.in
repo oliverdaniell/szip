@@ -8,6 +8,7 @@ string(TOUPPER @SZIP_PACKAGE@ SZIP_PACKAGE_NAME)
 #-----------------------------------------------------------------------------
 # User Options
 #-----------------------------------------------------------------------------
+set (${SZIP_PACKAGE_NAME}_ENABLE_ENCODING      @SZIP_ENABLE_ENCODING@)
 set (${SZIP_PACKAGE_NAME}_BUILD_SHARED_LIBS    @BUILD_SHARED_LIBS@)
 set (${SZIP_PACKAGE_NAME}_EXPORT_LIBRARIES     @SZIP_LIBRARIES_TO_EXPORT@)
 
