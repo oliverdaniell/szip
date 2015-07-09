@@ -30,6 +30,18 @@ macro (SZIP_SET_LIB_OPTIONS libtarget libname libtype)
           BUILD_WITH_INSTALL_RPATH ${SZIP_BUILD_WITH_INSTALL_NAME}
       )
     endif (SZIP_BUILD_WITH_INSTALL_NAME)
+    if (SZIP_BUILD_FRAMEWORKS)
+      if (${libtype} MATCHES "SHARED")
+        # adapt target to build frameworks instead of dylibs
+        set_target_properties(${libtarget} PROPERTIES
+            XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+            FRAMEWORK TRUE
+            FRAMEWORK_VERSION ${SZIP_PACKAGE_VERSION_MAJOR}
+            MACOSX_FRAMEWORK_IDENTIFIER org.hdfgroup.${libtarget}
+            MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${SZIP_PACKAGE_VERSION_MAJOR}
+            MACOSX_FRAMEWORK_BUNDLE_VERSION ${SZIP_PACKAGE_VERSION_MAJOR})
+      endif (${libtype} MATCHES "SHARED")
+    endif (SZIP_BUILD_FRAMEWORKS)
   endif (APPLE)
 
 endmacro (SZIP_SET_LIB_OPTIONS)
@@ -57,7 +69,7 @@ endmacro (IDE_GENERATED_PROPERTIES)
 macro (IDE_SOURCE_PROPERTIES SOURCE_PATH HEADERS SOURCES)
   #  install (FILES ${HEADERS}
   #       DESTINATION include/R3D/${NAME}
-  #       COMPONENT Headers       
+  #       COMPONENT Headers
   #  )
 
   string (REPLACE "/" "\\\\" source_group_path ${SOURCE_PATH}  )
@@ -140,7 +152,7 @@ macro (SZIP_SET_BASE_OPTIONS libtarget libname libtype)
       endif (CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE)
     endif (WIN32)
   endif (${libtype} MATCHES "SHARED")
-  
+
   set_target_properties (${libtarget}
       PROPERTIES
       OUTPUT_NAME_DEBUG          ${LIB_DEBUG_NAME}
@@ -148,7 +160,7 @@ macro (SZIP_SET_BASE_OPTIONS libtarget libname libtype)
       OUTPUT_NAME_MINSIZEREL     ${LIB_RELEASE_NAME}
       OUTPUT_NAME_RELWITHDEBINFO ${LIB_RELEASE_NAME}
   )
-  
+
   #----- Use MSVC Naming conventions for Shared Libraries
   if (MINGW AND ${libtype} MATCHES "SHARED")
     set_target_properties (${libtarget}
@@ -226,7 +238,7 @@ macro (TARGET_C_PROPERTIES wintarget libtype addcompileflags addlinkflags)
         PROPERTIES
             COMPILE_FLAGS "${addcompileflags}"
             LINK_FLAGS "${addlinkflags}"
-    ) 
+    )
   endif (MSVC)
 endmacro (TARGET_C_PROPERTIES)
 
@@ -237,6 +249,6 @@ macro (TARGET_MSVC_PROPERTIES wintarget libtype addcompileflags addlinkflags)
         PROPERTIES
             COMPILE_FLAGS "${addcompileflags}"
             LINK_FLAGS "${addlinkflags}"
-    ) 
+    )
   endif (MSVC)
 endmacro (TARGET_MSVC_PROPERTIES)

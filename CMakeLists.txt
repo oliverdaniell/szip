@@ -39,6 +39,10 @@ if (NOT SZIP_INSTALL_INCLUDE_DIR)
 endif (NOT SZIP_INSTALL_INCLUDE_DIR)
 if (NOT SZIP_INSTALL_DATA_DIR)
   if (NOT WIN32)
+    if (APPLE)
+      option (SZIP_BUILD_FRAMEWORKS "Create a Mac OSX Framework" OFF)
+      set (SZIP_INSTALL_FWRK_DIR ${CMAKE_INSTALL_FRAMEWORK_PREFIX})
+    endif (APPLE)
     set (SZIP_INSTALL_DATA_DIR share)
     set (SZIP_INSTALL_CMAKE_DIR share/cmake)
   else (NOT WIN32)
@@ -101,7 +105,7 @@ endif (NOT SZIP_EXTERNALLY_CONFIGURED)
 
 #-----------------------------------------------------------------------------
 # Targets built within this project are exported at Install time for use
-# by other projects using FindSZIP. 
+# by other projects using FindSZIP.
 #-----------------------------------------------------------------------------
 if (NOT SZIP_EXPORTED_TARGETS)
   set (SZIP_EXPORTED_TARGETS "szip-targets")
@@ -372,13 +376,13 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
   set (CPACK_PACKAGE_DESCRIPTION_SUMMARY "szip Installation")
   set (CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_VENDOR}/${CPACK_PACKAGE_NAME}/${CPACK_PACKAGE_VERSION}")
 
-  set (CPACK_GENERATOR "TGZ") 
+  set (CPACK_GENERATOR "TGZ")
   if (WIN32)
-    set (CPACK_GENERATOR "ZIP") 
+    set (CPACK_GENERATOR "ZIP")
 
-    if (NSIS_EXECUTABLE)    
-      list (APPEND CPACK_GENERATOR "NSIS") 
-    endif (NSIS_EXECUTABLE)    
+    if (NSIS_EXECUTABLE)
+      list (APPEND CPACK_GENERATOR "NSIS")
+    endif (NSIS_EXECUTABLE)
     # Installers for 32- vs. 64-bit CMake:
     #  - Root install directory (displayed to end user at installer-run time)
     #  - "NSIS package/display name" (text used in the installer GUI)
@@ -402,9 +406,9 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
     set (CPACK_NSIS_CONTACT "${SZIP_PACKAGE_BUGREPORT}")
     set (CPACK_NSIS_MODIFY_PATH ON)
 
-    if (WIX_EXECUTABLE)    
-      list (APPEND CPACK_GENERATOR "WIX") 
-    endif (WIX_EXECUTABLE)    
+    if (WIX_EXECUTABLE)
+      list (APPEND CPACK_GENERATOR "WIX")
+    endif (WIX_EXECUTABLE)
 #WiX variables
     set (CPACK_WIX_UNINSTALL "1")
 # .. variable:: CPACK_WIX_LICENSE_RTF
@@ -443,60 +447,46 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
 #  This image must be 493 by 312 pixels.
 #
   elseif (APPLE)
-    list (APPEND CPACK_GENERATOR "DragNDrop") 
+    list (APPEND CPACK_GENERATOR "DragNDrop")
     set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
     set (CPACK_PACKAGING_INSTALL_PREFIX "/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
     #set (CPACK_PACKAGE_ICON "${SZIP_RESOURCES_DIR}/hdf.icns")
 
-    option (SZIP_PACK_MACOSX_BUNDLE  "Package the SZIP Library in a Bundle" OFF)
-    if (SZIP_PACK_MACOSX_BUNDLE)
-      list (APPEND CPACK_GENERATOR "Bundle")
+    option (SZIP_PACK_MACOSX_FRAMEWORK  "Package the SZIP Library in a Bundle" OFF)
+    if (SZIP_PACK_MACOSX_FRAMEWORK AND SZIP_BUILD_FRAMEWORKS)
       set (CPACK_BUNDLE_NAME "${SZIP_PACKAGE_STRING}")
       set (CPACK_BUNDLE_LOCATION "/")    # make sure CMAKE_INSTALL_PREFIX ends in /
       set (CMAKE_INSTALL_PREFIX "/${CPACK_BUNDLE_NAME}.framework/Versions/${CPACK_PACKAGE_VERSION}/${CPACK_PACKAGE_NAME}/")
-#      set (CPACK_BUNDLE_ICON "${SZIP_RESOURCES_DIR}/SZIP.icns")
-#      set (CPACK_BUNDLE_PLIST "${SZIP_BINARY_DIR}/CMakeFiles/Info.plist")
-      set (CPACK_APPLE_GUI_INFO_STRING "SZIP Library and Utilities")
-      set (CPACK_APPLE_GUI_COPYRIGHT "Copyright © ???. All rights reserved.")
       set (CPACK_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}")
-      set (CPACK_APPLE_GUI_BUNDLE_NAME "${SZIP_PACKAGE_STRING}")
-      set (CPACK_APPLE_GUI_VERSION_STRING "${CPACK_PACKAGE_VERSION_STRING}")
-      set (CPACK_APPLE_GUI_SHORT_VERSION_STRING "${CPACK_PACKAGE_VERSION}")
       #-----------------------------------------------------------------------------
       # Configure the Info.plist file for the install bundle
       #-----------------------------------------------------------------------------
-#      configure_file (
-#          ${SZIP_RESOURCES_DIR}/CPack.Info.plist.in
-#          ${SZIP_BINARY_DIR}/CMakeFiles/Info.plist @ONLY
-#      )
-#      configure_file (
-#          ${SZIP_RESOURCES_DIR}/PkgInfo.in
-#          ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo @ONLY
-#      )
-#      configure_file (
-#          ${SZIP_RESOURCES_DIR}/version.plist.in
-#          ${SZIP_BINARY_DIR}/CMakeFiles/version.plist @ONLY
-#      )
-#      install (
-#          FILES ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo
-#                ${SZIP_BINARY_DIR}/CMakeFiles/version.plist
-#          DESTINATION ..
-#      )
-    endif (SZIP_PACK_MACOSX_BUNDLE)
+      configure_file (
+          ${SZIP_RESOURCES_DIR}/CPack.Info.plist.in
+          ${SZIP_BINARY_DIR}/CMakeFiles/Info.plist @ONLY
+      )
+      configure_file (
+          ${SZIP_RESOURCES_DIR}/PkgInfo.in
+          ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo @ONLY
+      )
+      install (
+          FILES ${SZIP_BINARY_DIR}/CMakeFiles/PkgInfo
+          DESTINATION ..
+      )
+    endif (SZIP_PACK_MACOSX_FRAMEWORK AND SZIP_BUILD_FRAMEWORKS)
   else (WIN32)
-    list (APPEND CPACK_GENERATOR "STGZ") 
+    list (APPEND CPACK_GENERATOR "STGZ")
     set (CPACK_PACKAGING_INSTALL_PREFIX "/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
     set (CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 
     set (CPACK_DEBIAN_PACKAGE_SECTION "Libraries")
     set (CPACK_DEBIAN_PACKAGE_MAINTAINER "${SZIP_PACKAGE_BUGREPORT}")
-    
-#      list (APPEND CPACK_GENERATOR "RPM") 
+
+#      list (APPEND CPACK_GENERATOR "RPM")
     set (CPACK_RPM_PACKAGE_RELEASE "1")
     set (CPACK_RPM_COMPONENT_INSTALL ON)
     set (CPACK_RPM_PACKAGE_RELOCATABLE ON)
   endif (WIN32)
-  
 
   # By default, do not warn when built on machines using only VS Express:
   if (NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
@@ -512,7 +502,7 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
   set (CPACK_INSTALL_TYPE_FULL_DISPLAY_NAME "Everything")
 
   set(CPACK_COMPONENTS_ALL libraries headers documents configinstall)
-  
+
   include (CPack)
 
   cpack_add_component_group(Runtime)
@@ -527,29 +517,28 @@ if (NOT SZIP_EXTERNALLY_CONFIGURED)
       DESCRIPTION "All of the tools you'll need to develop applications"
   )
 
-  cpack_add_component (libraries 
+  cpack_add_component (libraries
       DISPLAY_NAME "SZIP Libraries"
       REQUIRED
       GROUP Runtime
       INSTALL_TYPES Full Developer User
   )
-  cpack_add_component (headers 
-      DISPLAY_NAME "SZIP Headers" 
+  cpack_add_component (headers
+      DISPLAY_NAME "SZIP Headers"
       DEPENDS libraries
       GROUP Development
       INSTALL_TYPES Full Developer
   )
-  cpack_add_component (documents 
+  cpack_add_component (documents
       DISPLAY_NAME "SZIP Documents"
       GROUP Documents
       INSTALL_TYPES Full Developer
   )
-  cpack_add_component (configinstall 
-      DISPLAY_NAME "SZIP CMake files" 
+  cpack_add_component (configinstall
+      DISPLAY_NAME "SZIP CMake files"
       DEPENDS libraries
       GROUP Development
       INSTALL_TYPES Full Developer User
   )
-  
+
 endif (NOT SZIP_EXTERNALLY_CONFIGURED)
-  
